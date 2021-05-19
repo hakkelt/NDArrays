@@ -10,7 +10,7 @@ import java.util.stream.Collector;
 import org.apache.commons.math3.complex.Complex;
 import org.itk.simple.Image;
 
-import rs2d.spinlab.data.DataSet;
+import rs2d.spinlab.data.DataSetInterface;
 
 /**
  * N-dimensional arrays holding double-precision (64bit) complex values.
@@ -181,7 +181,7 @@ public class ComplexF64NDArray extends ComplexNDArray {
      * 
      * @param dataSet an RS2D DataSet from which elements are copied from
      */
-    public ComplexF64NDArray(DataSet dataSet)
+    public ComplexF64NDArray(DataSetInterface dataSet)
         { super(dataSet); }
 
     /**

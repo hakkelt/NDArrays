@@ -1,18 +1,15 @@
 # Java Interface for BART
 
-The aim of the code inside this directory is to provide an easy way to call BART commands natively from Java.
+N-dimensional arrays holding either complex or real values.
 
-## Prerequirements
+This interface can be parametrized with the following types: Float, Double, and Complex from org.apache.commons.math3.complex.
 
-- BART repository need to be cloned into the parent directory (../bart)
-- MSYS2 need to be installed (see: https://www.msys2.org/)
-- BART need to be compiled with MSYS2 (cd ../bart; ./msys_setup.sh; make; cd ../bartConnector)
+The purpuse of this datatype is two-fold:
+ 1. Provide an easy way to handle multidimensional data,
+ 2. Help easy conversion between RS2D and Simple ITK data and BART.
 
-## Modifying the interface
+## Documentation
 
-- If you change or extend the 
+Run `mvn javadoc:javadoc` and open `docs/index.html`
 
-## Installation
-
-pacman -S python-pip
-pip install pycparser
+Examples: See tests in src/test/java/com/mediso/mri/utils.

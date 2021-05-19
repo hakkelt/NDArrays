@@ -5,6 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.stream.IntStream;
+
+import org.itk.simple.Image;
+import org.itk.simple.VectorUInt32;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -371,6 +375,16 @@ public class TestRealF64NDArraySlice {
         Exception exception = assertThrows(UnsupportedOperationException.class, () -> slice2.toRS2DDataSet());
         assertEquals(String.format(AbstractNDArray.ERROR_RS2D_DATA_SET_TOO_HIGH_DIMENSIONAL, 6),
                      exception.getMessage());
+    }
+    
+    @Test
+    void testToSimpleITKImage() {
+        Image image = slice.toSimpleITKImage();
+        slice.streamCartesianIndices().forEach(index -> {
+            VectorUInt32 idx = new VectorUInt32(slice.ndims());
+            IntStream.range(0, slice.ndims()).forEach(i -> idx.set(i, index[i]));
+            assertEquals(slice.get(index).doubleValue(), image.getPixelAsDouble(idx));
+        });
     }
 
     @Test

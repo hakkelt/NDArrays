@@ -24,7 +24,6 @@ import org.itk.simple.Image;
 import org.itk.simple.PixelIDValueEnum;
 import org.itk.simple.VectorUInt32;
 
-import kotlin.UninitializedPropertyAccessException;
 import rs2d.spinlab.data.DataSet;
 import rs2d.spinlab.tools.param.ModalityEnum;
 
@@ -79,6 +78,8 @@ abstract class AbstractNDArray<T> extends AbstractCollection<T> implements NDArr
         "Cannot drop dimension %d because it is not singleton!";
     protected static final String ERROR_COPY_FROM_COMPLEX_UNSUPPORTED =
         "Cannot assign imaginary part to this real array!";
+    protected static final String ERROR_UNINITIALIZED_BART_DIMS =
+        "Meanings of dimension aren't specified yet!";
 
     class NDArrayIterator implements Iterator<T> {
         int current = 0;
@@ -284,7 +285,7 @@ abstract class AbstractNDArray<T> extends AbstractCollection<T> implements NDArr
     public NDArray<T> slice(Object ...slicingExpressions) {
         for (int i = 0; i < slicingExpressions.length; i++)
             if (slicingExpressions[i] instanceof String && slicingExpressions[i] != ":")
-                slicingExpressions[i] = parseRange((String)slicingExpressions[i]);
+                slicingExpressions[i] = parseRange((String)slicingExpressions[i], i);
         return new NDArraySliceView<>(this, slicingExpressions);
     }
 
@@ -457,17 +458,17 @@ abstract class AbstractNDArray<T> extends AbstractCollection<T> implements NDArr
         for (int i = 0; i < ndims(); i++)
             size.set(i, dims[i]);
         Image image;
-        image = new Image(size, dataTypeAsString().equals("RealF32") ?
+        image = new Image(size, eltype() == Float.class ?
             PixelIDValueEnum.sitkFloat32 :
             PixelIDValueEnum.sitkFloat64);
-        VectorUInt32 index = new VectorUInt32(ndims());
-        for (T item : this) {
-            if (dataTypeAsString().equals("RealF32"))
-                image.setPixelAsFloat(index, ((Float)item).floatValue());
+        streamCartesianIndices().forEach(index -> {
+            VectorUInt32 idx = new VectorUInt32(ndims());
+            IntStream.range(0, ndims()).forEach(i -> idx.set(i, index[i]));
+            if (eltype() == Float.class)
+                image.setPixelAsFloat(idx, (float)getReal(index));
             else
-                image.setPixelAsDouble(index, ((Double)item).doubleValue());
-            incrementSimpleITKIndex(index, 0);
-        }
+                image.setPixelAsDouble(idx, getReal(index));
+        });
         return image;
     }
 
@@ -540,7 +541,7 @@ abstract class AbstractNDArray<T> extends AbstractCollection<T> implements NDArr
     
     public NDArray<T> copyFrom(float[] real, float[] imag) {
         if (eltype() != Complex.class)
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException(ERROR_COPY_FROM_COMPLEX_UNSUPPORTED);
         flatten(real, imag, 0, 0);
         return this;
     }
@@ -590,7 +591,7 @@ abstract class AbstractNDArray<T> extends AbstractCollection<T> implements NDArr
     
     public BartDimsEnum[] getBartDims() {
         if (!areBartDimsSpecified)
-            throw new UninitializedPropertyAccessException();
+            throw new IllegalArgumentException(ERROR_UNINITIALIZED_BART_DIMS);
         return bartDims;
     }
     
@@ -653,12 +654,12 @@ abstract class AbstractNDArray<T> extends AbstractCollection<T> implements NDArr
     }
 
     
-    protected NDArraySliceView.Range parseRange(String str) {
+    protected NDArraySliceView.Range parseRange(String str, int dimension) {
         final Pattern r = Pattern.compile("(\\d*):(\\d*)");
         Matcher m = r.matcher(str);
         if (m.find()) {
             int start = m.group(1).equals("") ? 0 : Integer.parseInt(m.group(1));
-            int end = m.group(2).equals("") ? -1 : Integer.parseInt(m.group(2));
+            int end = m.group(2).equals("") ? dims(dimension) : Integer.parseInt(m.group(2));
             return new NDArraySliceView.Range(start, end);
         } else {
             throw new IllegalArgumentException(String.format(ERROR_INVALID_RANGE_EXPRESSION, str));

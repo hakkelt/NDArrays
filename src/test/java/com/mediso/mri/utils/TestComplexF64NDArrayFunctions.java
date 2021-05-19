@@ -587,6 +587,11 @@ public class TestComplexF64NDArrayFunctions {
     }
 
     @Test
+    void testToSimpleITKImage() {
+        assertThrows(UnsupportedOperationException.class, () -> array.toSimpleITKImage());
+    }
+
+    @Test
     public void testConcatenate() {
         NDArray<Complex> array2 = new ComplexF64NDArray(new int[]{4, 2, 3}).fill(1);
         NDArray<Complex> array3 = array.concatenate(1, array2);

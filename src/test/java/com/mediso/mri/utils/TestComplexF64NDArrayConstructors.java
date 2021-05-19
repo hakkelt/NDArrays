@@ -7,9 +7,13 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import java.util.Arrays;
 
 import org.apache.commons.math3.complex.Complex;
+import org.itk.simple.Image;
+import org.itk.simple.PixelIDValueEnum;
+import org.itk.simple.VectorUInt32;
 import org.junit.jupiter.api.Test;
 
 import rs2d.spinlab.data.DataSet;
+import rs2d.spinlab.data.DataSetInterface;
 import rs2d.spinlab.tools.param.ModalityEnum;
 
 public class TestComplexF64NDArrayConstructors {
@@ -307,7 +311,7 @@ public class TestComplexF64NDArrayConstructors {
 
     @Test
     public void testRS2DConstructor() {
-        DataSet dataSet = new DataSet(4, 5, 3, 6, 2, ModalityEnum.MRI);
+        DataSetInterface dataSet = new DataSet(4, 5, 3, 6, 2, ModalityEnum.MRI);
         float[][][][] realPart = new float[4][5][3][6];
         float[][][][] imagPart = new float[4][5][3][6];
         for (float[][][] image3D : realPart)
@@ -324,5 +328,30 @@ public class TestComplexF64NDArrayConstructors {
         NDArray<Complex> array = new ComplexF64NDArray(dataSet);
         for (Complex item : array)
             assertEquals(new Complex(0.5, -0.5), item);
+    }
+    
+    @Test
+    public void testSimpleITKConstructor() {
+        VectorUInt32 size = new VectorUInt32(3);
+        size.set(0, 4);
+        size.set(1, 5);
+        size.set(2, 3);
+        Image image = new Image(size, PixelIDValueEnum.sitkFloat64);
+        int counter = 0;
+        for (int k = 0; k < 3; k++)
+            for (int j = 0; j < 5; j++)
+                for (int i = 0; i < 4; i++) {
+                    VectorUInt32 idx = new VectorUInt32(3);
+                    idx.set(0, i);
+                    idx.set(1, j);
+                    idx.set(2, k);
+                    image.setPixelAsDouble(idx, counter++);
+                }
+        NDArray<Complex> array = new ComplexF64NDArray(image);
+        counter = 0;
+        for (int k = 0; k < 3; k++)
+            for (int j = 0; j < 5; j++)
+                for (int i = 0; i < 4; i++)
+                    assertEquals(new Complex(counter++, 0), array.get(i, j, k));
     }
 }

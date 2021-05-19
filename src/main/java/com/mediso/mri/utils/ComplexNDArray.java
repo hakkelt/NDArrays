@@ -7,10 +7,11 @@ import java.util.stream.IntStream;
 
 import org.apache.commons.math3.complex.Complex;
 import org.itk.simple.Image;
+import org.itk.simple.PixelIDValueEnum;
 import org.itk.simple.VectorUInt32;
 
 import rs2d.spinlab.data.Data;
-import rs2d.spinlab.data.DataSet;
+import rs2d.spinlab.data.DataSetInterface;
 import rs2d.spinlab.tools.param.DefaultParams;
 
 abstract class ComplexNDArray extends AbstractNDArray<Complex> {
@@ -98,7 +99,7 @@ abstract class ComplexNDArray extends AbstractNDArray<Complex> {
         copyFrom(array);
     }
 
-    protected ComplexNDArray(DataSet dataSet) {
+    protected ComplexNDArray(DataSetInterface dataSet) {
 
         // Calculate data dimensions
         int receiverCount = ((Number)dataSet.getHeader().getParam(DefaultParams.RECEIVER_COUNT).getValue()).intValue();
@@ -123,11 +124,13 @@ abstract class ComplexNDArray extends AbstractNDArray<Complex> {
         VectorUInt32 size = image.getSize();
         int[] dims = IntStream.range(0, (int)size.size()).map(i -> (int)size.get(i)).toArray();
         baseConstructor(dims);
-        VectorUInt32 idx = image.getSize();        
-        streamLinearIndices().parallel().forEach(linearIndex -> {
-            int[] index = linearIndexToCartesianIndices(linearIndex, multipliers, ndims(), length());
+        streamCartesianIndices().parallel().forEach(index -> {
+            VectorUInt32 idx = image.getSize();
             IntStream.range(0, ndims()).forEach(i -> idx.set(i, index[i]));
-            setReal(image.getPixelAsDouble(idx), linearIndex);
+            if (image.getPixelID() == PixelIDValueEnum.sitkFloat32)
+                setReal(image.getPixelAsFloat(idx), index);
+            else
+                setReal(image.getPixelAsDouble(idx), index);
         });
     }
 
