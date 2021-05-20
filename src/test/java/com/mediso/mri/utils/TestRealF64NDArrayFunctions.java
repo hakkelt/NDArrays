@@ -14,11 +14,11 @@ import org.junit.jupiter.api.Test;
 
 import rs2d.spinlab.data.DataSet;
 
-public class TestRealF64NDArrayFunctions {
+class TestRealF64NDArrayFunctions {
     RealF64NDArray array;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         int[] dims = { 4, 5, 3 };
         double[] real = new double[4 * 5 * 3];
         for (int i = 0; i < real.length; i++)
@@ -27,18 +27,18 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testGetNegativeLinearIndexing() {
+    void testGetNegativeLinearIndexing() {
         assertEquals(55, array.get(-5));
     }
 
     @Test
-    public void testGetNegativeCartesianIndexing() {
+    void testGetNegativeCartesianIndexing() {
         int linearIndex = (2 * 5 + 2) * 4 + 2; // equal to cartesian index [2,2,2]
         assertEquals(linearIndex, array.get(2, -3, -1));
     }
 
     @Test
-    public void testSetLinearIndexingGetCartesianIndexing() {
+    void testSetLinearIndexingGetCartesianIndexing() {
         int linearIndex = (2 * 5 + 2) * 4 + 2; // equal to cartesian index [2,2,2]
         assertEquals(linearIndex, array.get(2, -3, -1));
         array.set(1, linearIndex);
@@ -46,14 +46,14 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testSetCartesianIndexingGetLinearIndexing() {
+    void testSetCartesianIndexingGetLinearIndexing() {
         int linearIndex = (2 * 5 + 2) * 4 + 2; // equal to cartesian index [2,2,2]
         array.set(1, 2, -3, -1);
         assertEquals(1, array.get(linearIndex));
     }
 
     @Test
-    public void testWrongGetLinearIndexing() {
+    void testWrongGetLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> array.get(60));
         assertEquals(
             String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, array.length(), 60),
@@ -61,7 +61,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testWrongGetNegativeLinearIndexing() {
+    void testWrongGetNegativeLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> array.get(-61));
         assertEquals(
             String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, array.length(), -61),
@@ -69,7 +69,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testWrongGetCartesianIndexing() {
+    void testWrongGetCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> array.get(1,1,3));
         assertEquals(
             String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "4 × 5 × 3", "[1, 1, 3]"),
@@ -77,7 +77,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testWrongGetNegativeCartesianIndexing() {
+    void testWrongGetNegativeCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> array.get(1,-6,1));
         assertEquals(
             String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "4 × 5 × 3", "[1, -6, 1]"),
@@ -85,7 +85,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testWrongSetLinearIndexing() {
+    void testWrongSetLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> array.set(0, 60));
         assertEquals(
@@ -94,7 +94,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testWrongSetNegativeLinearIndexing() {
+    void testWrongSetNegativeLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> array.set(0, -61));
         assertEquals(
@@ -103,7 +103,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testWrongSetCartesianIndexing() {
+    void testWrongSetCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> array.set(0, 1,1,3));
         assertEquals(
@@ -112,7 +112,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testWrongSetNegativeCartesianIndexing() {
+    void testWrongSetNegativeCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> array.set(0, 1,-6,1));
         assertEquals(
@@ -121,7 +121,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testGetDimensionMismatchTooMany() {
+    void testGetDimensionMismatchTooMany() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> array.get(1,1,1,0));
         assertEquals(
             String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 4, 3),
@@ -129,7 +129,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testGetDimensionMismatchNotEnough() {
+    void testGetDimensionMismatchNotEnough() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> array.get(1,1));
         assertEquals(
             String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 2, 3),
@@ -137,7 +137,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testSetDimensionMismatchTooMany() {
+    void testSetDimensionMismatchTooMany() {
         Exception exception = assertThrows(IllegalArgumentException.class,
             () -> array.set(0, 1,1,1,0));
         assertEquals(
@@ -146,7 +146,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testSetDimensionMismatchNotEnough() {
+    void testSetDimensionMismatchNotEnough() {
         Exception exception = assertThrows(IllegalArgumentException.class,
             () -> array.set(0, 1,1));
         assertEquals(
@@ -155,12 +155,12 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testEltype() {
+    void testEltype() {
         assertEquals(Double.class, array.eltype());
     }
 
     @Test
-    public void testToArray() {
+    void testToArray() {
         Double[][][] arr = (Double[][][])array.toArray();
         int linearIndex = 0;
         for (int i = 0; i < arr[0][0].length; i++)
@@ -172,7 +172,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testEqual() {
+    void testEqual() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         assertEquals(array, array2);
         array2.set(0, 10);
@@ -180,12 +180,12 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testHashCode() {
+    void testHashCode() {
         assertThrows(UnsupportedOperationException.class, () -> { array.hashCode(); });
     }
 
     @Test
-    public void testIterator() {
+    void testIterator() {
         int linearIndex = 0;
         for (Double value : array) {
             assertEquals(linearIndex, value);
@@ -194,7 +194,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testStream() {
+    void testStream() {
         final int[] linearIndex = new int[1];
         array.stream().forEach((value) -> {
             assertEquals(linearIndex[0], value);
@@ -203,7 +203,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testParallelStream() {
+    void testParallelStream() {
         Double sum = array.stream().parallel()
             .reduce(0., (acc, item) -> acc + item);
         int GaussSum = (0 + array.length() - 1) * array.length() / 2;
@@ -211,7 +211,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testCollector() {
+    void testCollector() {
         NDArray<?> increased = array.stream()
             .map((value) -> value + 1)
             .collect(NDArrayCollectors.toRealF64NDArray(array.dims()));
@@ -220,7 +220,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testParallelCollector() {
+    void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
             .collect(NDArrayCollectors.toRealF64NDArray(array.dims()));
@@ -229,13 +229,13 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testToString() {
+    void testToString() {
         String str = array.toString();
         assertEquals("NDArray<RealF64>(4 × 5 × 3)", str);
     }
 
     @Test
-    public void testcontentToString() {
+    void testcontentToString() {
         String str = array.contentToString();
         String expected = new StringBuilder()
             .append("NDArray<RealF64>(4 × 5 × 3)\n")
@@ -262,7 +262,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testAdd() {
+    void testAdd() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         NDArray<Double> array3 = array.add(array2);
         for (int i = 0; i < array.length(); i++)
@@ -270,14 +270,14 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testAddScalar() {
+    void testAddScalar() {
         NDArray<Double> array2 = array.add(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) + 5, array2.get(i));
     }
 
     @Test
-    public void testAddMultiple() {
+    void testAddMultiple() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         NDArray<Double> array3 = array.add(array2, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
@@ -287,7 +287,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testAddInplace() {
+    void testAddInplace() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         array2.addInplace(array);
         for (int i = 0; i < array.length(); i++)
@@ -295,7 +295,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testAddInplaceScalar() {
+    void testAddInplaceScalar() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         array2.addInplace(5);
         for (int i = 0; i < array.length(); i++)
@@ -303,7 +303,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testAddInplaceMultiple() {
+    void testAddInplaceMultiple() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         array2.addInplace(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
@@ -313,7 +313,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testSubtract() {
+    void testSubtract() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         NDArray<Double> array3 = array.subtract(array2);
         for (int i = 0; i < array.length(); i++)
@@ -321,14 +321,14 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testSubtractScalar() {
+    void testSubtractScalar() {
         NDArray<Double> array2 = array.subtract(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) - 5, array2.get(i));
     }
 
     @Test
-    public void testSubtractMultiple() {
+    void testSubtractMultiple() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         NDArray<Double> array3 = array.subtract(array2, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
@@ -338,7 +338,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testSubtractInplace() {
+    void testSubtractInplace() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         array2.subtractInplace(array);
         for (int i = 0; i < array.length(); i++)
@@ -346,7 +346,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testSubtractInplaceScalar() {
+    void testSubtractInplaceScalar() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         array2.subtractInplace(5);
         for (int i = 0; i < array.length(); i++)
@@ -354,7 +354,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testSubtractInplaceMultiple() {
+    void testSubtractInplaceMultiple() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         array2.subtractInplace(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
@@ -364,7 +364,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testMultiply() {
+    void testMultiply() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         NDArray<Double> array3 = array.multiply(array2);
         for (int i = 0; i < array.length(); i++)
@@ -372,14 +372,14 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testMultiplyScalar() {
+    void testMultiplyScalar() {
         NDArray<Double> array2 = array.multiply(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) * 5., array2.get(i));
     }
 
     @Test
-    public void testMultiplyMultiple() {
+    void testMultiplyMultiple() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         NDArray<Double> array3 = array.multiply(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
@@ -389,7 +389,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testMultiplyInplace() {
+    void testMultiplyInplace() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         array2.multiplyInplace(array);
         for (int i = 0; i < array.length(); i++)
@@ -397,7 +397,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testMultiplyInplaceScalar() {
+    void testMultiplyInplaceScalar() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         array2.multiplyInplace(5);
         for (int i = 0; i < array.length(); i++)
@@ -405,7 +405,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testMultiplyInplaceMultiple() {
+    void testMultiplyInplaceMultiple() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         array2.multiplyInplace(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
@@ -418,7 +418,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testDivide() {
+    void testDivide() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         NDArray<Double> array3 = array.divide(array2);
         for (int i = 0; i < array.length(); i++) {
@@ -430,14 +430,14 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testDivideScalar() {
+    void testDivideScalar() {
         NDArray<Double> array2 = array.divide(5);
         for (int i = 0; i < array.length(); i++)
             assertTrue(Math.abs(array.get(i) / 5. - array2.get(i)) < 1e-5);
     }
 
     @Test
-    public void testDivideMultiple() {
+    void testDivideMultiple() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         NDArray<Double> array3 = array.divide(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
@@ -451,7 +451,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testDivideInplace() {
+    void testDivideInplace() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         array2.divideInplace(array);
         for (int i = 0; i < array.length(); i++)
@@ -462,7 +462,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testDivideInplaceScalar() {
+    void testDivideInplaceScalar() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         array2.divideInplace(5);
         for (int i = 0; i < array.length(); i++)
@@ -470,7 +470,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testDivideInplaceMultiple() {
+    void testDivideInplaceMultiple() {
         NDArray<Double> array2 = new RealF64NDArray(array);
         array2.divideInplace(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
@@ -484,14 +484,14 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testSum() {
+    void testSum() {
         Double sum = array.sum();
         int GaussSum = (0 + array.length() - 1) * array.length() / 2;
         assertEquals(GaussSum, sum);
     }
 
     @Test
-    public void testSum1D() {
+    void testSum1D() {
         NDArray<Double> sum = array.sum(1);
         for (int i = 0; i < sum.dims(0); i++) {
             for (int j = 0; j < sum.dims(1); j++) {
@@ -502,7 +502,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testSum2D() {
+    void testSum2D() {
         NDArray<Double> sum = array.sum(2, 1);
         for (int i = 0; i < sum.length(); i++) {
             double GaussSum = (array.get(i,0,0) + array.get(i,-1,-1)) * 15. / 2.;
@@ -511,7 +511,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testCopy() {
+    void testCopy() {
         NDArray<Double> array2 = array.copy();
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i), array2.get(i));
@@ -520,21 +520,21 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testFillFloat() {
+    void testFillFloat() {
         array.fill(3);
         for (Double elem : array)
             assertEquals(3, elem);
     }
 
     @Test
-    public void testFillReal() {
+    void testFillReal() {
         array.fill(3);
         for (Double elem : array)
             assertEquals(3, elem);
     }
 
     @Test
-    public void testPermuteDimsTooShortPermutationVector() {
+    void testPermuteDimsTooShortPermutationVector() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> array.permuteDims(0,2));
         assertEquals(
             String.format(NDArrayPermuteDimsView.ERROR_PERMUTATOR_SIZE_MISMATCH, "[0, 2]", "4 × 5 × 3"),
@@ -542,7 +542,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testPermuteDimsTooLongPermutationVector() {
+    void testPermuteDimsTooLongPermutationVector() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> array.permuteDims(0,2,1,4));
         assertEquals(
             String.format(NDArrayPermuteDimsView.ERROR_PERMUTATOR_SIZE_MISMATCH, "[0, 2, 1, 4]", "4 × 5 × 3"),
@@ -550,7 +550,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testPermuteDimsRepeatedDimension() {
+    void testPermuteDimsRepeatedDimension() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> array.permuteDims(0,1,1));
         assertEquals(
             String.format(NDArrayPermuteDimsView.ERROR_INVALID_PERMUTATOR, "[0, 1, 1]", "4 × 5 × 3"),
@@ -558,7 +558,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testToRS2DDataSet() {
+    void testToRS2DDataSet() {
         DataSet dataSet = array.toRS2DDataSet();
         for (int i = 0; i < array.dims(0); i++)
             for (int j = 0; j < array.dims(1); j++)
@@ -567,7 +567,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testToRS2DDataSetTooManyDimensions() {
+    void testToRS2DDataSetTooManyDimensions() {
         NDArray<Double> array2 = new RealF64NDArray(new int[]{2,2,2,2,2,2});
         Exception exception = assertThrows(UnsupportedOperationException.class, () -> array2.toRS2DDataSet());
         assertEquals(String.format(AbstractNDArray.ERROR_RS2D_DATA_SET_TOO_HIGH_DIMENSIONAL, 6),
@@ -585,7 +585,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testConcatenate() {
+    void testConcatenate() {
         NDArray<Double> array2 = new RealF64NDArray(new int[]{4, 2, 3}).fill(1);
         NDArray<Double> array3 = array.concatenate(1, array2);
         for (int i = 0; i < array.dims(0); i++)
@@ -599,7 +599,7 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testConcatenateMultiple() {
+    void testConcatenateMultiple() {
         NDArray<Double> array2 = array.copy().fill(1).slice(":", "1:3", ":");
         NDArray<Double> array3 = new RealF64NDArray(new int[]{3, 4, 4}).permuteDims(2, 1, 0);
         NDArray<Double> array4 = new RealF64NDArray(new int[]{12}).fill(2).reshape(4, 1, 3);
@@ -631,28 +631,28 @@ public class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    public void testReal() {
+    void testReal() {
         NDArray<Double> real = array.real();
         array.streamLinearIndices()
             .forEach(i -> assertEquals(array.get(i).floatValue(), real.get(i)));
     }
 
     @Test
-    public void testImag() {
+    void testImag() {
         NDArray<Double> imag = array.imaginary();
         array.streamLinearIndices()
             .forEach(i -> assertEquals(0, imag.get(i)));
     }
 
     @Test
-    public void testAbs() {
+    void testAbs() {
         NDArray<Double> abs = array.abs();
         array.streamLinearIndices()
             .forEach(i -> assertTrue(Math.abs(array.get(i)) - abs.get(i) < 1e-5));
     }
 
     @Test
-    public void testAngle() {
+    void testAngle() {
         NDArray<Double> angle = array.angle();
         array.streamLinearIndices()
             .forEach(i -> assertEquals(0, angle.get(i)));

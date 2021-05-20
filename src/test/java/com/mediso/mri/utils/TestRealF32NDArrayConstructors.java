@@ -6,10 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Test;
 
-public class TestRealF32NDArrayConstructors {
+class TestRealF32NDArrayConstructors {
 
     @Test
-    public void testDimsConstructor() {
+    void testDimsConstructor() {
         int[] dims = { 2, 4 };
         NDArray<Float> array = new RealF32NDArray(dims);
         assertArrayEquals(dims, array.dims());
@@ -20,7 +20,7 @@ public class TestRealF32NDArrayConstructors {
     }
 
     @Test
-    public void testDimsAnd1DFloatArrayConstructor() {
+    void testDimsAnd1DFloatArrayConstructor() {
         int[] dims = { 4, 5, 3 };
         float[] real = new float[4 * 5 * 3];
         for (int i = 0; i < real.length; i++)
@@ -34,7 +34,7 @@ public class TestRealF32NDArrayConstructors {
     }
 
     @Test
-    public void testDimsAnd1DDoubleArrayConstructor() {
+    void testDimsAnd1DDoubleArrayConstructor() {
         int[] dims = { 4, 5, 3 };
         double[] real = new double[4 * 5 * 3];
         for (int i = 0; i < real.length; i++)
@@ -48,7 +48,7 @@ public class TestRealF32NDArrayConstructors {
     }
 
     @Test
-    public void test1DFloatArrayConstructors() {
+    void test1DFloatArrayConstructors() {
         float[] real = new float[16];
         for (int i = 0; i < real.length; i++)
             real[i] = i;
@@ -58,7 +58,7 @@ public class TestRealF32NDArrayConstructors {
     }
 
     @Test
-    public void test1DDoubleArrayConstructors() {
+    void test1DDoubleArrayConstructors() {
         double[] real = new double[16];
         for (int i = 0; i < real.length; i++)
             real[i] = i;
@@ -68,7 +68,7 @@ public class TestRealF32NDArrayConstructors {
     }
 
     @Test
-    public void test2DFloatArrayConstructors() {
+    void test2DFloatArrayConstructors() {
         float[][] real = new float[4][5];
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
@@ -80,7 +80,7 @@ public class TestRealF32NDArrayConstructors {
     }
 
     @Test
-    public void test2DDoubleArrayConstructors() {
+    void test2DDoubleArrayConstructors() {
         double[][] real = new double[4][5];
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
@@ -92,7 +92,7 @@ public class TestRealF32NDArrayConstructors {
     }
 
     @Test
-    public void test3DFloatArrayConstructors() {
+    void test3DFloatArrayConstructors() {
         float[][][] real = new float[4][5][3];
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
@@ -106,7 +106,7 @@ public class TestRealF32NDArrayConstructors {
     }
 
     @Test
-    public void test3DDoubleArrayConstructors() {
+    void test3DDoubleArrayConstructors() {
         double[][][] real = new double[4][5][3];
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
@@ -120,7 +120,7 @@ public class TestRealF32NDArrayConstructors {
     }
 
     @Test
-    public void testCopyConstructor() {
+    void testCopyConstructor() {
         int[] dims = { 4, 5, 3 };
         double[] real = new double[4 * 5 * 3];
         for (int i = 0; i < real.length; i++) {
@@ -140,7 +140,7 @@ public class TestRealF32NDArrayConstructors {
     }
 
     @Test
-    public void testFloatF64CopyConstructor() {
+    void testFloatF64CopyConstructor() {
         int[] dims = { 4, 5, 3 };
         double[] real = new double[4 * 5 * 3];
         for (int i = 0; i < real.length; i++)

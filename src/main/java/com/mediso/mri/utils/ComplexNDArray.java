@@ -2,6 +2,7 @@ package com.mediso.mri.utils;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -10,7 +11,6 @@ import org.itk.simple.Image;
 import org.itk.simple.PixelIDValueEnum;
 import org.itk.simple.VectorUInt32;
 
-import rs2d.spinlab.data.Data;
 import rs2d.spinlab.data.DataSetInterface;
 import rs2d.spinlab.tools.param.DefaultParams;
 
@@ -106,18 +106,16 @@ abstract class ComplexNDArray extends AbstractNDArray<Complex> {
         float[][][][] real = dataSet.getData(0).getRealPart();
         List<Integer> realDimsList = new ArrayList<>();
         computeDims(realDimsList, real);
-        int lengthWithoutCoils = length(listToArray(realDimsList));
+        Collections.reverse(realDimsList);
         realDimsList.add(receiverCount);
         int[] dims = listToArray(realDimsList);
 
         baseConstructor(dims);
 
-        for (int receiver = 0; receiver < receiverCount; receiver++) {
-            Data data = dataSet.getData(receiver);
-            real = data.getRealPart();
-            float[][][][] imag = data.getImaginaryPart();
-            flatten(real, imag, receiver * lengthWithoutCoils, 0);
-        }
+        streamCartesianIndices().parallel().forEach(idx -> {
+            setReal(dataSet.getData(idx[4]).getRealElement(idx[0], idx[1], idx[2], idx[3]), idx);
+            setImag(dataSet.getData(idx[4]).getImaginaryElement(idx[0], idx[1], idx[2], idx[3]), idx);
+        });
     }
 
     protected ComplexNDArray(Image image) {

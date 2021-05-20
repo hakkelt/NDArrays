@@ -16,10 +16,10 @@ import rs2d.spinlab.data.DataSet;
 import rs2d.spinlab.data.DataSetInterface;
 import rs2d.spinlab.tools.param.ModalityEnum;
 
-public class TestComplexF32NDArrayConstructors {
+class TestComplexF32NDArrayConstructors {
 
     @Test
-    public void test1DDimsConstructor() {
+    void test1DDimsConstructor() {
         int[] dims = { 4 };
         NDArray<Complex> array = new ComplexF32NDArray(4);
         assertArrayEquals(dims, array.dims());
@@ -30,7 +30,7 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void testDimsConstructor() {
+    void testDimsConstructor() {
         int[] dims = { 2, 4 };
         NDArray<Complex> array = new ComplexF32NDArray(2, 4);
         assertArrayEquals(dims, array.dims());
@@ -41,7 +41,7 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void testDimsAnd1DFloatArrayRealOnlyConstructor() {
+    void testDimsAnd1DFloatArrayRealOnlyConstructor() {
         int[] dims = { 4, 5, 3 };
         float[] real = new float[4 * 5 * 3];
         for (int i = 0; i < real.length; i++)
@@ -55,7 +55,7 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void testDimsAnd1DDoubleArrayRealOnlyConstructor() {
+    void testDimsAnd1DDoubleArrayRealOnlyConstructor() {
         int[] dims = { 4, 5, 3 };
         double[] real = new double[4 * 5 * 3];
         for (int i = 0; i < real.length; i++)
@@ -69,7 +69,7 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void testDimsAnd1DFloatArrayComplexConstructor() {
+    void testDimsAnd1DFloatArrayComplexConstructor() {
         int[] dims = { 4, 5, 3 };
         float[] real = new float[4 * 5 * 3];
         float[] imag = new float[4 * 5 * 3];
@@ -88,7 +88,7 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void testDimsAnd1DDoubleArrayComplexConstructor() {
+    void testDimsAnd1DDoubleArrayComplexConstructor() {
         int[] dims = { 4, 5, 3 };
         double[] real = new double[4 * 5 * 3];
         double[] imag = new double[4 * 5 * 3];
@@ -107,7 +107,7 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void test1DFloatArrayRealOnlyConstructors() {
+    void test1DFloatArrayRealOnlyConstructors() {
         float[] real = new float[16];
         for (int i = 0; i < real.length; i++)
             real[i] = i;
@@ -117,7 +117,7 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void test1DDoubleArrayRealOnlyConstructors() {
+    void test1DDoubleArrayRealOnlyConstructors() {
         double[] real = new double[16];
         for (int i = 0; i < real.length; i++)
             real[i] = i;
@@ -127,7 +127,7 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void test2DFloatArrayRealOnlyConstructors() {
+    void test2DFloatArrayRealOnlyConstructors() {
         float[][] real = new float[4][5];
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
@@ -139,7 +139,7 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void test2DDoubleArrayRealOnlyConstructors() {
+    void test2DDoubleArrayRealOnlyConstructors() {
         double[][] real = new double[4][5];
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
@@ -151,7 +151,7 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void test3DFloatArrayRealOnlyConstructors() {
+    void test3DFloatArrayRealOnlyConstructors() {
         float[][][] real = new float[4][5][3];
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
@@ -165,7 +165,7 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void test3DDoubleArrayRealOnlyConstructors() {
+    void test3DDoubleArrayRealOnlyConstructors() {
         double[][][] real = new double[4][5][3];
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
@@ -179,7 +179,7 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void test1DFloatArrayComplexConstructors() {
+    void test1DFloatArrayComplexConstructors() {
         float[] real = new float[16];
         float[] imag = new float[16];
         for (int i = 0; i < real.length; i++) {
@@ -192,7 +192,7 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void test1DDoubleArrayComplexConstructors() {
+    void test1DDoubleArrayComplexConstructors() {
         double[] real = new double[16];
         double[] imag = new double[16];
         for (int i = 0; i < real.length; i++) {
@@ -205,7 +205,7 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void test2DFloatArrayComplexConstructors() {
+    void test2DFloatArrayComplexConstructors() {
         float[][] real = new float[4][5];
         float[][] imag = new float[4][5];
         for (int i = 0; i < real.length; i++)
@@ -222,7 +222,7 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void test2DDoubleArrayComplexConstructors() {
+    void test2DDoubleArrayComplexConstructors() {
         double[][] real = new double[4][5];
         double[][] imag= new double[4][5];
         for (int i = 0; i < real.length; i++)
@@ -239,7 +239,7 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void test3DFloatArrayComplexConstructors() {
+    void test3DFloatArrayComplexConstructors() {
         float[][][] real = new float[4][5][3];
         float[][][] imag = new float[4][5][3];
         for (int i = 0; i < real.length; i++)
@@ -258,7 +258,7 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void test3DDoubleArrayComplexConstructors() {
+    void test3DDoubleArrayComplexConstructors() {
         double[][][] real = new double[4][5][3];
         double[][][] imag = new double[4][5][3];
         for (int i = 0; i < real.length; i++)
@@ -277,7 +277,7 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void testCopyConstructor() {
+    void testCopyConstructor() {
         int[] dims = { 4, 5, 3 };
         double[] real = new double[4 * 5 * 3];
         double[] imag = new double[4 * 5 * 3];
@@ -299,7 +299,7 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void testComplexF64CopyConstructor() {
+    void testComplexF64CopyConstructor() {
         int[] dims = { 4, 5, 3 };
         double[] real = new double[4 * 5 * 3];
         double[] imag = new double[4 * 5 * 3];
@@ -321,10 +321,10 @@ public class TestComplexF32NDArrayConstructors {
     }
 
     @Test
-    public void testRS2DConstructor() {
+    void testRS2DConstructor() {
         DataSetInterface dataSet = new DataSet(4, 5, 3, 6, 2, ModalityEnum.MRI);
-        float[][][][] realPart = new float[4][5][3][6];
-        float[][][][] imagPart = new float[4][5][3][6];
+        float[][][][] realPart = new float[6][3][5][4];
+        float[][][][] imagPart = new float[6][3][5][4];
         for (float[][][] image3D : realPart)
             for (float[][] image2D : image3D)
                 for (float[] image1D : image2D)
@@ -337,12 +337,13 @@ public class TestComplexF32NDArrayConstructors {
         dataSet.setData(realPart, imagPart, 1);
 
         NDArray<Complex> array = new ComplexF32NDArray(dataSet);
+        assertArrayEquals(new int[]{4, 5, 3, 6, 2}, array.dims());
         for (Complex item : array)
             assertEquals(new Complex(0.5, -0.5), item);
     }
 
     @Test
-    public void testSimpleITKConstructor() {
+    void testSimpleITKConstructor() {
         VectorUInt32 size = new VectorUInt32(3);
         size.set(0, 4);
         size.set(1, 5);

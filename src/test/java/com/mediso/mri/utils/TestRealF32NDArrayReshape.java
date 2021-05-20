@@ -14,11 +14,11 @@ import org.junit.jupiter.api.Test;
 
 import rs2d.spinlab.data.DataSet;
 
-public class TestRealF32NDArrayReshape {
+class TestRealF32NDArrayReshape {
     NDArray<Float> array, reshaped;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         int[] dims = { 4, 5, 3 };
         double[] real = new double[4 * 5 * 3];
         for (int i = 0; i < real.length; i++)
@@ -28,18 +28,18 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testGetNegativeLinearIndexing() {
+    void testGetNegativeLinearIndexing() {
         assertEquals(55, reshaped.get(-5));
     }
 
     @Test
-    public void testGetNegativeCartesianIndexing() {
+    void testGetNegativeCartesianIndexing() {
         int linearIndex = (2 * 5 + 2) * 4 + 2; // equal to cartesian index [2,2,2] in parent
         assertEquals(linearIndex, reshaped.get(10, -1));
     }
 
     @Test
-    public void testSetLinearIndexingGetCartesianIndexing() {
+    void testSetLinearIndexingGetCartesianIndexing() {
         int linearIndex = (2 * 5 + 2) * 4 + 2; // equal to cartesian index [2,2,2]
         assertEquals(linearIndex, reshaped.get(10, -1));
         reshaped.set(1, linearIndex);
@@ -47,14 +47,14 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testSetCartesianIndexingGetLinearIndexing() {
+    void testSetCartesianIndexingGetLinearIndexing() {
         int linearIndex = (2 * 5 + 2) * 4 + 2; // equal to cartesian index [2,2,2]
         reshaped.set(1, 10, -1);
         assertEquals(1, reshaped.get(linearIndex));
     }
 
     @Test
-    public void testWrongGetLinearIndexing() {
+    void testWrongGetLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> reshaped.get(60));
         assertEquals(
             String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, reshaped.length(), 60),
@@ -62,7 +62,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testWrongGetNegativeLinearIndexing() {
+    void testWrongGetNegativeLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> reshaped.get(-61));
         assertEquals(
             String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, reshaped.length(), -61),
@@ -70,7 +70,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testWrongGetCartesianIndexing() {
+    void testWrongGetCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> reshaped.get(1,3));
         assertEquals(
             String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "20 × 3", "[1, 3]"),
@@ -78,7 +78,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testWrongGetNegativeCartesianIndexing() {
+    void testWrongGetNegativeCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> reshaped.get(-21,1));
         assertEquals(
             String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "20 × 3", "[-21, 1]"),
@@ -86,7 +86,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testWrongSetLinearIndexing() {
+    void testWrongSetLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> reshaped.set(0, 60));
         assertEquals(
@@ -95,7 +95,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testWrongSetNegativeLinearIndexing() {
+    void testWrongSetNegativeLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> reshaped.set(0, -61));
         assertEquals(
@@ -104,7 +104,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testWrongSetCartesianIndexing() {
+    void testWrongSetCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> reshaped.set(0, 1,3));
         assertEquals(
@@ -113,7 +113,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testWrongSetNegativeCartesianIndexing() {
+    void testWrongSetNegativeCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> reshaped.set(0, -21,1));
         assertEquals(
@@ -122,7 +122,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testGetDimensionMismatchTooMany() {
+    void testGetDimensionMismatchTooMany() {
         reshaped = array.reshape(5,4,3);
         Exception exception = assertThrows(IllegalArgumentException.class, () -> reshaped.get(1,1,1,0));
         assertEquals(
@@ -131,7 +131,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testGetDimensionMismatchNotEnough() {
+    void testGetDimensionMismatchNotEnough() {
         reshaped = array.reshape(5,4,3);
         Exception exception = assertThrows(IllegalArgumentException.class, () -> reshaped.get(1,1));
         assertEquals(
@@ -140,7 +140,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testSetDimensionMismatchTooMany() {
+    void testSetDimensionMismatchTooMany() {
         reshaped = array.reshape(5,4,3);
         Exception exception = assertThrows(IllegalArgumentException.class,
             () -> reshaped.set(0, 1,1,1,0));
@@ -150,7 +150,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testSetDimensionMismatchNotEnough() {
+    void testSetDimensionMismatchNotEnough() {
         reshaped = array.reshape(5,4,3);
         Exception exception = assertThrows(IllegalArgumentException.class,
             () -> reshaped.set(0, 1,1));
@@ -160,12 +160,12 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testEltype() {
+    void testEltype() {
         assertEquals(Float.class, reshaped.eltype());
     }
 
     @Test
-    public void testToArray() {
+    void testToArray() {
         Float[][] arr = (Float[][])reshaped.toArray();
         int linearIndex = 0;
         for (int i = 0; i < arr[0].length; i++)
@@ -176,7 +176,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testEqual() {
+    void testEqual() {
         NDArray<Float> array2 = new RealF32NDArray(reshaped);
         assertEquals(reshaped, array2);
         array2.set(0, 10);
@@ -184,12 +184,12 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testHashCode() {
+    void testHashCode() {
         assertThrows(UnsupportedOperationException.class, () -> { reshaped.hashCode(); });
     }
 
     @Test
-    public void testIterator() {
+    void testIterator() {
         int linearIndex = 0;
         for (Float value : reshaped) {
             assertEquals(linearIndex, value);
@@ -198,7 +198,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testStream() {
+    void testStream() {
         final int[] linearIndex = new int[1];
         reshaped.stream().forEach((value) -> {
             assertEquals(linearIndex[0], value);
@@ -207,7 +207,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testParallelStream() {
+    void testParallelStream() {
         Float sum = reshaped.stream().parallel()
             .reduce(0.f, (acc, item) -> acc + item);
         int GaussSum = (0 + array.length() - 1) * array.length() / 2;
@@ -215,7 +215,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testCollector() {
+    void testCollector() {
         NDArray<?> increased = reshaped.stream()
             .map((value) -> value + 1)
             .collect(NDArrayCollectors.toRealF32NDArray(reshaped.dims()));
@@ -224,7 +224,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testParallelCollector() {
+    void testParallelCollector() {
         NDArray<?> increased = reshaped.stream().parallel()
             .map((value) -> value + 1)
             .collect(NDArrayCollectors.toRealF32NDArray(reshaped.dims()));
@@ -233,13 +233,13 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testToString() {
+    void testToString() {
         String str = reshaped.toString();
         assertEquals("NDArray<RealF32>(20 × 3)", str);
     }
 
     @Test
-    public void testcontentToString() {
+    void testcontentToString() {
         String str = reshaped.contentToString();
         String expected = new StringBuilder()
             .append("NDArray<RealF32>(20 × 3)\n")
@@ -268,7 +268,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testAdd() {
+    void testAdd() {
         NDArray<Float> array2 = new RealF32NDArray(reshaped);
         NDArray<Float> array3 = reshaped.add(array2);
         for (int i = 0; i < reshaped.length(); i++)
@@ -276,14 +276,14 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testAddScalar() {
+    void testAddScalar() {
         NDArray<Float> array2 = reshaped.add(5);
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals(reshaped.get(i) + 5, array2.get(i));
     }
 
     @Test
-    public void testAddMultiple() {
+    void testAddMultiple() {
         NDArray<Float> array2 = new RealF32NDArray(reshaped);
         NDArray<Float> array3 = reshaped.add(array2, 5.3, array2, 3);
         for (int i = 0; i < reshaped.length(); i++) {
@@ -293,7 +293,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testAddInplace() {
+    void testAddInplace() {
         NDArray<Float> array2 = new RealF32NDArray(reshaped);
         array2.addInplace(reshaped);
         for (int i = 0; i < reshaped.length(); i++)
@@ -301,7 +301,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testAddInplaceScalar() {
+    void testAddInplaceScalar() {
         NDArray<Float> array2 = new RealF32NDArray(reshaped);
         array2.addInplace(5);
         for (int i = 0; i < reshaped.length(); i++)
@@ -309,7 +309,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testAddInplaceMultiple() {
+    void testAddInplaceMultiple() {
         NDArray<Float> array2 = new RealF32NDArray(reshaped);
         array2.addInplace(reshaped, 5.3, array2, 3);
         for (int i = 0; i < reshaped.length(); i++) {
@@ -319,14 +319,14 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testSum() {
+    void testSum() {
         Float sum = reshaped.sum();
         int GaussSum = (0 + array.length() - 1) * array.length() / 2;
         assertEquals(GaussSum, sum);
     }
 
     @Test
-    public void testSum1D() {
+    void testSum1D() {
         NDArray<Float> sum = reshaped.sum(1);
         for (int i = 0; i < sum.dims(0); i++) {
             float GaussSum = (reshaped.get(i,0) + reshaped.get(i,-1)) * 3 / 2;
@@ -335,7 +335,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testSum2D() {
+    void testSum2D() {
         reshaped = array.reshape(5,4,3);
         NDArray<Float> sum = reshaped.sum(2, 1);
         for (int i = 0; i < sum.length(); i++) {
@@ -348,7 +348,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testCopy() {
+    void testCopy() {
         NDArray<Float> array2 = reshaped.copy();
         for (int i = 0; i < array.length(); i++)
             assertEquals(reshaped.get(i), array2.get(i));
@@ -357,7 +357,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testFillFloat() {
+    void testFillFloat() {
         reshaped.fill(3);
         for (Float elem : reshaped)
             assertEquals(3, elem);
@@ -366,7 +366,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testFillReal() {
+    void testFillReal() {
         reshaped.fill(3);
         for (Float elem : reshaped)
             assertEquals(3, elem);
@@ -375,7 +375,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testPermuteDimsTooShortPermutationVector() {
+    void testPermuteDimsTooShortPermutationVector() {
         reshaped = array.reshape(5,4,3);
         Exception exception = assertThrows(IllegalArgumentException.class, () -> reshaped.permuteDims(0,2));
         assertEquals(
@@ -384,7 +384,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testPermuteDimsTooLongPermutationVector() {
+    void testPermuteDimsTooLongPermutationVector() {
         reshaped = array.reshape(5,4,3);
         Exception exception = assertThrows(IllegalArgumentException.class, () -> reshaped.permuteDims(0,2,1,4));
         assertEquals(
@@ -393,7 +393,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testPermuteDimsRepeatedDimension() {
+    void testPermuteDimsRepeatedDimension() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> reshaped.permuteDims(1,1));
         assertEquals(
             String.format(NDArrayPermuteDimsView.ERROR_INVALID_PERMUTATOR, "[1, 1]", "20 × 3"),
@@ -401,7 +401,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testToRS2DDataSet() {
+    void testToRS2DDataSet() {
         DataSet dataSet = reshaped.toRS2DDataSet();
         for (int i = 0; i < reshaped.dims(0); i++)
             for (int j = 0; j < reshaped.dims(1); j++) {
@@ -411,7 +411,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testToRS2DDataSetTooManyDimensions() {
+    void testToRS2DDataSetTooManyDimensions() {
         NDArray<Float> array2 = new RealF32NDArray(new int[]{2,2,2,2,2,2}).reshape(8,8,1,1,1,1);
         Exception exception = assertThrows(UnsupportedOperationException.class, () -> array2.toRS2DDataSet());
         assertEquals(String.format(AbstractNDArray.ERROR_RS2D_DATA_SET_TOO_HIGH_DIMENSIONAL, 6),
@@ -429,7 +429,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testConcatenate() {
+    void testConcatenate() {
         NDArray<Float> array2 = new RealF32NDArray(new int[]{5, 3}).fill(1);
         NDArray<Float> array3 = reshaped.concatenate(0, array2);
         for (int i = 0; i < reshaped.dims(0); i++)
@@ -441,7 +441,7 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testConcatenateMultiple() {
+    void testConcatenateMultiple() {
         NDArray<Float> array2 = reshaped.copy().fill(1).slice("1:5", ":");
         NDArray<Float> array3 = new RealF32NDArray(new int[]{3, 2}).permuteDims(1, 0);
         NDArray<Float> array4 = new RealF32NDArray(new int[]{9}).fill(2).reshape(3, 3);
@@ -469,28 +469,28 @@ public class TestRealF32NDArrayReshape {
     }
 
     @Test
-    public void testReal() {
+    void testReal() {
         NDArray<Double> real = reshaped.real();
         reshaped.streamLinearIndices()
             .forEach(i -> assertEquals(reshaped.get(i).floatValue(), real.get(i)));
     }
 
     @Test
-    public void testImag() {
+    void testImag() {
         NDArray<Double> imag = reshaped.imaginary();
         reshaped.streamLinearIndices()
             .forEach(i -> assertEquals(0, imag.get(i)));
     }
 
     @Test
-    public void testAbs() {
+    void testAbs() {
         NDArray<Double> abs = reshaped.abs();
         reshaped.streamLinearIndices()
             .forEach(i -> assertTrue(Math.abs(reshaped.get(i)) - abs.get(i) < 1e-5));
     }
 
     @Test
-    public void testAngle() {
+    void testAngle() {
         NDArray<Double> angle = reshaped.angle();
         reshaped.streamLinearIndices()
             .forEach(i -> assertEquals(0, angle.get(i)));

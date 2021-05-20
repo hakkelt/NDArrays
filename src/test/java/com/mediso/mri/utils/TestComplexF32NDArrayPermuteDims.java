@@ -11,11 +11,11 @@ import org.junit.jupiter.api.Test;
 
 import rs2d.spinlab.data.DataSet;
 
-public class TestComplexF32NDArrayPermuteDims {
+class TestComplexF32NDArrayPermuteDims {
     NDArray<Complex> array, pArray;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         int[] dims = { 4, 5, 3 };
         double[] real = new double[4 * 5 * 3];
         double[] imag = new double[4 * 5 * 3];
@@ -28,17 +28,17 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testGetNegativeLinearIndexing() {
+    void testGetNegativeLinearIndexing() {
         assertEquals(new Complex(39, -39), pArray.get(-5));
     }
 
     @Test
-    public void testGetNegativeCartesianIndexing() {
+    void testGetNegativeCartesianIndexing() {
         assertEquals(new Complex(50, -50), pArray.get(2, -1, -3));
     }
 
     @Test
-    public void testSetLinearIndexingGetCartesianIndexing() {
+    void testSetLinearIndexingGetCartesianIndexing() {
         int parentLinearIndex = (2 * 5 + 2) * 4 + 2; // equal to cartesian index [2,2,2] in parent
         assertEquals(new Complex(parentLinearIndex, -parentLinearIndex), pArray.get(2, -1, -3));
         int viewLinearIndex = (2 * 3 + 2) * 4 + 2; // equal to cartesian index [2,2,2] in view
@@ -47,14 +47,14 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testSetCartesianIndexingGetLinearIndexing() {
+    void testSetCartesianIndexingGetLinearIndexing() {
         int linearIndex = (2 * 3 + 2) * 4 + 2; // equal to cartesian index [2,2,2] in view
         pArray.set(new Complex(1, 1), 2, -1, -3);
         assertEquals(new Complex(1, 1), pArray.get(linearIndex));
     }
 
     @Test
-    public void testWrongGetLinearIndexing() {
+    void testWrongGetLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> pArray.get(60));
         assertEquals(
             String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, pArray.length(), 60),
@@ -62,7 +62,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testWrongGetNegativeLinearIndexing() {
+    void testWrongGetNegativeLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> pArray.get(-61));
         assertEquals(
             String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, pArray.length(), -61),
@@ -70,7 +70,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testWrongGetCartesianIndexing() {
+    void testWrongGetCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> pArray.get(1,3,1));
         assertEquals(
             String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "4 × 3 × 5", "[1, 3, 1]"),
@@ -78,7 +78,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testWrongGetNegativeCartesianIndexing() {
+    void testWrongGetNegativeCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> pArray.get(1,1,-6));
         assertEquals(
             String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "4 × 3 × 5", "[1, 1, -6]"),
@@ -86,7 +86,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testWrongSetLinearIndexing() {
+    void testWrongSetLinearIndexing() {
         Complex zero = new Complex(0,0);
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> pArray.set(zero, 60));
@@ -96,7 +96,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testWrongSetNegativeLinearIndexing() {
+    void testWrongSetNegativeLinearIndexing() {
         Complex zero = new Complex(0,0);
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> pArray.set(zero, -61));
@@ -106,7 +106,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testWrongSetCartesianIndexing() {
+    void testWrongSetCartesianIndexing() {
         Complex zero = new Complex(0,0);
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> pArray.set(zero, 1,3,1));
@@ -116,7 +116,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testWrongSetNegativeCartesianIndexing() {
+    void testWrongSetNegativeCartesianIndexing() {
         Complex zero = new Complex(0,0);
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> pArray.set(zero, 1,1,-6));
@@ -126,7 +126,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testGetDimensionMismatchTooMany() {
+    void testGetDimensionMismatchTooMany() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> pArray.get(1,1,1,0));
         assertEquals(
             String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 4, 3),
@@ -134,7 +134,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testGetDimensionMismatchNotEnough() {
+    void testGetDimensionMismatchNotEnough() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> pArray.get(1,1));
         assertEquals(
             String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 2, 3),
@@ -142,7 +142,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testSetDimensionMismatchTooMany() {
+    void testSetDimensionMismatchTooMany() {
         Complex zero = new Complex(0,0);
         Exception exception = assertThrows(IllegalArgumentException.class,
             () -> pArray.set(zero, 1, 1, 1, 0));
@@ -152,7 +152,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testSetDimensionMismatchNotEnough() {
+    void testSetDimensionMismatchNotEnough() {
         Complex zero = new Complex(0,0);
         Exception exception = assertThrows(IllegalArgumentException.class,
             () -> pArray.set(zero, 1,1));
@@ -162,12 +162,12 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testEltype() {
+    void testEltype() {
         assertEquals(Complex.class, pArray.eltype());
     }
 
     @Test
-    public void testToArray() {
+    void testToArray() {
         Complex[][][] arr = (Complex[][][])pArray.toArray();
         int linearIndex = 0;
         for (int i = 0; i < arr[0].length; i++)
@@ -179,7 +179,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testEqual() {
+    void testEqual() {
         NDArray<Complex> array2 = new ComplexF32NDArray(pArray);
         assertEquals(pArray, array2);
         array2.set(new Complex(0,0), 5);
@@ -187,19 +187,19 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testHashCode() {
+    void testHashCode() {
         assertThrows(UnsupportedOperationException.class, () -> { pArray.hashCode(); });
     }
 
     @Test
-    public void testIterator() {
+    void testIterator() {
         int linearIndex = 0;
         for (Complex value : pArray)
             assertEquals(pArray.get(linearIndex++), value);
     }
 
     @Test
-    public void testStream() {
+    void testStream() {
         final int[] linearIndex = new int[1];
         pArray.stream().forEach((value) -> {
             assertEquals(pArray.get(linearIndex[0]++), value);
@@ -207,7 +207,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testParallelStream() {
+    void testParallelStream() {
         Complex sum = pArray.stream().parallel()
             .reduce(new Complex(0,0), (acc, item) -> acc.add(item));
         Complex acc = new Complex(0,0);
@@ -219,7 +219,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testCollector() {
+    void testCollector() {
         final Complex one = new Complex(1,-1);
         NDArray<Complex> increased = pArray.stream()
             .map((value) -> value.add(one))
@@ -229,7 +229,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testParallelCollector() {
+    void testParallelCollector() {
         final Complex one = new Complex(1,-1);
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value.add(one))
@@ -239,13 +239,13 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testToString() {
+    void testToString() {
         String str = pArray.toString();
         assertEquals("NDArray<ComplexF32>(4 × 3 × 5)", str);
     }
 
     @Test
-    public void testcontentToString() {
+    void testcontentToString() {
         String str = pArray.contentToString();
         String expected = new StringBuilder()
             .append("NDArray<ComplexF32>(4 × 3 × 5)\n")
@@ -284,7 +284,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testAddArrayTopArray() {
+    void testAddArrayTopArray() {
         NDArray<Complex> array2 = new ComplexF32NDArray(pArray);
         NDArray<Complex> array3 = pArray.add(array2);
         for (int i = 0; i < pArray.length(); i++)
@@ -292,7 +292,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testAddpArrayToArray() {
+    void testAddpArrayToArray() {
         NDArray<Complex> array2 = new ComplexF32NDArray(pArray);
         NDArray<Complex> array3 = array2.add(pArray);
         for (int i = 0; i < pArray.length(); i++)
@@ -300,7 +300,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testAddpArrayTopArray() {
+    void testAddpArrayTopArray() {
         NDArray<Complex> pArray2 = array.permuteDims(0, 2, 1);
         NDArray<Complex> array3 = pArray2.add(pArray);
         for (int i = 0; i < pArray.length(); i++)
@@ -308,14 +308,14 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testAddScalar() {
+    void testAddScalar() {
         NDArray<Complex> pArray2 = pArray.add(5);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i).add(5), pArray2.get(i));
     }
 
     @Test
-    public void testAddMultiple() {
+    void testAddMultiple() {
         NDArray<Complex> array2 = new ComplexF32NDArray(array);
         NDArray<Complex> pArray2 = array2.permuteDims(0, 2, 1);
         NDArray<Complex> array3 = pArray2.add(pArray, 5.3, pArray2, new Complex(3,1));
@@ -326,7 +326,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testAddInplace() {
+    void testAddInplace() {
         NDArray<Complex> array2 = new ComplexF32NDArray(array);
         NDArray<Complex> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(pArray);
@@ -335,7 +335,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testAddInplaceScalar() {
+    void testAddInplaceScalar() {
         NDArray<Complex> array2 = new ComplexF32NDArray(array);
         NDArray<Complex> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(5);
@@ -344,7 +344,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testAddInplaceMultiple() {
+    void testAddInplaceMultiple() {
         NDArray<Complex> array2 = new ComplexF32NDArray(array);
         NDArray<Complex> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(pArray, 5.3, pArray2, new Complex(3,1));
@@ -355,7 +355,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testCopy() {
+    void testCopy() {
         NDArray<Complex> array2 = pArray.copy();
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i), array2.get(i));
@@ -364,21 +364,21 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testFillComplex() {
+    void testFillComplex() {
         pArray.fill(new Complex(3,3));
         for (Complex elem : pArray)
             assertEquals(new Complex(3, 3), elem);
     }
 
     @Test
-    public void testFillReal() {
+    void testFillReal() {
         pArray.fill(3);
         for (Complex elem : pArray)
             assertEquals(new Complex(3, 0), elem);
     }
 
     @Test
-    public void testSliceAndToArray() {
+    void testSliceAndToArray() {
         NDArray<Complex> slice = pArray.slice(1, ":", "1:4");
         Complex[][] arr = (Complex[][])slice.toArray();
         for (int i = 0; i < slice.dims(0); i++)
@@ -387,7 +387,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testToRS2DDataSet() {
+    void testToRS2DDataSet() {
         DataSet dataSet = pArray.toRS2DDataSet();
         for (int i = 0; i < pArray.dims(0); i++)
             for (int j = 0; j < pArray.dims(1); j++)
@@ -398,7 +398,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testToRS2DDataSetTooManyDimensions() {
+    void testToRS2DDataSetTooManyDimensions() {
         NDArray<Complex> array2 = new ComplexF32NDArray(new int[]{2,2,2,2,2,2}).permuteDims(5, 4, 3, 2, 1, 0);
         Exception exception = assertThrows(UnsupportedOperationException.class, () -> array2.toRS2DDataSet());
         assertEquals(String.format(AbstractNDArray.ERROR_RS2D_DATA_SET_TOO_HIGH_DIMENSIONAL, 6),
@@ -406,7 +406,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testConcatenate() {
+    void testConcatenate() {
         NDArray<Complex> array2 = new ComplexF32NDArray(new int[]{4, 3, 2}).fill(1);
         NDArray<Complex> array3 = pArray.concatenate(2, array2);
         for (int i = 0; i < pArray.dims(0); i++)
@@ -420,7 +420,7 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testConcatenateMultiple() {
+    void testConcatenateMultiple() {
         NDArray<Complex> array2 = pArray.copy().fill(1).slice(":", ":", "1:3");
         NDArray<Complex> array3 = new ComplexF32NDArray(new int[]{5, 3, 4}).permuteDims(2, 1, 0);
         NDArray<Complex> array4 = new ComplexF32NDArray(new int[]{36}).fill(new Complex(2, -2)).reshape(4, 3, 3);
@@ -452,28 +452,28 @@ public class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
-    public void testReal() {
+    void testReal() {
         NDArray<Double> real = pArray.real();
         pArray.streamLinearIndices()
             .forEach(i -> assertEquals(pArray.get(i).getReal(), real.get(i)));
     }
 
     @Test
-    public void testImag() {
+    void testImag() {
         NDArray<Double> imag = pArray.imaginary();
         pArray.streamLinearIndices()
             .forEach(i -> assertEquals(pArray.get(i).getImaginary(), imag.get(i)));
     }
 
     @Test
-    public void testAbs() {
+    void testAbs() {
         NDArray<Double> abs = pArray.abs();
         pArray.streamLinearIndices()
             .forEach(i -> assertTrue(pArray.get(i).abs() - abs.get(i) < 1e-5));
     }
 
     @Test
-    public void testAngle() {
+    void testAngle() {
         NDArray<Double> angle = pArray.angle();
         pArray.streamLinearIndices()
             .forEach(i -> assertTrue(pArray.get(i).getArgument() - angle.get(i) < 1e-5));

@@ -11,11 +11,11 @@ import org.junit.jupiter.api.Test;
 
 import rs2d.spinlab.data.DataSet;
 
-public class TestComplexF32NDArraySlice {
+class TestComplexF32NDArraySlice {
     NDArray<Complex> array, slice;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         int[] dims = { 4, 5, 3 };
         double[] real = new double[4 * 5 * 3];
         double[] imag = new double[4 * 5 * 3];
@@ -28,19 +28,19 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testGetNegativeLinearIndexing() {
+    void testGetNegativeLinearIndexing() {
         assertEquals(new Complex(45, -45), slice.get(-3));
     }
 
     @Test
-    public void testGetNegativeCartesianIndexing() {
+    void testGetNegativeCartesianIndexing() {
         // linearIndex equal to cartesian index [1,3,2] in original array and [2,2] in slice:
         int linearIndex = (2 * 5 + (1 + 2)) * 4 + 1;
         assertEquals(new Complex(linearIndex, -linearIndex), slice.get(2, -1));
     }
 
     @Test
-    public void testSetLinearIndexingGetCartesianIndexing() {
+    void testSetLinearIndexingGetCartesianIndexing() {
         // linearIndex equal to cartesian index [1,3,2] in original array and [2,2] in slice:
         int arrayLinearIndex = (2 * 5 + (1 + 2)) * 4 + 1;
         int viewLinearIndex = 2 * 3 + 2;
@@ -51,7 +51,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testSetCartesianIndexingGetLinearIndexing() {
+    void testSetCartesianIndexingGetLinearIndexing() {
         // linearIndex equal to cartesian index [1,3,2] in original array and [2,2] in slice:
         int viewLinearIndex = 2 * 3 + 2;
         array.set(new Complex(1, 1), 1, -2, -1);
@@ -59,7 +59,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testWrongGetLinearIndexing() {
+    void testWrongGetLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> slice.get(10));
         assertEquals(
             String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, slice.length(), 10),
@@ -67,7 +67,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testWrongGetNegativeLinearIndexing() {
+    void testWrongGetNegativeLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> slice.get(-11));
         assertEquals(
             String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, slice.length(), -11),
@@ -75,7 +75,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testWrongGetCartesianIndexing() {
+    void testWrongGetCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> slice.get(1,3));
         assertEquals(
             String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "3 × 3", "[1, 3]"),
@@ -83,7 +83,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testWrongGetNegativeCartesianIndexing() {
+    void testWrongGetNegativeCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> slice.get(-4,1));
         assertEquals(
             String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "3 × 3", "[-4, 1]"),
@@ -91,7 +91,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testWrongSetLinearIndexing() {
+    void testWrongSetLinearIndexing() {
         Complex zero = new Complex(0,0);
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> slice.set(zero, 10));
@@ -101,7 +101,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testWrongSetNegativeLinearIndexing() {
+    void testWrongSetNegativeLinearIndexing() {
         Complex zero = new Complex(0,0);
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> slice.set(zero, -11));
@@ -111,7 +111,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testWrongSetCartesianIndexing() {
+    void testWrongSetCartesianIndexing() {
         Complex zero = new Complex(0,0);
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> slice.set(zero, 1,3));
@@ -121,7 +121,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testWrongSetNegativeCartesianIndexing() {
+    void testWrongSetNegativeCartesianIndexing() {
         Complex zero = new Complex(0,0);
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> slice.set(zero, -4,1));
@@ -131,7 +131,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testGetDimensionMismatchTooMany() {
+    void testGetDimensionMismatchTooMany() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> slice.get(1,1,0));
         assertEquals(
             String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 3, 2),
@@ -139,7 +139,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testGetDimensionMismatchNotEnough() {
+    void testGetDimensionMismatchNotEnough() {
         NDArray<Complex> slice2 = array.slice("1:4", "1:4", ":");
         Exception exception = assertThrows(IllegalArgumentException.class, () -> slice2.get(1,1));
         assertEquals(
@@ -148,7 +148,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testSetDimensionMismatchTooMany() {
+    void testSetDimensionMismatchTooMany() {
         Complex zero = new Complex(0,0);
         Exception exception = assertThrows(IllegalArgumentException.class,
             () -> slice.set(zero, 1,1,0));
@@ -158,7 +158,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testSetDimensionMismatchNotEnough() {
+    void testSetDimensionMismatchNotEnough() {
         Complex zero = new Complex(0,0);
         NDArray<Complex> slice2 = array.slice("1:4", "1:4", ":");
         Exception exception = assertThrows(IllegalArgumentException.class,
@@ -169,12 +169,12 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testEltype() {
+    void testEltype() {
         assertEquals(Complex.class, slice.eltype());
     }
 
     @Test
-    public void testToArray() {
+    void testToArray() {
         Complex[][] arr = (Complex[][])slice.toArray();
         for (int i = 0; i < slice.dims(0); i++)
             for (int j = 0; j < slice.dims(1); j++)
@@ -182,7 +182,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testEqual() {
+    void testEqual() {
         NDArray<Complex> array2 = new ComplexF32NDArray(slice);
         assertEquals(slice, array2);
         array2.set(new Complex(0,0), 5);
@@ -190,19 +190,19 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testHashCode() {
+    void testHashCode() {
         assertThrows(UnsupportedOperationException.class, () -> { slice.hashCode(); });
     }
 
     @Test
-    public void testIterator() {
+    void testIterator() {
         int linearIndex = 0;
         for (Complex value : slice)
             assertEquals(slice.get(linearIndex++), value);
     }
 
     @Test
-    public void testStream() {
+    void testStream() {
         final int[] linearIndex = new int[1];
         slice.stream().forEach((value) -> {
             assertEquals(slice.get(linearIndex[0]++), value);
@@ -210,7 +210,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testParallelStream() {
+    void testParallelStream() {
         Complex sum = slice.stream().parallel()
             .reduce(new Complex(0,0), (acc, item) -> acc.add(item));
         Complex acc = new Complex(0,0);
@@ -221,7 +221,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testCollector() {
+    void testCollector() {
         final Complex one = new Complex(1,-1);
         NDArray<Complex> increased = slice.stream()
             .map((value) -> value.add(one))
@@ -231,7 +231,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testParallelCollector() {
+    void testParallelCollector() {
         final Complex one = new Complex(1,-1);
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value.add(one))
@@ -241,13 +241,13 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testToString() {
+    void testToString() {
         String str = slice.toString();
         assertEquals("NDArray<ComplexF32>(3 × 3)", str);
     }
 
     @Test
-    public void testcontentToString() {
+    void testcontentToString() {
         String str = slice.contentToString();
         String expected = new StringBuilder()
             .append("NDArray<ComplexF32>(3 × 3)\n")
@@ -259,7 +259,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testAddArrayToSlice() {
+    void testAddArrayToSlice() {
         NDArray<Complex> array2 = new ComplexF32NDArray(slice);
         NDArray<Complex> array3 = slice.add(array2);
         for (int i = 0; i < slice.length(); i++)
@@ -267,7 +267,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testAddSliceToArray() {
+    void testAddSliceToArray() {
         NDArray<Complex> array2 = new ComplexF32NDArray(slice);
         NDArray<Complex> array3 = array2.add(slice);
         for (int i = 0; i < slice.length(); i++)
@@ -275,7 +275,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testAddSliceToSlice() {
+    void testAddSliceToSlice() {
         NDArray<Complex> slice2 = array.slice(1, "1:4", ":");
         NDArray<Complex> array3 = slice2.add(slice);
         for (int i = 0; i < slice.length(); i++)
@@ -283,14 +283,14 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testAddScalar() {
+    void testAddScalar() {
         NDArray<Complex> slice2 = slice.add(5);
         for (int i = 0; i < slice.length(); i++)
             assertEquals(slice.get(i).add(5), slice2.get(i));
     }
 
     @Test
-    public void testAddMultiple() {
+    void testAddMultiple() {
         NDArray<Complex> array2 = new ComplexF32NDArray(array);
         NDArray<Complex> slice2 = array2.slice(1, "1:4", ":");
         NDArray<Complex> array3 = slice2.add(slice, 5.3, slice2, new Complex(3,1));
@@ -301,7 +301,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testAddInplace() {
+    void testAddInplace() {
         NDArray<Complex> array2 = new ComplexF32NDArray(array);
         NDArray<Complex> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(slice);
@@ -310,7 +310,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testAddInplaceScalar() {
+    void testAddInplaceScalar() {
         NDArray<Complex> array2 = new ComplexF32NDArray(array);
         NDArray<Complex> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(5);
@@ -319,7 +319,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testAddInplaceMultiple() {
+    void testAddInplaceMultiple() {
         NDArray<Complex> array2 = new ComplexF32NDArray(array);
         NDArray<Complex> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(slice, 5.3, slice2, new Complex(3,1));
@@ -330,7 +330,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testCopy() {
+    void testCopy() {
         NDArray<Complex> array2 = slice.copy();
         for (int i = 0; i < slice.length(); i++)
             assertEquals(slice.get(i), array2.get(i));
@@ -339,7 +339,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testFillComplex() {
+    void testFillComplex() {
         slice.fill(new Complex(3,3));
         for (Complex elem : slice)
             assertEquals(new Complex(3, 3), elem);
@@ -349,7 +349,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testFillReal() {
+    void testFillReal() {
         slice.fill(3);
         for (Complex elem : slice)
             assertEquals(new Complex(3, 0), elem);
@@ -359,7 +359,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testPermuteDimsAndToArray() {
+    void testPermuteDimsAndToArray() {
         NDArray<Complex> pArray = slice.permuteDims(1,0);
         Complex[][] arr = (Complex[][])pArray.toArray();
         for (int i = 0; i < pArray.dims(0); i++)
@@ -368,7 +368,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testToRS2DDataSet() {
+    void testToRS2DDataSet() {
         DataSet dataSet = slice.toRS2DDataSet();
         for (int i = 0; i < slice.dims(0); i++)
             for (int j = 0; j < slice.dims(1); j++) {
@@ -378,7 +378,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testToRS2DDataSetTooManyDimensions() {
+    void testToRS2DDataSetTooManyDimensions() {
         NDArray<Complex> slice2 = new ComplexF32NDArray(new int[]{2,2,2,2,2,2}).slice(":",":",":",":",":",":");
         Exception exception = assertThrows(UnsupportedOperationException.class, () -> slice2.toRS2DDataSet());
         assertEquals(String.format(AbstractNDArray.ERROR_RS2D_DATA_SET_TOO_HIGH_DIMENSIONAL, 6),
@@ -386,7 +386,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testConcatenate() {
+    void testConcatenate() {
         NDArray<Complex> array2 = new ComplexF32NDArray(new int[]{5, 3}).fill(1);
         NDArray<Complex> array3 = slice.concatenate(0, array2);
         for (int i = 0; i < slice.dims(0); i++)
@@ -398,7 +398,7 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testConcatenateMultiple() {
+    void testConcatenateMultiple() {
         NDArray<Complex> array2 = slice.copy().fill(1).slice("1:1", ":");
         NDArray<Complex> array3 = new ComplexF32NDArray(new int[]{3, 2}).permuteDims(1, 0);
         NDArray<Complex> array4 = new ComplexF32NDArray(new int[]{9}).fill(new Complex(2, -2)).reshape(3, 3);
@@ -426,28 +426,28 @@ public class TestComplexF32NDArraySlice {
     }
 
     @Test
-    public void testReal() {
+    void testReal() {
         NDArray<Double> real = slice.real();
         slice.streamLinearIndices()
             .forEach(i -> assertEquals(slice.get(i).getReal(), real.get(i)));
     }
 
     @Test
-    public void testImag() {
+    void testImag() {
         NDArray<Double> imag = slice.imaginary();
         slice.streamLinearIndices()
             .forEach(i -> assertEquals(slice.get(i).getImaginary(), imag.get(i)));
     }
 
     @Test
-    public void testAbs() {
+    void testAbs() {
         NDArray<Double> abs = slice.abs();
         slice.streamLinearIndices()
             .forEach(i -> assertTrue(slice.get(i).abs() - abs.get(i) < 1e-5));
     }
 
     @Test
-    public void testAngle() {
+    void testAngle() {
         NDArray<Double> angle = slice.angle();
         slice.streamLinearIndices()
             .forEach(i -> assertTrue(slice.get(i).getArgument() - angle.get(i) < 1e-5));
