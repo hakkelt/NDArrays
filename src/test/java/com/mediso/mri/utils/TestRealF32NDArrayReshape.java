@@ -348,6 +348,55 @@ class TestRealF32NDArrayReshape {
     }
 
     @Test
+    void test0Norm() {
+        reshaped.slice(":", 0).fill(0);
+        double norm = reshaped.stream()
+            .filter(value -> value != 0.)
+            .count();
+        assertEquals(norm, reshaped.norm(0));
+    }
+
+    @Test
+    void test1Norm() {
+        double norm = reshaped.stream()
+            .mapToDouble(value -> Math.abs(value))
+            .reduce(0., (acc, item) -> acc + item);
+        assertEquals(norm, reshaped.norm(1));
+    }
+
+    @Test
+    void test2Norm() {
+        double norm = Math.sqrt(reshaped.stream()
+            .mapToDouble(value -> Math.pow(Math.abs(value), 2))
+            .reduce(0., (acc, item) -> acc + item));
+        assertEquals(norm, reshaped.norm());
+    }
+
+    @Test
+    void testPQuasinorm() {
+        double norm = Math.pow(reshaped.stream()
+            .mapToDouble(value -> Math.pow(Math.abs(value), 0.5))
+            .reduce(0., (acc, item) -> acc + item), 2);
+        assertEquals(norm, reshaped.norm(0.5));
+    }
+
+    @Test
+    void testPNorm() {
+        double norm = Math.pow(reshaped.stream()
+            .mapToDouble(value -> Math.pow(Math.abs(value), 3.5))
+            .reduce(0., (acc, item) -> acc + item), 1 / 3.5);
+        assertEquals(norm, reshaped.norm(3.5));
+    }
+
+    @Test
+    void testInfNorm() {
+        double norm = reshaped.stream()
+            .mapToDouble(value -> Math.abs(value))
+            .max().getAsDouble();
+        assertEquals(norm, reshaped.norm(Double.POSITIVE_INFINITY));
+    }
+
+    @Test
     void testCopy() {
         NDArray<Float> array2 = reshaped.copy();
         for (int i = 0; i < array.length(); i++)

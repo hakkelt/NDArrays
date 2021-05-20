@@ -25,7 +25,7 @@ import rs2d.spinlab.data.DataSet;
 public interface NDArray<T> extends Collection<T> {
 
     /** 
-     * Returns the number of elements within this NDArray
+     * Returns the number of elements within this NDArray.
      * 
      * Alias for length().
      * 
@@ -34,7 +34,7 @@ public interface NDArray<T> extends Collection<T> {
     public int size();
 
     /** 
-     * Returns the number of elements within this NDArray
+     * Returns the number of elements within this NDArray.
      * 
      * Alias for size().
      * 
@@ -701,6 +701,57 @@ public interface NDArray<T> extends Collection<T> {
      * @return sum of all elementsalong the specified dimensions
      */
     public NDArray<T> sum(int ...selectedDims);
+
+    /**
+     * Returns the 2-norm (Euclidean norm) of the vectorized array.
+     * 
+     * <p>Note: All N-dimensional arrays are treated as if they were reshaped to a 1D vector.</p>
+     * 
+     * @return the 2-norm (Euclidean norm) of the vectorized array
+     */
+    public double norm();
+
+    /**
+     * Returns the p-norm of the vectorized array.
+     * 
+     * <p>Note: All N-dimensional arrays are treated as if they were reshaped to a 1D vector.</p>
+     * 
+     * Possible values:
+     * <ul>
+     *  <li>p = 0: Hamming distance of the vector from zero (number of non-zero entries) -- it is not a true norm!</li>
+     *  <li>0 < p < 1: Hamming distance of the vector from zero (number of non-zero entries) --
+     *          it is only a quasi norm (triangle inequality doesn't hold)!</li>
+     *  <li>1: Absolute-value norm (sum of the absolute values of the entries)</li>
+     *  <li>2: Euclidean norm (square root of sum of the squared entry values)</li>
+     *  <li>1 < p: General p-norm (Σ(|p|)ᵖ)^(1/p)</li>
+     *  <li>p = Double.POSITIVE_INFINITY: Infinity norm (returns the entry with the maximal absolute value)</li>
+     * </ul>
+     * 
+     * @param p type of norm
+     * @return the p-(quasi)norm of the array
+     */
+    public double norm(Double p);
+
+    /**
+     * Returns the p-norm of the vectorized array.
+     * 
+     * <p>Note: All N-dimensional arrays are treated as if they were reshaped to a 1D vector.</p>
+     * 
+     * Possible values:
+     * <ul>
+     *  <li>p = 0: Hamming distance of the vector from zero (number of non-zero entries) -- it is not a true norm!</li>
+     *  <li>0 < p < 1: Hamming distance of the vector from zero (number of non-zero entries) --
+     *          it is only a quasi norm (triangle inequality doesn't hold)!</li>
+     *  <li>1: Absolute-value norm (sum of the absolute values of the entries)</li>
+     *  <li>2: Euclidean norm (square root of sum of the squared entry values)</li>
+     *  <li>1 < p: General p-norm (Σ(|p|)ᵖ)^(1/p)</li>
+     *  <li>p = Double.POSITIVE_INFINITY: Infinity norm (returns the entry with the maximal absolute value)</li>
+     * </ul>
+     * 
+     * @param p type of norm
+     * @return the p-(quasi)norm of the array
+     */
+    public double norm(int p);
     
     /** 
      * Fill this NDArray with the specified value

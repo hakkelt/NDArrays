@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -80,6 +81,8 @@ abstract class AbstractNDArray<T> extends AbstractCollection<T> implements NDArr
         "Cannot assign imaginary part to this real array!";
     protected static final String ERROR_UNINITIALIZED_BART_DIMS =
         "Meanings of dimension aren't specified yet!";
+    protected static final String ERROR_NEGATIVE_NORM =
+        "p must be a positive real number!";
 
     class NDArrayIterator implements Iterator<T> {
         int current = 0;
@@ -379,6 +382,43 @@ abstract class AbstractNDArray<T> extends AbstractCollection<T> implements NDArr
                 return value;
             })
             .collect(getCollector(remainingDims));
+    }
+
+
+    public double norm() {
+        if (eltype() == Complex.class)
+            return Math.sqrt(stream()
+                .map(item -> ((Complex)item).multiply(((Complex)item).conjugate()).getReal())
+                .reduce(0., (acc, item) -> acc + item));
+        else if (eltype() == Float.class)
+            return Math.sqrt(stream()
+                .mapToDouble(item -> ((Float)item).floatValue() * ((Float)item).floatValue())
+                .reduce(0., (acc, item) -> acc + item));
+        else
+            return Math.sqrt(stream()
+                .mapToDouble(item -> ((Double)item).doubleValue() * ((Double)item).doubleValue())
+                .reduce(0., (acc, item) -> acc + item));
+    }
+
+
+    public double norm(Double p) {
+        if (p < 0)
+            throw new IllegalArgumentException(ERROR_NEGATIVE_NORM);
+        else if (p == 0)
+            return (double)countNonZero();
+        else if (p == 1)
+            return streamAbs().reduce(0., (acc, item) -> acc + item);
+        else if (p == 2)
+            return norm();
+        else if (p == Double.POSITIVE_INFINITY)
+            return streamAbs().max().getAsDouble();
+        else
+            return Math.pow(streamAbs().map(value -> Math.pow(value, p)).reduce(0., (acc, item) -> acc + item), 1 / p);
+    }
+
+
+    public double norm(int p) {
+        return norm((double)p);
     }
 
     
@@ -854,6 +894,26 @@ abstract class AbstractNDArray<T> extends AbstractCollection<T> implements NDArr
             linearIndex -= indices[i] * multipliers[i];
         }
         return indices;
+    }
+
+
+    protected DoubleStream streamAbs() {
+        if (eltype() == Complex.class)
+            return stream().mapToDouble(value -> ((Complex)value).abs());
+        else if (eltype() == Float.class)
+            return stream().mapToDouble(value -> Math.abs(((Float)value)));
+        else
+            return stream().mapToDouble(value -> Math.abs(((Double)value)));
+    }
+
+
+    protected long countNonZero() {
+        if (eltype() == Complex.class)
+            return stream().filter(item -> item != Complex.ZERO).count();
+        else if (eltype() == Float.class)
+            return stream().filter(item -> (Float)item != 0.).count();
+        else
+            return stream().filter(item -> (Double)item != 0.).count();
     }
 
     

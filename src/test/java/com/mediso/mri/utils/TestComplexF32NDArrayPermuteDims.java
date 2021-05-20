@@ -355,6 +355,55 @@ class TestComplexF32NDArrayPermuteDims {
     }
 
     @Test
+    void test0Norm() {
+        pArray.slice(":", 0, ":").fill(0);
+        double norm = pArray.stream()
+            .filter(value -> value != Complex.ZERO)
+            .count();
+        assertEquals(norm, pArray.norm(0));
+    }
+
+    @Test
+    void test1Norm() {
+        double norm = pArray.stream()
+            .mapToDouble(value -> value.abs())
+            .reduce(0., (acc, item) -> acc + item);
+        assertEquals(norm, pArray.norm(1));
+    }
+
+    @Test
+    void test2Norm() {
+        double norm = Math.sqrt(pArray.stream()
+            .mapToDouble(value -> Math.pow(value.abs(), 2))
+            .reduce(0., (acc, item) -> acc + item));
+        assertEquals(norm, pArray.norm());
+    }
+
+    @Test
+    void testPQuasinorm() {
+        double norm = Math.pow(pArray.stream()
+            .mapToDouble(value -> Math.pow(value.abs(), 0.5))
+            .reduce(0., (acc, item) -> acc + item), 2);
+        assertEquals(norm, pArray.norm(0.5));
+    }
+
+    @Test
+    void testPNorm() {
+        double norm = Math.pow(pArray.stream()
+            .mapToDouble(value -> Math.pow(value.abs(), 3.5))
+            .reduce(0., (acc, item) -> acc + item), 1 / 3.5);
+        assertEquals(norm, pArray.norm(3.5));
+    }
+
+    @Test
+    void testInfNorm() {
+        double norm = pArray.stream()
+            .mapToDouble(value -> value.abs())
+            .max().getAsDouble();
+        assertEquals(norm, pArray.norm(Double.POSITIVE_INFINITY));
+    }
+
+    @Test
     void testCopy() {
         NDArray<Complex> array2 = pArray.copy();
         for (int i = 0; i < pArray.length(); i++)
