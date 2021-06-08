@@ -4,12 +4,13 @@ N-dimensional arrays holding either complex or real values.
 
 This interface can be parametrized with the following types: Float, Double, and Complex from org.apache.commons.math3.complex.
 
-The purpuse of this datatype is two-fold:
+Goals:
  1. Provide an easy way to handle multidimensional data,
- 2. Help easy conversion between RS2D and Simple ITK data and BART.
+ 2. Make it easy to pass data to JNI functions through a FloatBuffer object.
+ 3. Add convenience functions to handle dimensions as they are used in [BART](https://github.com/mrirecon/bart)
 
 ## Documentation
 
 Run `mvn javadoc:javadoc` and open `docs/index.html`
 
-Examples: See tests in src/test/java/com/mediso/mri/utils.
+Examples: See tests in src/test/java/com/github/hakkelt/ndarrays.
