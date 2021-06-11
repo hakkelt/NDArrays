@@ -63,7 +63,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.github.hakkelt.ndarrays.NDArray</mainClass>
+                            <mainClass>io.github.hakkelt.ndarrays.NDArray</mainClass>
                             <classpathPrefix>main/java/</classpathPrefix>
                         </manifest>
                     </archive>
