@@ -7,7 +7,7 @@ This interface can be parametrized with the following types: Float, Double, and 
 Goals:
  1. Provide an easy way to handle multidimensional data,
  2. Make it easy to pass data to JNI functions through a FloatBuffer object.
- 3. Add convenience functions to handle dimensions as they are used in [BART](https://github.com/mrirecon/bart)
+ 3. Add convenience functions to handle dimensions in a way they are used in [BART](https://github.com/mrirecon/bart).
 
 ## Documentation
 

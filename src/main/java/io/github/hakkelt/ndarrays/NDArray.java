@@ -13,9 +13,10 @@ import java.util.stream.Stream;
  * This interface can be parametrized with the following types: Float, Double, and
  * Complex from org.apache.commons.math3.complex.
  * 
- * <p>The purpuse of this datatype is two-fold:
- * <ol><li> Provide an easy way to handle multidimensional data,</li>
- * <li> Help easy conversion between RS2D and Simple ITK data and BART.</li></ol>
+ * <p>Goals:
+ * <ol><li>Provide an easy way to handle multidimensional data,</li>
+ * <li>make it easy to pass data to JNI functions through a FloatBuffer object,</li>
+ * <li>Add convenience functions to handle dimensions in a way they are used in [BART](https://github.com/mrirecon/bart)</li></ol>
  * 
  */
 public interface NDArray<T> extends Collection<T> {
