@@ -180,7 +180,7 @@ abstract class AbstractNDArray<T> extends AbstractCollection<T> implements NDArr
 
     
     public String contentToString() {
-        String str = "NDArray<" + dataTypeAsString() + ">(" + dimsToString(dims) + ")\n";
+        String str = "NDArray<" + dataTypeAsString() + ">(" + dimsToString(dims) + ")" + System.lineSeparator();
         if (ndims() == 1)
             str += printRow(0, dims(0), 1);
         else if (ndims() == 2)
@@ -902,7 +902,7 @@ abstract class AbstractNDArray<T> extends AbstractCollection<T> implements NDArr
         StringBuilder str = new StringBuilder();
         for (int i = 0; i < height; i++) {
             str.append(printRow(startIndex + i, width, height, format));
-            str.append("\n");
+            str.append(System.lineSeparator());
         }
         return str.toString();
     }
@@ -923,12 +923,12 @@ abstract class AbstractNDArray<T> extends AbstractCollection<T> implements NDArr
         for (indices[dimension - 2] = 0; indices[dimension - 2] < dims(dimension); indices[dimension - 2]++) {
             if (dimension == 2) {
                 str.append(printIndices(indices));
-                str.append(" =\n");
+                str.append(" =" + System.lineSeparator());
                 int[] startIndices = new int[ndims()];
                 for (int j = 2; j < ndims(); j++)
                     startIndices[j] = indices[j - 2];
                 str.append(printMatrix(resolveIndices(startIndices), dims(1), dims(0)));
-                str.append("\n");
+                str.append(System.lineSeparator());
             } else {
                 str.append(printNDArray(dimension - 1, indices));
             }

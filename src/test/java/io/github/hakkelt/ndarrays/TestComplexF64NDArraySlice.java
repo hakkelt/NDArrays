@@ -248,10 +248,10 @@ class TestComplexF64NDArraySlice {
     void testcontentToString() {
         String str = slice.contentToString();
         String expected = new StringBuilder()
-            .append("NDArray<ComplexF64>(3 × 3)\n")
-            .append("5,00000e+00+-5,00000e+00i	2,50000e+01+-2,50000e+01i	4,50000e+01+-4,50000e+01i	\n")
-            .append("9,00000e+00+-9,00000e+00i	2,90000e+01+-2,90000e+01i	4,90000e+01+-4,90000e+01i	\n")
-            .append("1,30000e+01+-1,30000e+01i	3,30000e+01+-3,30000e+01i	5,30000e+01+-5,30000e+01i	\n")
+            .append("NDArray<ComplexF64>(3 × 3)" + System.lineSeparator())
+            .append("5,00000e+00+-5,00000e+00i	2,50000e+01+-2,50000e+01i	4,50000e+01+-4,50000e+01i	" + System.lineSeparator())
+            .append("9,00000e+00+-9,00000e+00i	2,90000e+01+-2,90000e+01i	4,90000e+01+-4,90000e+01i	" + System.lineSeparator())
+            .append("1,30000e+01+-1,30000e+01i	3,30000e+01+-3,30000e+01i	5,30000e+01+-5,30000e+01i	" + System.lineSeparator())
             .toString();
         assertEquals(expected, str);
     }

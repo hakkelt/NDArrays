@@ -236,10 +236,10 @@ class TestRealF64NDArraySlice {
     void testcontentToString() {
         String str = slice.contentToString();
         String expected = new StringBuilder()
-            .append("NDArray<RealF64>(3 × 3)\n")
-            .append("5,00000e+00	2,50000e+01	4,50000e+01	\n")
-            .append("9,00000e+00	2,90000e+01	4,90000e+01	\n")
-            .append("1,30000e+01	3,30000e+01	5,30000e+01	\n")
+            .append("NDArray<RealF64>(3 × 3)" + System.lineSeparator())
+            .append("5,00000e+00	2,50000e+01	4,50000e+01	" + System.lineSeparator())
+            .append("9,00000e+00	2,90000e+01	4,90000e+01	" + System.lineSeparator())
+            .append("1,30000e+01	3,30000e+01	5,30000e+01	" + System.lineSeparator())
             .toString();
         assertEquals(expected, str);
     }
