@@ -143,8 +143,8 @@ abstract class ComplexNDArray extends AbstractNDArray<Complex> {
     @Override
     protected String printItem(int index, String format) {
         Complex item = get(index);
-        String complexFormat = format + "+" + format + "i";
-        return String.format(complexFormat, item.getReal(), item.getImaginary());
+        String complexFormat = format + (item.getImaginary() < 0 ? "-" : "+") + format + "i";
+        return String.format(complexFormat, item.getReal(), Math.abs(item.getImaginary()));
     }
 
     @Override

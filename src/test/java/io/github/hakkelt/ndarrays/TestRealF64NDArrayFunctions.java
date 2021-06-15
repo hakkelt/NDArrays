@@ -231,25 +231,26 @@ class TestRealF64NDArrayFunctions {
     @Test
     void testcontentToString() {
         String str = array.contentToString();
+        String lineFormat = "%8.5e\t%8.5e\t%8.5e\t%8.5e\t%8.5e\t%n";
         String expected = new StringBuilder()
             .append("NDArray<RealF64>(4 × 5 × 3)" + System.lineSeparator())
             .append("[:, :, 0] =" + System.lineSeparator())
-            .append("0,00000e+00	4,00000e+00	8,00000e+00	1,20000e+01	1,60000e+01	" + System.lineSeparator())
-            .append("1,00000e+00	5,00000e+00	9,00000e+00	1,30000e+01	1,70000e+01	" + System.lineSeparator())
-            .append("2,00000e+00	6,00000e+00	1,00000e+01	1,40000e+01	1,80000e+01	" + System.lineSeparator())
-            .append("3,00000e+00	7,00000e+00	1,10000e+01	1,50000e+01	1,90000e+01	" + System.lineSeparator())
+            .append(String.format(lineFormat, 0.00000e+00, 4.00000e+00, 8.00000e+00, 1.20000e+01, 1.60000e+01))
+            .append(String.format(lineFormat, 1.00000e+00, 5.00000e+00, 9.00000e+00, 1.30000e+01, 1.70000e+01))
+            .append(String.format(lineFormat, 2.00000e+00, 6.00000e+00, 1.00000e+01, 1.40000e+01, 1.80000e+01))
+            .append(String.format(lineFormat, 3.00000e+00, 7.00000e+00, 1.10000e+01, 1.50000e+01, 1.90000e+01))
             .append(System.lineSeparator())
             .append("[:, :, 1] =" + System.lineSeparator())
-            .append("2,00000e+01	2,40000e+01	2,80000e+01	3,20000e+01	3,60000e+01	" + System.lineSeparator())
-            .append("2,10000e+01	2,50000e+01	2,90000e+01	3,30000e+01	3,70000e+01	" + System.lineSeparator())
-            .append("2,20000e+01	2,60000e+01	3,00000e+01	3,40000e+01	3,80000e+01	" + System.lineSeparator())
-            .append("2,30000e+01	2,70000e+01	3,10000e+01	3,50000e+01	3,90000e+01	" + System.lineSeparator())
+            .append(String.format(lineFormat, 2.00000e+01, 2.40000e+01, 2.80000e+01, 3.20000e+01, 3.60000e+01))
+            .append(String.format(lineFormat, 2.10000e+01, 2.50000e+01, 2.90000e+01, 3.30000e+01, 3.70000e+01))
+            .append(String.format(lineFormat, 2.20000e+01, 2.60000e+01, 3.00000e+01, 3.40000e+01, 3.80000e+01))
+            .append(String.format(lineFormat, 2.30000e+01, 2.70000e+01, 3.10000e+01, 3.50000e+01, 3.90000e+01))
             .append(System.lineSeparator())
             .append("[:, :, 2] =" + System.lineSeparator())
-            .append("4,00000e+01	4,40000e+01	4,80000e+01	5,20000e+01	5,60000e+01	" + System.lineSeparator())
-            .append("4,10000e+01	4,50000e+01	4,90000e+01	5,30000e+01	5,70000e+01	" + System.lineSeparator())
-            .append("4,20000e+01	4,60000e+01	5,00000e+01	5,40000e+01	5,80000e+01	" + System.lineSeparator())
-            .append("4,30000e+01	4,70000e+01	5,10000e+01	5,50000e+01	5,90000e+01	" + System.lineSeparator())
+            .append(String.format(lineFormat, 4.00000e+01, 4.40000e+01, 4.80000e+01, 5.20000e+01, 5.60000e+01))
+            .append(String.format(lineFormat, 4.10000e+01, 4.50000e+01, 4.90000e+01, 5.30000e+01, 5.70000e+01))
+            .append(String.format(lineFormat, 4.20000e+01, 4.60000e+01, 5.00000e+01, 5.40000e+01, 5.80000e+01))
+            .append(String.format(lineFormat, 4.30000e+01, 4.70000e+01, 5.10000e+01, 5.50000e+01, 5.90000e+01))
             .append(System.lineSeparator())
             .toString();
         assertEquals(expected, str);

@@ -235,11 +235,12 @@ class TestRealF32NDArraySlice {
     @Test
     void testcontentToString() {
         String str = slice.contentToString();
+        String lineFormat = "%8.5e\t%8.5e\t%8.5e\t%n";
         String expected = new StringBuilder()
             .append("NDArray<RealF32>(3 × 3)" + System.lineSeparator())
-            .append("5,00000e+00	2,50000e+01	4,50000e+01	" + System.lineSeparator())
-            .append("9,00000e+00	2,90000e+01	4,90000e+01	" + System.lineSeparator())
-            .append("1,30000e+01	3,30000e+01	5,30000e+01	" + System.lineSeparator())
+            .append(String.format(lineFormat, 5.00000e+00, 2.50000e+01, 4.50000e+01))
+            .append(String.format(lineFormat, 9.00000e+00, 2.90000e+01, 4.90000e+01))
+            .append(String.format(lineFormat, 1.30000e+01, 3.30000e+01, 5.30000e+01))
             .toString();
         assertEquals(expected, str);
     }
