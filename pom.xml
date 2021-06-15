@@ -3,7 +3,7 @@
   
     <groupId>io.github.hakkelt</groupId>
     <artifactId>ndarrays</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>NDArrays</name>
@@ -26,11 +26,20 @@
     </properties>
 
     <scm>
+        <url>https://github.com/hakkelt/NDArrays</url>
         <developerConnection>
             scm:git:git@github.com:hakkelt/NDArrays.git
         </developerConnection>
       <tag>ndarrays-1.0.0</tag>
-  </scm>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>hakkelt</id>
+            <name>Tamás Hakkel</name>
+            <email>hakkelt@gmail.com</email>
+        </developer>
+    </developers>
 
     <distributionManagement>
         <snapshotRepository>
