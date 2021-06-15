@@ -13,15 +13,6 @@ Multi-dimensional arrays holding either complex or real values.
  - Native Java code
  - The underlying data container (FloatBuffer) can be passed to JNI function calls without copying data
 
-## Similar packages
- - [Vectorz](https://github.com/mikera/vectorz)
- - [DeepJavaLibrary](https://github.com/deepjavalibrary/djl) -> [documentation](https://javadoc.io/doc/ai.djl/api/latest/ai/djl/ndarray/NDArray.html)
- - [Jep - Java Embedded Python](https://github.com/ninia/jep) -> [Numpy Usage](https://github.com/ninia/jep/wiki/Numpy-Usage)
-
-## Inspiration from other languages
- - Python's [numpy.ndarray](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html)
- - Julia's native [multidimensional array type](https://docs.julialang.org/en/v1/manual/arrays/)
-
 ## Examples
 
 ```java
@@ -46,3 +37,30 @@ array.addInplace(new Complex(1,3.5)); // Adds 1 + 3.5i to all elements
 
 For more examples, see tests in [src/test/java/com/github/hakkelt/ndarrays](https://github.com/hakkelt/NDArrays/tree/main/src/test/java/io/github/hakkelt/ndarrays).  
 For a complete list of features, please refer to the [documentation](https://hakkelt.github.io/NDArrays/).
+
+## Installation
+
+### Maven
+```
+<dependencies>
+    <dependency>
+        <groupId>io.github.hakkelt</groupId>
+        <artifactId>ndarrays</artifactId>
+        <version>1.0.0</version>
+    </dependency>
+    ...
+</dependencies>
+```
+
+### Manual
+
+Download jar files from [latest release](https://github.com/hakkelt/NDArrays/releases/latest), and add their path to java path. You should also take care of the dependencies (`org.apache.commons.commons-math3`, `org.apache.commons.commons-lang3`).
+
+## Similar packages
+ - [Vectorz](https://github.com/mikera/vectorz)
+ - [DeepJavaLibrary](https://github.com/deepjavalibrary/djl) -> [documentation](https://javadoc.io/doc/ai.djl/api/latest/ai/djl/ndarray/NDArray.html)
+ - [Jep - Java Embedded Python](https://github.com/ninia/jep) -> [Numpy Usage](https://github.com/ninia/jep/wiki/Numpy-Usage)
+
+## Inspiration from other languages
+ - Python's [numpy.ndarray](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html)
+ - Julia's native [multidimensional array type](https://docs.julialang.org/en/v1/manual/arrays/)
