@@ -46,7 +46,7 @@ For a complete list of features, please refer to the [documentation](https://hak
     <dependency>
         <groupId>io.github.hakkelt</groupId>
         <artifactId>ndarrays</artifactId>
-        <version>1.0.0</version>
+        <version>1.0</version>
     </dependency>
     ...
 </dependencies>
