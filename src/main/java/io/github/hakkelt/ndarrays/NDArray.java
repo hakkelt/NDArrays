@@ -1,6 +1,7 @@
 package io.github.hakkelt.ndarrays;
 
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Spliterator;
@@ -522,6 +523,17 @@ public interface NDArray<T> extends Collection<T> {
      * @return a FloatBuffer or DoubleBuffer that holds values of elements
      */
     public Buffer getBuffer();
+
+    /** 
+     * Returns a ByteBuffer that gives raw access to the memory segment that hold the data.
+     * 
+     * Values are stored as little endian floats/doubles.
+     * For complex arrays, the complex elements are stored as two float/double values put directly
+     * after each other in the buffer. 
+     * 
+     * @return a ByteBuffer that holds values of elements
+     */
+    public ByteBuffer getByteBuffer();
 
     /** 
      * Returns a String representation of element type.

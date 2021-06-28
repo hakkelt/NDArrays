@@ -107,17 +107,17 @@ public class RealF64NDArray extends RealNDArray<Double> {
     }
 
     protected ByteBuffer createBuffer(int dataLength) {
-        ByteBuffer buffer = ByteBuffer.allocateDirect(dataLength * Double.BYTES * 2);
-        buffer.order(ByteOrder.LITTLE_ENDIAN);
-        return buffer;
+        rawData = ByteBuffer.allocateDirect(dataLength * Double.BYTES * 2);
+        rawData.order(ByteOrder.LITTLE_ENDIAN);
+        return rawData;
     }
 
     @Override
     protected void baseConstructor(int[] dims) {
         this.dims = dims.clone();
         this.dataLength = length(dims);
-        ByteBuffer buffer = createBuffer(this.dataLength);
-        this.data = buffer.asDoubleBuffer();
+        rawData = createBuffer(this.dataLength);
+        this.data = rawData.asDoubleBuffer();
         this.multipliers = calculateMultipliers(dims);
     }
 
@@ -125,6 +125,7 @@ public class RealF64NDArray extends RealNDArray<Double> {
     protected void baseConstructor(int[] dims, ByteBuffer buffer) {
         this.dims = dims.clone();
         this.dataLength = length(dims);
+        this.rawData = buffer;
         this.data = buffer.asDoubleBuffer();
         this.multipliers = calculateMultipliers(dims);
     }

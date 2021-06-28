@@ -1,6 +1,7 @@
 package io.github.hakkelt.ndarrays;
 
 import java.lang.reflect.Array;
+import java.nio.ByteBuffer;
 import java.util.AbstractCollection;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,6 +29,7 @@ abstract class AbstractNDArray<T> extends AbstractCollection<T> implements NDArr
     protected int dataLength;
     protected BartDimsEnum[] bartDims;
     protected boolean areBartDimsSpecified = false;
+    protected ByteBuffer rawData;
     
     protected static final String ERROR_PARAMETER_MUST_BE_BETWEEN =
         "Parameter '%s' must be between %d and %d, but %d is given!";
@@ -660,6 +662,10 @@ abstract class AbstractNDArray<T> extends AbstractCollection<T> implements NDArr
     
     public Stream<int[]> streamCartesianIndices() {
         return streamLinearIndices().mapToObj(i -> linearIndexToCartesianIndices(i, multipliers, ndims(), length()));
+    }
+
+    public ByteBuffer getByteBuffer() {
+        return rawData;
     }
 
     

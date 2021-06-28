@@ -3,7 +3,7 @@
   
     <groupId>io.github.hakkelt</groupId>
     <artifactId>ndarrays</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>NDArrays</name>
@@ -30,7 +30,7 @@
         <developerConnection>
             scm:git:git@github.com:hakkelt/NDArrays.git
         </developerConnection>
-      <tag>ndarrays-1.0.1</tag>
+      <tag>ndarrays-1.0.2</tag>
     </scm>
 
     <developers>

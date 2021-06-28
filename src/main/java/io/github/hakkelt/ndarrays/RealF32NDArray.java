@@ -111,17 +111,17 @@ public class RealF32NDArray extends RealNDArray<Float> {
     }
 
     protected ByteBuffer createBuffer(int dataLength) {
-        ByteBuffer buffer = ByteBuffer.allocateDirect(dataLength * Float.BYTES * 2);
-        buffer.order(ByteOrder.LITTLE_ENDIAN);
-        return buffer;
+        rawData = ByteBuffer.allocateDirect(dataLength * Float.BYTES * 2);
+        rawData.order(ByteOrder.LITTLE_ENDIAN);
+        return rawData;
     }
 
     @Override
     protected void baseConstructor(int[] dims) {
         this.dims = dims.clone();
         this.dataLength = length(dims);
-        ByteBuffer buffer = createBuffer(this.dataLength);
-        this.data = buffer.asFloatBuffer();
+        rawData = createBuffer(this.dataLength);
+        this.data = rawData.asFloatBuffer();
         this.multipliers = calculateMultipliers(dims);
     }
 
@@ -129,6 +129,7 @@ public class RealF32NDArray extends RealNDArray<Float> {
     protected void baseConstructor(int[] dims, ByteBuffer buffer) {
         this.dims = dims.clone();
         this.dataLength = length(dims);
+        this.rawData = buffer;
         this.data = buffer.asFloatBuffer();
         this.multipliers = calculateMultipliers(dims);
     }
