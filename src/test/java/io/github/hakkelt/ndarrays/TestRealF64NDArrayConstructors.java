@@ -25,7 +25,7 @@ class TestRealF64NDArrayConstructors {
         float[] real = new float[4 * 5 * 3];
         for (int i = 0; i < real.length; i++)
             real[i] = i;
-        NDArray<Double> array = new RealF64NDArray(dims, real);
+        NDArray<Double> array = new RealF64NDArray(dims).copyFrom(real);
         int idx = 0;
         for (int k = 0; k < dims[2]; k++)
             for (int j = 0; j < dims[1]; j++)
@@ -39,7 +39,7 @@ class TestRealF64NDArrayConstructors {
         double[] real = new double[4 * 5 * 3];
         for (int i = 0; i < real.length; i++)
             real[i] = i;
-        NDArray<Double> array = new RealF64NDArray(dims, real);
+        NDArray<Double> array = new RealF64NDArray(dims).copyFrom(real);
         int idx = 0;
         for (int k = 0; k < dims[2]; k++)
             for (int j = 0; j < dims[1]; j++)
@@ -52,7 +52,7 @@ class TestRealF64NDArrayConstructors {
         float[] real = new float[16];
         for (int i = 0; i < real.length; i++)
             real[i] = i;
-        NDArray<Double> array = new RealF64NDArray(real);
+        NDArray<Double> array = RealF64NDArray.of(real);
         for (int i = 0; i < real.length; i++)
             assertEquals(Double.valueOf(i), array.get(i));
     }
@@ -62,7 +62,7 @@ class TestRealF64NDArrayConstructors {
         double[] real = new double[16];
         for (int i = 0; i < real.length; i++)
             real[i] = i;
-        NDArray<Double> array = new RealF64NDArray(real);
+        NDArray<Double> array = RealF64NDArray.of(real);
         for (int i = 0; i < real.length; i++)
         assertEquals(Double.valueOf(i), array.get(i));
     }
@@ -73,7 +73,7 @@ class TestRealF64NDArrayConstructors {
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
                 real[i][j] = i * real.length + j;
-        NDArray<Double> array = new RealF64NDArray(real);
+        NDArray<Double> array = RealF64NDArray.of(real);
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
                 assertEquals(Double.valueOf(i * real.length + j), array.get(i, j));
@@ -85,7 +85,7 @@ class TestRealF64NDArrayConstructors {
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
                 real[i][j] = i * real.length + j;
-        NDArray<Double> array = new RealF64NDArray(real);
+        NDArray<Double> array = RealF64NDArray.of(real);
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
                 assertEquals(Double.valueOf(i * real.length + j), array.get(i, j));
@@ -98,7 +98,7 @@ class TestRealF64NDArrayConstructors {
             for (int j = 0; j < real[i].length; j++)
                 for (int k = 0; k < real[i][j].length; k++)
                     real[i][j][k] = (i * real.length + j) * real[i].length + k;
-        NDArray<Double> array = new RealF64NDArray(real);
+        NDArray<Double> array = RealF64NDArray.of(real);
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
                 for (int k = 0; k < real[i][j].length; k++)
@@ -112,7 +112,7 @@ class TestRealF64NDArrayConstructors {
             for (int j = 0; j < real[i].length; j++)
                 for (int k = 0; k < real[i][j].length; k++)
                     real[i][j][k] = (i * real.length + j) * real[i].length + k;
-        NDArray<Double> array = new RealF64NDArray(real);
+        NDArray<Double> array = RealF64NDArray.of(real);
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
                 for (int k = 0; k < real[i][j].length; k++)
@@ -126,7 +126,7 @@ class TestRealF64NDArrayConstructors {
         for (int i = 0; i < real.length; i++) {
             real[i] = i;
         }
-        NDArray<Double> array1 = new RealF64NDArray(dims, real);
+        NDArray<Double> array1 = new RealF64NDArray(dims).copyFrom(real);
         NDArray<Double> array2 = new RealF64NDArray(array1);
         array1.set(0, 2,2,2);
         for (int k = 0; k < dims[2]; k++)
@@ -145,7 +145,7 @@ class TestRealF64NDArrayConstructors {
         double[] real = new double[4 * 5 * 3];
         for (int i = 0; i < real.length; i++)
             real[i] = i;
-        NDArray<Double> array1 = new RealF64NDArray(dims, real);
+        NDArray<Double> array1 = new RealF64NDArray(dims).copyFrom(real);
         NDArray<Double> array2 = new RealF64NDArray(array1);
         array1.set(0, 2,2,2);
         for (int k = 0; k < dims[2]; k++)

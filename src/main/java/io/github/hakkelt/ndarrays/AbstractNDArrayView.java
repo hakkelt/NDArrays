@@ -1,17 +1,23 @@
 package io.github.hakkelt.ndarrays;
 
-import java.nio.Buffer;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collector;
 
 import org.apache.commons.math3.complex.Complex;
 
-abstract class AbstractNDArrayView<T> extends AbstractNDArray<T> {
-    AbstractNDArray<T> parent;
+abstract class AbstractNDArrayView<T,T2 extends Number> extends AbstractNDArray<T,T2> {
+    AbstractNDArray<T,T2> parent;
 
     @Override
     public Object eltype() {
         return parent.eltype();
+    }
+
+    @Override
+    public Object eltype2() {
+        return parent.eltype2();
     }
 
     @Override
@@ -20,26 +26,14 @@ abstract class AbstractNDArrayView<T> extends AbstractNDArray<T> {
     }
 
     @Override
-    public NDArray<T> fill(T value) {
-        streamLinearIndices().parallel().forEach(i -> set(value, i));
-        return this;
-    }
-
-    @Override
-    public NDArray<T> fill(float value) {
-        streamLinearIndices().parallel().forEach(i -> set(value, i));
-        return this;
-    }
-
-    @Override
-    public NDArray<T> fill(double value) {
-        streamLinearIndices().parallel().forEach(i -> set(value, i));
-        return this;
-    }
-
-    @Override
     public String dataTypeAsString() {
         return parent.dataTypeAsString();
+    }
+
+    protected long countNonZero() {
+        if (eltype() == Complex.class)
+            return stream().filter(item -> item != Complex.ZERO).count();
+        return stream().filter(item -> ((Number)item).doubleValue() != 0.).count();
     }
 
     @Override
@@ -48,13 +42,13 @@ abstract class AbstractNDArrayView<T> extends AbstractNDArray<T> {
     }
 
     @Override
-    protected T oneT() {
-        return parent.oneT();
+    protected T2 zeroT2() {
+        return parent.zeroT2();
     }
 
     @Override
-    protected T accumulate(T acc, NDArray<?> array, int linearIndex, AbstractNDArray.AccumulateOperators operator) {
-        return parent.accumulate(acc, array, linearIndex, operator);
+    protected T oneT() {
+        return parent.oneT();
     }
 
     @Override
@@ -62,49 +56,177 @@ abstract class AbstractNDArrayView<T> extends AbstractNDArray<T> {
         return parent.accumulate(acc, value, operator);
     }
 
-    @Override
-    protected T accumulate(T acc, Complex value, AbstractNDArray.AccumulateOperators operator) {
-        return parent.accumulate(acc, value, operator);
+    protected T accumulate(Float acc, NDArray<?> array, int linearIndex, AccumulateOperators operator) {
+        return parent.accumulate(acc, array, linearIndex, operator);
+    }
+
+    protected T accumulate(Double acc, NDArray<?> array, int linearIndex, AccumulateOperators operator) {
+        return parent.accumulate(acc, array, linearIndex, operator); 
+    }
+
+    protected T accumulate(Byte acc, NDArray<?> array, int linearIndex, AccumulateOperators operator) {
+        return parent.accumulate(acc, array, linearIndex, operator);
+    }
+
+    protected T accumulate(Short acc, NDArray<?> array, int linearIndex, AccumulateOperators operator) {
+        return parent.accumulate(acc, array, linearIndex, operator);
+    }
+
+    protected T accumulate(Integer acc, NDArray<?> array, int linearIndex, AccumulateOperators operator) {
+        return parent.accumulate(acc, array, linearIndex, operator);
+    }
+
+    protected T accumulate(Long acc, NDArray<?> array, int linearIndex, AccumulateOperators operator) {
+        return parent.accumulate(acc, array, linearIndex, operator);
+    }
+
+    protected T accumulate(Complex acc, NDArray<?> array, int linearIndex, AccumulateOperators operator) {
+        return parent.accumulate(acc, array, linearIndex, operator);
+    }
+
+
+    protected T accumulate(Byte acc, Number value, AbstractNDArray.AccumulateOperators operation) {
+        switch (operation) { 
+            case ADD: return wrapValue(acc.byteValue() + value.byteValue());
+            case SUBTRACT: return wrapValue(acc.byteValue() - value.byteValue());
+            case MULTIPLY: return wrapValue(acc.byteValue() * value.byteValue());
+            case DIVIDE: return wrapValue(acc.byteValue() / value.byteValue());
+            default: throw new IllegalArgumentException();
+        }
+    }
+    
+
+    protected T accumulate(Short acc, Number value, AbstractNDArray.AccumulateOperators operation) {
+        switch (operation) { 
+            case ADD: return wrapValue(acc.shortValue() + value.shortValue());
+            case SUBTRACT: return wrapValue(acc.shortValue() - value.shortValue());
+            case MULTIPLY: return wrapValue(acc.shortValue() * value.shortValue());
+            case DIVIDE: return wrapValue(acc.shortValue() / value.shortValue());
+            default: throw new IllegalArgumentException();
+        }
+    }
+    
+
+    protected T accumulate(Integer acc, Number value, AbstractNDArray.AccumulateOperators operation) {
+       switch (operation) { 
+            case ADD: return wrapValue(acc.intValue() + value.intValue());
+            case SUBTRACT: return wrapValue(acc.intValue() - value.intValue());
+            case MULTIPLY: return wrapValue(acc.intValue() * value.intValue());
+            case DIVIDE: return wrapValue(acc.intValue() / value.intValue());
+            default: throw new IllegalArgumentException();
+        }
+    }
+    
+
+    protected T accumulate(Long acc, Number value, AbstractNDArray.AccumulateOperators operation) {
+        switch (operation) { 
+            case ADD: return wrapValue(acc.longValue() + value.longValue());
+            case SUBTRACT: return wrapValue(acc.longValue() - value.longValue());
+            case MULTIPLY: return wrapValue(acc.longValue() * value.longValue());
+            case DIVIDE: return wrapValue(acc.longValue() / value.longValue());
+            default: throw new IllegalArgumentException();
+        }
+    }
+    
+
+    protected T accumulate(Float acc, Number value, AbstractNDArray.AccumulateOperators operation) {
+        switch (operation) { 
+            case ADD: return wrapValue(acc.floatValue() + value.floatValue());
+            case SUBTRACT: return wrapValue(acc.floatValue() - value.floatValue());
+            case MULTIPLY: return wrapValue(acc.floatValue() * value.floatValue());
+            case DIVIDE: return wrapValue(acc.floatValue() / value.floatValue());
+            default: throw new IllegalArgumentException();
+        }
+    }
+    
+
+    protected T accumulate(Double acc, Number value, AbstractNDArray.AccumulateOperators operation) {
+        switch (operation) { 
+            case ADD: return wrapValue(acc.doubleValue() + value.doubleValue());
+            case SUBTRACT: return wrapValue(acc.doubleValue() - value.doubleValue());
+            case MULTIPLY: return wrapValue(acc.doubleValue() * value.doubleValue());
+            case DIVIDE: return wrapValue(acc.doubleValue() / value.doubleValue());
+            default: throw new IllegalArgumentException();
+        }
+    }
+    
+    protected T accumulate(Complex acc, Complex value, AccumulateOperators operator) {
+        throw new IllegalArgumentException();
+    }
+    
+    protected T accumulate(Complex acc, Number value, AccumulateOperators operator) {
+        throw new IllegalArgumentException();
+    }
+
+    private T specializedAccumulate(T acc, NDArray<?> item, int linearIndex, AccumulateOperators operator) {
+        if (eltype() == Float.class)
+            return accumulate((Float)acc, ((NDArray<?>)item), linearIndex, operator);
+        else if (eltype() == Double.class)
+            return accumulate((Double)acc, ((NDArray<?>)item), linearIndex, operator);
+        else if (eltype() == Byte.class)
+            return accumulate((Byte)acc, ((NDArray<?>)item), linearIndex, operator);
+        else if (eltype() == Short.class)
+            return accumulate((Short)acc, ((NDArray<?>)item), linearIndex, operator);
+        else if (eltype() == Integer.class)
+            return accumulate((Integer)acc, ((NDArray<?>)item), linearIndex, operator);
+        else if (eltype() == Long.class)
+            return accumulate((Long)acc, ((NDArray<?>)item), linearIndex, operator);
+        else if (eltype() == Complex.class)
+            return accumulate((Complex)acc, ((NDArray<?>)item), linearIndex, operator);
+        else throw new UnsupportedOperationException();
+    }
+
+    private T specializedAccumulate(T acc, Number item, AccumulateOperators operator) {
+        if (eltype() == Float.class)
+            return accumulate((Float)acc, item, operator);
+        else if (eltype() == Double.class)
+            return accumulate((Double)acc, item, operator);
+        else if (eltype() == Byte.class)
+            return accumulate((Byte)acc, item, operator);
+        else if (eltype() == Short.class)
+            return accumulate((Short)acc, item, operator);
+        else if (eltype() == Integer.class)
+            return accumulate((Integer)acc, item, operator);
+        else if (eltype() == Long.class)
+            return accumulate((Long)acc, item, operator);
+        else if (eltype() == Complex.class)
+            return accumulate((Complex)acc, item, operator);
+        else throw new UnsupportedOperationException();
+    }
+    
+    protected T accumulateAtIndex(int linearIndex, AccumulateOperators operator, Object ...objects) {
+        T acc = get(linearIndex);
+        for (Object item : objects) {
+            if (item instanceof NDArray<?>)
+                acc = specializedAccumulate(acc, (NDArray<?>)item, linearIndex, operator);
+            else if (item instanceof Complex && eltype() == Complex.class)
+                acc = accumulate((Complex)acc, (Complex)item, operator);
+            else if (item instanceof Number)
+                acc =specializedAccumulate(acc, (Number)item, operator);
+            else
+                throw new UnsupportedOperationException();
+        }
+        return wrapValue(acc);
     }
 
     @Override
-    protected T accumulate(T acc, Double value, AbstractNDArray.AccumulateOperators operator) {
-        return parent.accumulate(acc, value, operator);
+    protected Collector<Object, List<Object>, NDArray<T>> getCollectorInternal(int[] dims) {
+        return parent.getCollectorInternal(dims);
     }
 
-    @Override
-    protected T accumulate(T acc, Float value, AbstractNDArray.AccumulateOperators operator) {
-        return parent.accumulate(acc, value, operator);
-    }
-
-    @Override
-    protected T accumulate(T acc, Integer value, AbstractNDArray.AccumulateOperators operator) {
-        return parent.accumulate(acc, value, operator);
-    }
-
-    @Override
-    protected Collector<Object, List<Object>, NDArray<T>> getCollector(int[] dims) {
-        return parent.getCollector(dims);
+    protected Collector<Object, List<Object>, NDArray<T2>> getRealCollectorInternal(int[] dims) {
+        return parent.getRealCollectorInternal(dims);
     }
 
     @Override
     public NDArray<T> similar() {
-        return parent.similar(this);
-    }
-
-    @Override
-    protected NDArray<T> similar(NDArray<?> array) {
-        return parent.similar(array);
+        return parent.createNewNDArrayOfSameTypeAsMe(dims);
     }
 
     @Override
     public NDArray<T> copy() {
-        return parent.copy(this);
-    }
-
-    @Override
-    protected NDArray<T> copy(NDArray<?> array) {
-        return parent.copy(array);
+        NDArray<T> newInstance = parent.createNewNDArrayOfSameTypeAsMe(dims);
+        return newInstance.copyFrom(this);
     }
     
     public int[] linearIndexToViewIndices(int linearIndex) {
@@ -112,37 +234,41 @@ abstract class AbstractNDArrayView<T> extends AbstractNDArray<T> {
     }
 
     @Override
-    protected AbstractNDArray<T> createNewNDArrayOfSameTypeAsMe(int[] dims) {
+    protected AbstractNDArray<T,T2> createNewNDArrayOfSameTypeAsMe(int... dims) {
         return parent.createNewNDArrayOfSameTypeAsMe(dims);
-    }
-    
-    public NDArray<Double> real() {
-        return streamLinearIndices()
-            .mapToObj(this::getReal).collect(NDArrayCollectors.toRealF64NDArray(dims));
-    }
-    public NDArray<Double> imaginary() {
-        return streamLinearIndices()
-            .mapToObj(this::getImag).collect(NDArrayCollectors.toRealF64NDArray(dims));
-    }
-    public NDArray<Double> abs() {
-        if (eltype() == Complex.class)
-            return streamLinearIndices()
-                .mapToObj(i -> ((Complex)get(i)).abs()).collect(NDArrayCollectors.toRealF64NDArray(dims));
-        if (eltype() == Float.class)
-            return streamLinearIndices()
-                .mapToObj(i -> Math.abs(((Float)get(i)).doubleValue())).collect(NDArrayCollectors.toRealF64NDArray(dims));
-        return streamLinearIndices()
-            .mapToObj(i -> Math.abs((Double)get(i))).collect(NDArrayCollectors.toRealF64NDArray(dims));
-    }
-    public NDArray<Double> angle() {
-        if (eltype() == Complex.class)
-            return streamLinearIndices()
-                .mapToObj(i -> ((Complex)get(i)).getArgument()).collect(NDArrayCollectors.toRealF64NDArray(dims));
-        return new RealF64NDArray(dims);
     }
 
     @Override
-    public Buffer getBuffer() {
-        return copy().getBuffer();
+    protected AbstractRealNDArray<T2> createNewRealNDArrayOfSameTypeAsMe(int... dims) {
+        return parent.createNewRealNDArrayOfSameTypeAsMe(dims);
+    }
+
+    @Override
+    protected T wrapValue(Object value) {
+        return parent.wrapValue(value);
+    }
+
+    protected T wrapValue(Number value) {
+        return parent.wrapValue(value);
+    }
+
+    protected T2 wrapRealValue(Number value) {
+        return parent.wrapRealValue(value);
+    }
+
+    protected String name() {
+        return parent.name();
+    }
+    
+    protected static AbstractNDArraySliceView.Range parseRange(String str, int[] dims, int dimension) {
+        final Pattern r = Pattern.compile("(\\d*):(\\d*)");
+        Matcher m = r.matcher(str);
+        if (m.find()) {
+            int start = m.group(1).equals("") ? 0 : Integer.parseInt(m.group(1));
+            int end = m.group(2).equals("") ? dims[dimension] : Integer.parseInt(m.group(2));
+            return new AbstractNDArraySliceView.Range(start, end);
+        } else {
+            throw new IllegalArgumentException(String.format(ERROR_INVALID_RANGE_EXPRESSION, str));
+        }
     }
 }

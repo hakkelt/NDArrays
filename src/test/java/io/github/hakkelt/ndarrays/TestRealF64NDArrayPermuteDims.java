@@ -13,11 +13,8 @@ class TestRealF64NDArrayPermuteDims {
 
     @BeforeEach
     void setup() {
-        int[] dims = { 4, 5, 3 };
-        double[] real = new double[4 * 5 * 3];
-        for (int i = 0; i < real.length; i++)
-            real[i] = i;
-        array = new RealF64NDArray(dims, real);
+        array = new RealF64NDArray(new int[]{ 4, 5, 3 });
+        array.applyWithLinearIndex((value, index) -> (double)index);
         pArray = array.permuteDims(0, 2, 1);
     }
 
@@ -210,7 +207,7 @@ class TestRealF64NDArrayPermuteDims {
     void testCollector() {
         NDArray<Double> increased = pArray.stream()
             .map((value) -> value + 1)
-            .collect(NDArrayCollectors.toRealF64NDArray(pArray.dims()));
+            .collect(RealF64NDArray.getCollector(pArray.dims()));
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i) + 1, increased.get(i));
     }
@@ -219,7 +216,7 @@ class TestRealF64NDArrayPermuteDims {
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(NDArrayCollectors.toRealF64NDArray(array.dims()));
+            .collect(RealF64NDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) + 1, increased.get(i));
     }
@@ -227,7 +224,7 @@ class TestRealF64NDArrayPermuteDims {
     @Test
     void testToString() {
         String str = pArray.toString();
-        assertEquals("NDArray<RealF64>(4 × 3 × 5)", str);
+        assertEquals("simple NDArray<Double>(4 × 3 × 5)", str);
     }
 
     @Test
@@ -235,7 +232,7 @@ class TestRealF64NDArrayPermuteDims {
         String str = pArray.contentToString();
         String lineFormat = "%8.5e\t%8.5e\t%8.5e\t%n";
         String expected = new StringBuilder()
-            .append("NDArray<RealF64>(4 × 3 × 5)" + System.lineSeparator())
+            .append("simple NDArray<Double>(4 × 3 × 5)" + System.lineSeparator())
             .append("[:, :, 0] =" + System.lineSeparator())
             .append(String.format(lineFormat, 0.00000e+00, 2.00000e+01, 4.00000e+01))
             .append(String.format(lineFormat, 1.00000e+00, 2.10000e+01, 4.10000e+01))
@@ -466,33 +463,5 @@ class TestRealF64NDArrayPermuteDims {
             for (int j = 0; j < array2.dims(1); j++)
                 for (int k = start; k < end; k++)
                     assertEquals(2., array5.get(i, j, k));
-    }
-
-    @Test
-    void testReal() {
-        NDArray<Double> real = pArray.real();
-        pArray.streamLinearIndices()
-            .forEach(i -> assertEquals(pArray.get(i).floatValue(), real.get(i)));
-    }
-
-    @Test
-    void testImag() {
-        NDArray<Double> imag = pArray.imaginary();
-        pArray.streamLinearIndices()
-            .forEach(i -> assertEquals(0, imag.get(i)));
-    }
-
-    @Test
-    void testAbs() {
-        NDArray<Double> abs = pArray.abs();
-        pArray.streamLinearIndices()
-            .forEach(i -> assertTrue(Math.abs(pArray.get(i)) - abs.get(i) < 1e-5));
-    }
-
-    @Test
-    void testAngle() {
-        NDArray<Double> angle = pArray.angle();
-        pArray.streamLinearIndices()
-            .forEach(i -> assertEquals(0, angle.get(i)));
     }
 }

@@ -13,11 +13,8 @@ class TestRealF32NDArrayPermuteDims {
 
     @BeforeEach
     void setup() {
-        int[] dims = { 4, 5, 3 };
-        double[] real = new double[4 * 5 * 3];
-        for (int i = 0; i < real.length; i++)
-            real[i] = i;
-        array = new RealF32NDArray(dims, real);
+        array = new RealF32NDArray(new int[]{ 4, 5, 3 });
+        array.applyWithLinearIndex((value, index) -> (float)index);
         pArray = array.permuteDims(0, 2, 1);
     }
 
@@ -210,7 +207,7 @@ class TestRealF32NDArrayPermuteDims {
     void testCollector() {
         NDArray<Float> increased = pArray.stream()
             .map((value) -> value + 1)
-            .collect(NDArrayCollectors.toRealF32NDArray(pArray.dims()));
+            .collect(RealF32NDArray.getCollector(pArray.dims()));
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i) + 1, increased.get(i));
     }
@@ -219,7 +216,7 @@ class TestRealF32NDArrayPermuteDims {
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(NDArrayCollectors.toRealF32NDArray(array.dims()));
+            .collect(RealF32NDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) + 1, increased.get(i));
     }
@@ -227,7 +224,7 @@ class TestRealF32NDArrayPermuteDims {
     @Test
     void testToString() {
         String str = pArray.toString();
-        assertEquals("NDArray<RealF32>(4 × 3 × 5)", str);
+        assertEquals("simple NDArray<Float>(4 × 3 × 5)", str);
     }
 
     @Test
@@ -235,7 +232,7 @@ class TestRealF32NDArrayPermuteDims {
         String str = pArray.contentToString();
         String lineFormat = "%8.5e\t%8.5e\t%8.5e\t%n";
         String expected = new StringBuilder()
-            .append("NDArray<RealF32>(4 × 3 × 5)" + System.lineSeparator())
+            .append("simple NDArray<Float>(4 × 3 × 5)" + System.lineSeparator())
             .append("[:, :, 0] =" + System.lineSeparator())
             .append(String.format(lineFormat, 0.00000e+00, 2.00000e+01, 4.00000e+01))
             .append(String.format(lineFormat, 1.00000e+00, 2.10000e+01, 4.10000e+01))
@@ -347,7 +344,7 @@ class TestRealF32NDArrayPermuteDims {
         double norm = pArray.stream()
             .filter(value -> value != 0.)
             .count();
-        assertEquals(norm, pArray.norm(0));
+        assertTrue(Math.abs(norm - pArray.norm(0)) / norm < 1e-6);
     }
 
     @Test
@@ -355,31 +352,31 @@ class TestRealF32NDArrayPermuteDims {
         double norm = pArray.stream()
             .mapToDouble(value -> Math.abs(value))
             .reduce(0., (acc, item) -> acc + item);
-        assertEquals(norm, pArray.norm(1));
+        assertTrue(Math.abs(norm - pArray.norm(1)) / norm < 1e-6);
     }
 
     @Test
     void test2Norm() {
-        double norm = Math.sqrt(pArray.stream()
-            .mapToDouble(value -> Math.pow(Math.abs(value), 2))
-            .reduce(0., (acc, item) -> acc + item));
-        assertEquals(norm, pArray.norm());
+        double norm = (float)Math.sqrt(pArray.stream()
+            .mapToDouble(value -> (float)Math.pow(Math.abs(value), 2))
+            .reduce((float)0., (acc, item) -> acc + item));
+        assertTrue(Math.abs(norm - pArray.norm()) / norm < 1e-6);
     }
 
     @Test
     void testPQuasinorm() {
-        double norm = Math.pow(pArray.stream()
-            .mapToDouble(value -> Math.pow(Math.abs(value), 0.5))
-            .reduce(0., (acc, item) -> acc + item), 2);
-        assertEquals(norm, pArray.norm(0.5));
+        double norm = (float)Math.pow(pArray.stream()
+            .mapToDouble(value -> (float)Math.pow(Math.abs(value), 0.5))
+            .reduce((float)0., (acc, item) -> acc + item), 2);
+        assertTrue(Math.abs(norm - pArray.norm(0.5)) / norm < 1e-6);
     }
 
     @Test
     void testPNorm() {
-        double norm = Math.pow(pArray.stream()
-            .mapToDouble(value -> Math.pow(Math.abs(value), 3.5))
-            .reduce(0., (acc, item) -> acc + item), 1 / 3.5);
-        assertEquals(norm, pArray.norm(3.5));
+        double norm = (float)Math.pow(pArray.stream()
+            .mapToDouble(value -> (float)Math.pow(Math.abs(value), 3.5))
+            .reduce((float)0., (acc, item) -> acc + item), 1 / 3.5);
+        assertTrue(Math.abs(norm - pArray.norm(3.5)) / norm < 1e-6);
     }
 
     @Test
@@ -387,7 +384,7 @@ class TestRealF32NDArrayPermuteDims {
         double norm = pArray.stream()
             .mapToDouble(value -> Math.abs(value))
             .max().getAsDouble();
-        assertEquals(norm, pArray.norm(Double.POSITIVE_INFINITY));
+        assertTrue(Math.abs(norm - pArray.norm(Double.POSITIVE_INFINITY)) / norm < 1e-6);
     }
 
     @Test
@@ -466,33 +463,5 @@ class TestRealF32NDArrayPermuteDims {
             for (int j = 0; j < array2.dims(1); j++)
                 for (int k = start; k < end; k++)
                     assertEquals(2.f, array5.get(i, j, k));
-    }
-
-    @Test
-    void testReal() {
-        NDArray<Double> real = pArray.real();
-        pArray.streamLinearIndices()
-            .forEach(i -> assertEquals(pArray.get(i).floatValue(), real.get(i)));
-    }
-
-    @Test
-    void testImag() {
-        NDArray<Double> imag = pArray.imaginary();
-        pArray.streamLinearIndices()
-            .forEach(i -> assertEquals(0, imag.get(i)));
-    }
-
-    @Test
-    void testAbs() {
-        NDArray<Double> abs = pArray.abs();
-        pArray.streamLinearIndices()
-            .forEach(i -> assertTrue(Math.abs(pArray.get(i).doubleValue()) - abs.get(i) < 1e-5));
-    }
-
-    @Test
-    void testAngle() {
-        NDArray<Double> angle = pArray.angle();
-        pArray.streamLinearIndices()
-            .forEach(i -> assertEquals(0, angle.get(i)));
     }
 }

@@ -10,18 +10,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class TestComplexF32NDArraySlice {
-    NDArray<Complex> array, slice;
+    ComplexNDArray<Float> array, slice;
 
     @BeforeEach
     void setup() {
-        int[] dims = { 4, 5, 3 };
-        double[] real = new double[4 * 5 * 3];
-        double[] imag = new double[4 * 5 * 3];
-        for (int i = 0; i < real.length; i++) {
-            real[i] = i;
-            imag[i] = -i;
-        }
-        array = new ComplexF32NDArray(dims, real, imag);
+        array = new ComplexF32NDArray(new int[]{ 4, 5, 3 });
+        array.applyWithLinearIndex((value, index) -> new Complex(index, -index));
         slice = array.slice(1, "1:4", ":");
     }
 
@@ -138,7 +132,7 @@ class TestComplexF32NDArraySlice {
 
     @Test
     void testGetDimensionMismatchNotEnough() {
-        NDArray<Complex> slice2 = array.slice("1:4", "1:4", ":");
+        ComplexNDArray<Float> slice2 = array.slice("1:4", "1:4", ":");
         Exception exception = assertThrows(IllegalArgumentException.class, () -> slice2.get(1,1));
         assertEquals(
             String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 2, 3),
@@ -158,7 +152,7 @@ class TestComplexF32NDArraySlice {
     @Test
     void testSetDimensionMismatchNotEnough() {
         Complex zero = new Complex(0,0);
-        NDArray<Complex> slice2 = array.slice("1:4", "1:4", ":");
+        ComplexNDArray<Float> slice2 = array.slice("1:4", "1:4", ":");
         Exception exception = assertThrows(IllegalArgumentException.class,
             () -> slice2.set(zero, 1,1));
         assertEquals(
@@ -181,7 +175,7 @@ class TestComplexF32NDArraySlice {
 
     @Test
     void testEqual() {
-        NDArray<Complex> array2 = new ComplexF32NDArray(slice);
+        ComplexNDArray<Float> array2 = new ComplexF32NDArray(slice);
         assertEquals(slice, array2);
         array2.set(new Complex(0,0), 5);
         assertNotEquals(slice, array2);
@@ -223,7 +217,7 @@ class TestComplexF32NDArraySlice {
         final Complex one = new Complex(1,-1);
         NDArray<Complex> increased = slice.stream()
             .map((value) -> value.add(one))
-            .collect(NDArrayCollectors.toComplexF32NDArray(slice.dims()));
+            .collect(ComplexF32NDArray.getCollector(slice.dims()));
         for (int i = 0; i < slice.length(); i++)
             assertEquals(slice.get(i).add(one), increased.get(i));
     }
@@ -233,7 +227,7 @@ class TestComplexF32NDArraySlice {
         final Complex one = new Complex(1,-1);
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value.add(one))
-            .collect(NDArrayCollectors.toComplexF32NDArray(array.dims()));
+            .collect(ComplexF32NDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).add(one), increased.get(i));
     }
@@ -241,7 +235,7 @@ class TestComplexF32NDArraySlice {
     @Test
     void testToString() {
         String str = slice.toString();
-        assertEquals("NDArray<ComplexF32>(3 × 3)", str);
+        assertEquals("simple NDArray<Complex Float>(3 × 3)", str);
     }
 
     @Test
@@ -249,7 +243,7 @@ class TestComplexF32NDArraySlice {
         String str = slice.contentToString();
         String lineFormat = "%8.5e%+8.5ei\t%8.5e%+8.5ei\t%8.5e%+8.5ei\t%n";
         String expected = new StringBuilder()
-            .append("NDArray<ComplexF32>(3 × 3)" + System.lineSeparator())
+            .append("simple NDArray<Complex Float>(3 × 3)" + System.lineSeparator())
             .append(String.format(lineFormat, 5.0e+00, -5.0e+00, 2.5e+01, -2.5e+01, 4.5e+01, -4.5e+01))
             .append(String.format(lineFormat, 9.0e+00, -9.0e+00, 2.9e+01, -2.9e+01, 4.9e+01, -4.9e+01))
             .append(String.format(lineFormat, 1.3e+01, -1.3e+01, 3.3e+01, -3.3e+01, 5.3e+01, -5.3e+01))
@@ -259,40 +253,40 @@ class TestComplexF32NDArraySlice {
 
     @Test
     void testAddArrayToSlice() {
-        NDArray<Complex> array2 = new ComplexF32NDArray(slice);
-        NDArray<Complex> array3 = slice.add(array2);
+        ComplexNDArray<Float> array2 = new ComplexF32NDArray(slice);
+        ComplexNDArray<Float> array3 = slice.add(array2);
         for (int i = 0; i < slice.length(); i++)
             assertEquals(slice.get(i).multiply(2), array3.get(i));
     }
 
     @Test
     void testAddSliceToArray() {
-        NDArray<Complex> array2 = new ComplexF32NDArray(slice);
-        NDArray<Complex> array3 = array2.add(slice);
+        ComplexNDArray<Float> array2 = new ComplexF32NDArray(slice);
+        ComplexNDArray<Float> array3 = array2.add(slice);
         for (int i = 0; i < slice.length(); i++)
             assertEquals(slice.get(i).multiply(2), array3.get(i));
     }
 
     @Test
     void testAddSliceToSlice() {
-        NDArray<Complex> slice2 = array.slice(1, "1:4", ":");
-        NDArray<Complex> array3 = slice2.add(slice);
+        ComplexNDArray<Float> slice2 = array.slice(1, "1:4", ":");
+        ComplexNDArray<Float> array3 = slice2.add(slice);
         for (int i = 0; i < slice.length(); i++)
             assertEquals(slice.get(i).multiply(2), array3.get(i));
     }
 
     @Test
     void testAddScalar() {
-        NDArray<Complex> slice2 = slice.add(5);
+        ComplexNDArray<Float> slice2 = slice.add(5);
         for (int i = 0; i < slice.length(); i++)
             assertEquals(slice.get(i).add(5), slice2.get(i));
     }
 
     @Test
     void testAddMultiple() {
-        NDArray<Complex> array2 = new ComplexF32NDArray(array);
-        NDArray<Complex> slice2 = array2.slice(1, "1:4", ":");
-        NDArray<Complex> array3 = slice2.add(slice, 5.3, slice2, new Complex(3,1));
+        ComplexNDArray<Float> array2 = new ComplexF32NDArray(array);
+        ComplexNDArray<Float> slice2 = array2.slice(1, "1:4", ":");
+        ComplexNDArray<Float> array3 = slice2.add(slice, 5.3, slice2, new Complex(3,1));
         for (int i = 0; i < slice.length(); i++) {
             Complex expected = slice.get(i).multiply(3).add(new Complex(5.3 + 3,1));
             assertTrue(expected.subtract(array3.get(i)).abs() < 1e5);
@@ -301,8 +295,8 @@ class TestComplexF32NDArraySlice {
 
     @Test
     void testAddInplace() {
-        NDArray<Complex> array2 = new ComplexF32NDArray(array);
-        NDArray<Complex> slice2 = array2.slice(1, "1:4", ":");
+        ComplexNDArray<Float> array2 = new ComplexF32NDArray(array);
+        ComplexNDArray<Float> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(slice);
         for (int i = 0; i < slice.length(); i++)
             assertEquals(slice.get(i).multiply(2), slice2.get(i));
@@ -310,8 +304,8 @@ class TestComplexF32NDArraySlice {
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Complex> array2 = new ComplexF32NDArray(array);
-        NDArray<Complex> slice2 = array2.slice(1, "1:4", ":");
+        ComplexNDArray<Float> array2 = new ComplexF32NDArray(array);
+        ComplexNDArray<Float> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(5);
         for (int i = 0; i < slice.length(); i++)
             assertEquals(slice.get(i).add(5), slice2.get(i));
@@ -319,8 +313,8 @@ class TestComplexF32NDArraySlice {
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Complex> array2 = new ComplexF32NDArray(array);
-        NDArray<Complex> slice2 = array2.slice(1, "1:4", ":");
+        ComplexNDArray<Float> array2 = new ComplexF32NDArray(array);
+        ComplexNDArray<Float> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(slice, 5.3, slice2, new Complex(3,1));
         for (int i = 0; i < slice.length(); i++) {
             Complex expected = slice.get(i).multiply(3).add(new Complex(5.3 + 3,1));
@@ -339,39 +333,39 @@ class TestComplexF32NDArraySlice {
 
     @Test
     void test1Norm() {
-        double norm = slice.stream()
-            .mapToDouble(value -> value.abs())
-            .reduce(0., (acc, item) -> acc + item);
-        assertEquals(norm, slice.norm(1));
+        double norm = (float)slice.stream()
+            .map(value -> (float)value.abs())
+            .reduce((float)0., (acc, item) -> acc + item);
+        assertTrue(Math.abs(norm - slice.norm(1)) / norm < 1e-6);
     }
 
     @Test
     void test2Norm() {
-        double norm = Math.sqrt(slice.stream()
-            .mapToDouble(value -> Math.pow(value.abs(), 2))
-            .reduce(0., (acc, item) -> acc + item));
-        assertEquals(norm, slice.norm());
+        double norm = (float)Math.sqrt(slice.stream()
+            .map(value -> (float)Math.pow(value.abs(), 2))
+            .reduce((float)0., (acc, item) -> acc + item));
+        assertTrue(Math.abs(norm - slice.norm()) / norm < 1e-6);
     }
 
     @Test
     void testPQuasinorm() {
-        double norm = Math.pow(slice.stream()
-            .mapToDouble(value -> Math.pow(value.abs(), 0.5))
-            .reduce(0., (acc, item) -> acc + item), 2);
-        assertEquals(norm, slice.norm(0.5));
+        double norm = (float)Math.pow(slice.stream()
+            .map(value -> (float)Math.pow(value.abs(), 0.5))
+            .reduce((float)0., (acc, item) -> acc + item), 2);
+        assertTrue(Math.abs(norm - slice.norm(0.5)) / norm < 5e-6);
     }
 
     @Test
     void testPNorm() {
-        double norm = Math.pow(slice.stream()
-            .mapToDouble(value -> Math.pow(value.abs(), 3.5))
-            .reduce(0., (acc, item) -> acc + item), 1 / 3.5);
-        assertEquals(norm, slice.norm(3.5));
+        double norm = (float)Math.pow(slice.stream()
+            .map(value -> (float)Math.pow(value.abs(), 3.5))
+            .reduce((float)0., (acc, item) -> acc + item), 1 / 3.5);
+        assertTrue(Math.abs(norm - slice.norm(3.5)) / norm < 5e-6);
     }
 
     @Test
     void testInfNorm() {
-        double norm = slice.stream()
+        double norm = (float)slice.stream()
             .mapToDouble(value -> value.abs())
             .max().getAsDouble();
         assertEquals(norm, slice.norm(Double.POSITIVE_INFINITY));
@@ -379,7 +373,7 @@ class TestComplexF32NDArraySlice {
 
     @Test
     void testCopy() {
-        NDArray<Complex> array2 = slice.copy();
+        ComplexNDArray<Float> array2 = slice.copy();
         for (int i = 0; i < slice.length(); i++)
             assertEquals(slice.get(i), array2.get(i));
         array2.set(new Complex(0,0), 5);
@@ -391,7 +385,7 @@ class TestComplexF32NDArraySlice {
         slice.fill(new Complex(3,3));
         for (Complex elem : slice)
             assertEquals(new Complex(3, 3), elem);
-        NDArray<Complex> slice2 = array.slice(0, ":", ":");
+        ComplexNDArray<Float> slice2 = array.slice(0, ":", ":");
         for (Complex elem : slice2)
             assertNotEquals(new Complex(3, 3), elem);
     }
@@ -401,14 +395,14 @@ class TestComplexF32NDArraySlice {
         slice.fill(3);
         for (Complex elem : slice)
             assertEquals(new Complex(3, 0), elem);
-        NDArray<Complex> slice2 = array.slice(0, ":", ":");
+        ComplexNDArray<Float> slice2 = array.slice(0, ":", ":");
         for (Complex elem : slice2)
             assertNotEquals(new Complex(3, 0), elem);
     }
 
     @Test
     void testPermuteDimsAndToArray() {
-        NDArray<Complex> pArray = slice.permuteDims(1,0);
+        ComplexNDArray<Float> pArray = slice.permuteDims(1,0);
         Complex[][] arr = (Complex[][])pArray.toArray();
         for (int i = 0; i < pArray.dims(0); i++)
             for (int j = 0; j < pArray.dims(1); j++)
@@ -417,8 +411,8 @@ class TestComplexF32NDArraySlice {
 
     @Test
     void testConcatenate() {
-        NDArray<Complex> array2 = new ComplexF32NDArray(new int[]{5, 3}).fill(1);
-        NDArray<Complex> array3 = slice.concatenate(0, array2);
+        ComplexNDArray<Float> array2 = new ComplexF32NDArray(new int[]{5, 3}).fill(1);
+        ComplexNDArray<Float> array3 = slice.concatenate(0, array2);
         for (int i = 0; i < slice.dims(0); i++)
             for (int j = 0; j < slice.dims(1); j++)
                 assertEquals(slice.get(i, j), array3.get(i, j));
@@ -429,10 +423,10 @@ class TestComplexF32NDArraySlice {
 
     @Test
     void testConcatenateMultiple() {
-        NDArray<Complex> array2 = slice.copy().fill(1).slice("1:1", ":");
-        NDArray<Complex> array3 = new ComplexF32NDArray(new int[]{3, 2}).permuteDims(1, 0);
-        NDArray<Complex> array4 = new ComplexF32NDArray(new int[]{9}).fill(new Complex(2, -2)).reshape(3, 3);
-        NDArray<Complex> array5 = slice.concatenate(0, array2, array3, array4);
+        ComplexNDArray<Float> array2 = slice.copy().fill(1).slice("1:1", ":");
+        ComplexNDArray<Float> array3 = new ComplexF32NDArray(new int[]{3, 2}).permuteDims(1, 0);
+        ComplexNDArray<Float> array4 = new ComplexF32NDArray(new int[]{9}).fill(new Complex(2, -2)).reshape(3, 3);
+        ComplexNDArray<Float> array5 = slice.concatenate(0, array2, array3, array4);
         int start = 0;
         int end = slice.dims(0);
         for (int i = start; i < end; i++)
@@ -457,28 +451,28 @@ class TestComplexF32NDArraySlice {
 
     @Test
     void testReal() {
-        NDArray<Double> real = slice.real();
+        NDArray<Float> real = slice.real();
         slice.streamLinearIndices()
-            .forEach(i -> assertEquals(slice.get(i).getReal(), real.get(i)));
+            .forEach(i -> assertEquals(slice.get(i).getReal(), real.get(i).doubleValue()));
     }
 
     @Test
     void testImag() {
-        NDArray<Double> imag = slice.imaginary();
+        NDArray<Float> imag = slice.imaginary();
         slice.streamLinearIndices()
-            .forEach(i -> assertEquals(slice.get(i).getImaginary(), imag.get(i)));
+            .forEach(i -> assertEquals(slice.get(i).getImaginary(), imag.get(i).doubleValue()));
     }
 
     @Test
     void testAbs() {
-        NDArray<Double> abs = slice.abs();
+        NDArray<Float> abs = slice.abs();
         slice.streamLinearIndices()
             .forEach(i -> assertTrue(slice.get(i).abs() - abs.get(i) < 1e-5));
     }
 
     @Test
     void testAngle() {
-        NDArray<Double> angle = slice.angle();
+        NDArray<Float> angle = slice.angle();
         slice.streamLinearIndices()
             .forEach(i -> assertTrue(slice.get(i).getArgument() - angle.get(i) < 1e-5));
     }

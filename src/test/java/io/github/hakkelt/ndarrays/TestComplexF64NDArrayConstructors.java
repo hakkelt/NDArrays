@@ -12,7 +12,7 @@ class TestComplexF64NDArrayConstructors {
     @Test
     void testDimsConstructor() {
         int[] dims = { 2, 4 };
-        NDArray<Complex> array = new ComplexF64NDArray(dims);
+        ComplexNDArray<Double> array = new ComplexF64NDArray(dims);
         assertArrayEquals(dims, array.dims());
         assertEquals(8, array.length());
         assertEquals(8, array.size());
@@ -26,7 +26,7 @@ class TestComplexF64NDArrayConstructors {
         float[] real = new float[4 * 5 * 3];
         for (int i = 0; i < real.length; i++)
             real[i] = i;
-        NDArray<Complex> array = new ComplexF64NDArray(dims, real);
+        ComplexNDArray<Double> array = new ComplexF64NDArray(dims).copyFrom(real);
         int idx = 0;
         for (int k = 0; k < dims[2]; k++)
             for (int j = 0; j < dims[1]; j++)
@@ -40,7 +40,7 @@ class TestComplexF64NDArrayConstructors {
         double[] real = new double[4 * 5 * 3];
         for (int i = 0; i < real.length; i++)
             real[i] = i;
-        NDArray<Complex> array = new ComplexF64NDArray(dims, real);
+        ComplexNDArray<Double> array = new ComplexF64NDArray(dims).copyFrom(real);
         int idx = 0;
         for (int k = 0; k < dims[2]; k++)
             for (int j = 0; j < dims[1]; j++)
@@ -57,7 +57,7 @@ class TestComplexF64NDArrayConstructors {
             real[i] = i;
             imag[i] = -i;
         }
-        NDArray<Complex> array = new ComplexF64NDArray(dims, real, imag);
+        ComplexNDArray<Double> array = new ComplexF64NDArray(dims).copyFrom(real, imag);
         int idx = 0;
         for (int k = 0; k < dims[2]; k++)
             for (int j = 0; j < dims[1]; j++)
@@ -76,7 +76,7 @@ class TestComplexF64NDArrayConstructors {
             real[i] = i;
             imag[i] = -i;
         }
-        NDArray<Complex> array = new ComplexF64NDArray(dims, real, imag);
+        ComplexNDArray<Double> array = new ComplexF64NDArray(dims).copyFrom(real, imag);
         int idx = 0;
         for (int k = 0; k < dims[2]; k++)
             for (int j = 0; j < dims[1]; j++)
@@ -91,7 +91,7 @@ class TestComplexF64NDArrayConstructors {
         float[] real = new float[16];
         for (int i = 0; i < real.length; i++)
             real[i] = i;
-        NDArray<Complex> array = new ComplexF64NDArray(real);
+        ComplexNDArray<Double> array = ComplexF64NDArray.of(real);
         for (int i = 0; i < real.length; i++)
             assertEquals(new Complex(i, 0), array.get(i));
     }
@@ -101,7 +101,7 @@ class TestComplexF64NDArrayConstructors {
         double[] real = new double[16];
         for (int i = 0; i < real.length; i++)
             real[i] = i;
-        NDArray<Complex> array = new ComplexF64NDArray(real);
+        ComplexNDArray<Double> array = ComplexF64NDArray.of(real);
         for (int i = 0; i < real.length; i++)
             assertEquals(new Complex(i, 0), array.get(i));
     }
@@ -112,7 +112,7 @@ class TestComplexF64NDArrayConstructors {
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
                 real[i][j] = i * real.length + j;
-        NDArray<Complex> array = new ComplexF64NDArray(real);
+        ComplexNDArray<Double> array = ComplexF64NDArray.of(real);
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
                 assertEquals(new Complex(i * real.length + j, 0), array.get(i, j));
@@ -124,7 +124,7 @@ class TestComplexF64NDArrayConstructors {
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
                 real[i][j] = i * real.length + j;
-        NDArray<Complex> array = new ComplexF64NDArray(real);
+        ComplexNDArray<Double> array = ComplexF64NDArray.of(real);
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
                 assertEquals(new Complex(i * real.length + j, 0), array.get(i, j));
@@ -137,7 +137,7 @@ class TestComplexF64NDArrayConstructors {
             for (int j = 0; j < real[i].length; j++)
                 for (int k = 0; k < real[i][j].length; k++)
                     real[i][j][k] = (i * real.length + j) * real[i].length + k;
-        NDArray<Complex> array = new ComplexF64NDArray(real);
+        ComplexNDArray<Double> array = ComplexF64NDArray.of(real);
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
                 for (int k = 0; k < real[i][j].length; k++)
@@ -151,7 +151,7 @@ class TestComplexF64NDArrayConstructors {
             for (int j = 0; j < real[i].length; j++)
                 for (int k = 0; k < real[i][j].length; k++)
                     real[i][j][k] = (i * real.length + j) * real[i].length + k;
-        NDArray<Complex> array = new ComplexF64NDArray(real);
+        ComplexNDArray<Double> array = ComplexF64NDArray.of(real);
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
                 for (int k = 0; k < real[i][j].length; k++)
@@ -166,7 +166,7 @@ class TestComplexF64NDArrayConstructors {
             real[i] = i;
             imag[i] = -i;
         }
-        NDArray<Complex> array = new ComplexF64NDArray(real, imag);
+        ComplexNDArray<Double> array = ComplexF64NDArray.of(real, imag);
         for (int i = 0; i < real.length; i++)
             assertEquals(new Complex(i, -i), array.get(i));
     }
@@ -179,7 +179,7 @@ class TestComplexF64NDArrayConstructors {
             real[i] = i;
             imag[i] = -i;
         }
-        NDArray<Complex> array = new ComplexF64NDArray(real, imag);
+        ComplexNDArray<Double> array = ComplexF64NDArray.of(real, imag);
         for (int i = 0; i < real.length; i++)
             assertEquals(new Complex(i, -i), array.get(i));
     }
@@ -193,7 +193,7 @@ class TestComplexF64NDArrayConstructors {
                 real[i][j] = i * real.length + j;
                 imag[i][j] = -(i * imag.length + j);
             }
-        NDArray<Complex> array = new ComplexF64NDArray(real, imag);
+        ComplexNDArray<Double> array = ComplexF64NDArray.of(real, imag);
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++) {
                 int val = i * real.length + j;
@@ -210,7 +210,7 @@ class TestComplexF64NDArrayConstructors {
                 real[i][j] = i * real.length + j;
                 imag[i][j] = -(i * imag.length + j);
             }
-        NDArray<Complex> array = new ComplexF64NDArray(real, imag);
+        ComplexNDArray<Double> array = ComplexF64NDArray.of(real, imag);
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++) {
                 int val = i * real.length + j;
@@ -228,7 +228,7 @@ class TestComplexF64NDArrayConstructors {
                     real[i][j][k] = (i * real.length + j) * real[i].length + k;
                     imag[i][j][k] = -((i * imag.length + j) * imag[i].length + k);
                 }
-        NDArray<Complex> array = new ComplexF64NDArray(real, imag);
+        ComplexNDArray<Double> array = ComplexF64NDArray.of(real, imag);
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
                 for (int k = 0; k < imag[i][j].length; k++) {
@@ -247,7 +247,7 @@ class TestComplexF64NDArrayConstructors {
                     real[i][j][k] = (i * real.length + j) * real[i].length + k;
                     imag[i][j][k] = -((i * imag.length + j) * imag[i].length + k);
                 }
-        NDArray<Complex> array = new ComplexF64NDArray(real, imag);
+        ComplexNDArray<Double> array = ComplexF64NDArray.of(real, imag);
         for (int i = 0; i < real.length; i++)
             for (int j = 0; j < real[i].length; j++)
                 for (int k = 0; k < imag[i][j].length; k++) {
@@ -265,8 +265,8 @@ class TestComplexF64NDArrayConstructors {
             real[i] = i;
             imag[i] = -i;
         }
-        NDArray<Complex> array1 = new ComplexF64NDArray(dims, real, imag);
-        NDArray<Complex> array2 = new ComplexF64NDArray(array1);
+        ComplexNDArray<Double> array1 = new ComplexF64NDArray(dims).copyFrom(real, imag);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array1);
         array1.set(new Complex(0,0), 2,2,2);
         for (int k = 0; k < dims[2]; k++)
             for (int j = 0; j < dims[1]; j++)
@@ -287,8 +287,8 @@ class TestComplexF64NDArrayConstructors {
             real[i] = i;
             imag[i] = -i;
         }
-        NDArray<Complex> array1 = new ComplexF32NDArray(dims, real, imag);
-        NDArray<Complex> array2 = new ComplexF64NDArray(array1);
+        ComplexNDArray<Float> array1 = new ComplexF32NDArray(dims).copyFrom(real, imag);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array1);
         array1.set(new Complex(0,0), 2,2,2);
         for (int k = 0; k < dims[2]; k++)
             for (int j = 0; j < dims[1]; j++)

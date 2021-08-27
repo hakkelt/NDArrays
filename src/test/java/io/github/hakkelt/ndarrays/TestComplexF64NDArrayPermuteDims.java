@@ -10,18 +10,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class TestComplexF64NDArrayPermuteDims {
-    NDArray<Complex> array, pArray;
+    ComplexNDArray<Double> array, pArray;
 
     @BeforeEach
     void setup() {
-        int[] dims = { 4, 5, 3 };
-        double[] real = new double[4 * 5 * 3];
-        double[] imag = new double[4 * 5 * 3];
-        for (int i = 0; i < real.length; i++) {
-            real[i] = i;
-            imag[i] = -i;
-        }
-        array = new ComplexF64NDArray(dims, real, imag);
+        array = new ComplexF64NDArray(new int[]{ 4, 5, 3 });
+        array.applyWithLinearIndex((value, index) -> new Complex(index, -index));
         pArray = array.permuteDims(0, 2, 1);
     }
 
@@ -178,7 +172,7 @@ class TestComplexF64NDArrayPermuteDims {
 
     @Test
     void testEqual() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(pArray);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(pArray);
         assertEquals(pArray, array2);
         array2.set(new Complex(0,0), 5);
         assertNotEquals(pArray, array2);
@@ -221,7 +215,7 @@ class TestComplexF64NDArrayPermuteDims {
         final Complex one = new Complex(1,-1);
         NDArray<Complex> increased = pArray.stream()
             .map((value) -> value.add(one))
-            .collect(NDArrayCollectors.toComplexF64NDArray(pArray.dims()));
+            .collect(ComplexF64NDArray.getCollector(pArray.dims()));
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i).add(one), increased.get(i));
     }
@@ -231,7 +225,7 @@ class TestComplexF64NDArrayPermuteDims {
         final Complex one = new Complex(1,-1);
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value.add(one))
-            .collect(NDArrayCollectors.toComplexF64NDArray(array.dims()));
+            .collect(ComplexF64NDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).add(one), increased.get(i));
     }
@@ -239,7 +233,7 @@ class TestComplexF64NDArrayPermuteDims {
     @Test
     void testToString() {
         String str = pArray.toString();
-        assertEquals("NDArray<ComplexF64>(4 × 3 × 5)", str);
+        assertEquals("simple NDArray<Complex Double>(4 × 3 × 5)", str);
     }
 
     @Test
@@ -247,7 +241,7 @@ class TestComplexF64NDArrayPermuteDims {
         String str = pArray.contentToString();
         String lineFormat = "%8.5e%+8.5ei\t%8.5e%+8.5ei\t%8.5e%+8.5ei\t%n";
         String expected = new StringBuilder()
-            .append("NDArray<ComplexF64>(4 × 3 × 5)" + System.lineSeparator())
+            .append("simple NDArray<Complex Double>(4 × 3 × 5)" + System.lineSeparator())
             .append("[:, :, 0] =" + System.lineSeparator())
             .append(String.format(lineFormat, 0.0e+00, +0.0e+00, 2.0e+01, -2.0e+01, 4.0e+01, -4.0e+01))
             .append(String.format(lineFormat, 1.0e+00, -1.0e+00, 2.1e+01, -2.1e+01, 4.1e+01, -4.1e+01))
@@ -284,40 +278,40 @@ class TestComplexF64NDArrayPermuteDims {
 
     @Test
     void testAddArrayTopArray() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(pArray);
-        NDArray<Complex> array3 = pArray.add(array2);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(pArray);
+        ComplexNDArray<Double> array3 = pArray.add(array2);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i).multiply(2), array3.get(i));
     }
 
     @Test
     void testAddpArrayToArray() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(pArray);
-        NDArray<Complex> array3 = array2.add(pArray);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(pArray);
+        ComplexNDArray<Double> array3 = array2.add(pArray);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i).multiply(2), array3.get(i));
     }
 
     @Test
     void testAddpArrayTopArray() {
-        NDArray<Complex> pArray2 = array.permuteDims(0, 2, 1);
-        NDArray<Complex> array3 = pArray2.add(pArray);
+        ComplexNDArray<Double> pArray2 = array.permuteDims(0, 2, 1);
+        ComplexNDArray<Double> array3 = pArray2.add(pArray);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i).multiply(2), array3.get(i));
     }
 
     @Test
     void testAddScalar() {
-        NDArray<Complex> pArray2 = pArray.add(5);
+        ComplexNDArray<Double> pArray2 = pArray.add(5);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i).add(5), pArray2.get(i));
     }
 
     @Test
     void testAddMultiple() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
-        NDArray<Complex> pArray2 = array2.permuteDims(0, 2, 1);
-        NDArray<Complex> array3 = pArray2.add(pArray, 5.3, pArray2, new Complex(3,1));
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> pArray2 = array2.permuteDims(0, 2, 1);
+        ComplexNDArray<Double> array3 = pArray2.add(pArray, 5.3, pArray2, new Complex(3,1));
         for (int i = 0; i < pArray.length(); i++) {
             Complex expected = pArray.get(i).multiply(3).add(new Complex(5.3 + 3,1));
             assertTrue(expected.subtract(array3.get(i)).abs() < 1e5);
@@ -326,8 +320,8 @@ class TestComplexF64NDArrayPermuteDims {
 
     @Test
     void testAddInplace() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
-        NDArray<Complex> pArray2 = array2.permuteDims(0, 2, 1);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(pArray);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i).multiply(2), pArray2.get(i));
@@ -335,8 +329,8 @@ class TestComplexF64NDArrayPermuteDims {
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
-        NDArray<Complex> pArray2 = array2.permuteDims(0, 2, 1);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(5);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i).add(5), pArray2.get(i));
@@ -344,8 +338,8 @@ class TestComplexF64NDArrayPermuteDims {
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
-        NDArray<Complex> pArray2 = array2.permuteDims(0, 2, 1);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(pArray, 5.3, pArray2, new Complex(3,1));
         for (int i = 0; i < pArray.length(); i++) {
             Complex expected = pArray.get(i).multiply(3).add(new Complex(5.3 + 3,1));
@@ -404,7 +398,7 @@ class TestComplexF64NDArrayPermuteDims {
 
     @Test
     void testCopy() {
-        NDArray<Complex> array2 = pArray.copy();
+        ComplexNDArray<Double> array2 = pArray.copy();
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i), array2.get(i));
         array2.set(new Complex(0,0), 5);
@@ -427,7 +421,7 @@ class TestComplexF64NDArrayPermuteDims {
 
     @Test
     void testSliceAndToArray() {
-        NDArray<Complex> slice = pArray.slice(1, ":", "1:4");
+        ComplexNDArray<Double> slice = pArray.slice(1, ":", "1:4");
         Complex[][] arr = (Complex[][])slice.toArray();
         for (int i = 0; i < slice.dims(0); i++)
             for (int j = 0; j < slice.dims(1); j++)
@@ -436,8 +430,8 @@ class TestComplexF64NDArrayPermuteDims {
 
     @Test
     void testConcatenate() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(new int[]{4, 3, 2}).fill(1);
-        NDArray<Complex> array3 = pArray.concatenate(2, array2);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(new int[]{4, 3, 2}).fill(1);
+        ComplexNDArray<Double> array3 = pArray.concatenate(2, array2);
         for (int i = 0; i < pArray.dims(0); i++)
             for (int j = 0; j < pArray.dims(1); j++)
                 for (int k = 0; k < pArray.dims(2); k++)
@@ -450,10 +444,10 @@ class TestComplexF64NDArrayPermuteDims {
 
     @Test
     void testConcatenateMultiple() {
-        NDArray<Complex> array2 = pArray.copy().fill(1).slice(":", ":", "1:3");
-        NDArray<Complex> array3 = new ComplexF64NDArray(new int[]{5, 3, 4}).permuteDims(2, 1, 0);
-        NDArray<Complex> array4 = new ComplexF64NDArray(new int[]{36}).fill(new Complex(2, -2)).reshape(4, 3, 3);
-        NDArray<Complex> array5 = pArray.concatenate(2, array2, array3, array4);
+        ComplexNDArray<Double> array2 = pArray.copy().fill(1).slice(":", ":", "1:3");
+        ComplexNDArray<Double> array3 = new ComplexF64NDArray(new int[]{5, 3, 4}).permuteDims(2, 1, 0);
+        ComplexNDArray<Double> array4 = new ComplexF64NDArray(new int[]{36}).fill(new Complex(2, -2)).reshape(4, 3, 3);
+        ComplexNDArray<Double> array5 = pArray.concatenate(2, array2, array3, array4);
         int start = 0;
         int end = pArray.dims(2);
         for (int i = 0; i < pArray.dims(0); i++)

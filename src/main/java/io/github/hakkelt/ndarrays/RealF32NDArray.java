@@ -1,23 +1,14 @@
 package io.github.hakkelt.ndarrays;
 
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.stream.Collector;
 
-import org.apache.commons.math3.complex.Complex;
-
 /**
- * N-dimensional arrays holding single-precision (32bit) real values.
- * 
- * The sole reason why it would be a better option than RealF64NDArray,
- * it that it uses half of the memory RealF64NDArray would require.
+ * N-dimensional arrays holding single-precision (32bit) floating point values.
  * 
  */
-public class RealF32NDArray extends RealNDArray<Float> {
-    protected FloatBuffer data;
+public class RealF32NDArray extends AbstractFloatNDArray {
+    protected float[] data;
 
     protected RealF32NDArray() {}
 
@@ -26,222 +17,78 @@ public class RealF32NDArray extends RealNDArray<Float> {
      * 
      * @param dims dimensions / shape of the NDArray
      */
-    public RealF32NDArray(int... dims)
-        { super(dims); }
+    public RealF32NDArray(int... dims) {
+        baseConstuctor(dims);
+        this.data = new float[length()];
+    }
 
     /**
-     * Constructor that copies values from the array given as parameter.
-     * 
-     * The resulting NDArray is 1-dimensional, and has the same length as the parameter array.
-     * 
-     * @param real array of float values to be copied to the NDArray
-     */
-    public RealF32NDArray(float[] real)
-        { super(real); }
-    
-    /**
-     * Constructor that copies values from the array given as parameter.
-     * 
-     * The resulting NDArray is 1-dimensional, and has the same length as the parameter array.
-     * 
-     * @param real array of double values to be copied to the NDArray
-     */
-    public RealF32NDArray(double[] real)
-        { super(real); }
-    
-    /**
-     * Constructor that copies values from the array given as parameter.
-     * 
-     * The resulting NDArray has the same dimensionality as the input array.
-     * 
-     * @param real a multidimensional primitive array of floats or doubles
-     * that stores values to be copied to this NDArray as initial value
-     * 
-     */
-    public RealF32NDArray(Object[] real)
-        { super(real); }
-    
-    /**
-     * Constructor that copies values from the array given as parameter.
-     * 
-     * @param dims dimensionality of the resulting NDArray
-     * @param real array of float values to be copied to the NDArray
-     */
-    public RealF32NDArray(int[] dims, float[] real)
-        { super(dims, real); }
-    
-    /**
-     * Constructor that copies values from the array given as parameter.
-     * 
-     * @param dims dimensionality of the resulting NDArray
-     * @param real array of double values to be copied to the NDArray
-     */
-    public RealF32NDArray(int[] dims, double[] real)
-        { super(dims, real); }
-    
-    /**
      * Copy constructor.
      * 
-     * @param array NDArray from which elements are copied from
+     * @param array NDArray from which entries are copied from.
      */
-    public RealF32NDArray(NDArray<?> array)
-        { super(array); }
+    public RealF32NDArray(NDArray<? extends Number> array) {
+        baseConstuctor(array.dims());
+        this.data = new float[length()];
+        copyFrom(array);
+    }
+
+    public static NDArray<Float> of(float[] array) {
+        return new RealF32NDArray(array.length).copyFrom(array);
+    }
     
-    /**
-     * Copy constructor.
-     * 
-     * @param array NDArray from which elements are copied from
-     */
-    public RealF32NDArray(RealF32NDArray array) {
-        baseConstructor(array.dims());
-        data.put(array.data);
-        if (array.areBartDimsSpecified()) {
-            bartDims = array.getBartDims();
-            areBartDimsSpecified = true;
-        }
+    public static NDArray<Float> of(double[] array) {
+        return new RealF32NDArray(array.length).copyFrom(array);
+    }
+    
+    public static NDArray<Float> of(byte[] array) {
+        return new RealF32NDArray(array.length).copyFrom(array);
+    }
+    
+    public static NDArray<Float> of(short[] array) {
+        return new RealF32NDArray(array.length).copyFrom(array);
+    }
+    
+    public static NDArray<Float> of(int[] array) {
+        return new RealF32NDArray(array.length).copyFrom(array);
+    }
+    
+    public static NDArray<Float> of(long[] array) {
+        return new RealF32NDArray(array.length).copyFrom(array);
+    }
+    
+    public static NDArray<Float> of(Object[] realOrComplex) {
+        return new RealF32NDArray(computeDims(realOrComplex)).copyFrom(realOrComplex);
+    }
+
+    public NDArray<Float> copyFrom(RealF32NDArray array) {
+        data = array.data.clone();
+        return this;
     }
 
     public Float get(int linearIndex) {
         linearIndex = boundaryCheck(linearIndex, length());
-        return data.get(linearIndex);
+        return data[linearIndex];
     }
 
-    public String dataTypeAsString() {
-        return "RealF32";
-    }
-
-    protected ByteBuffer createBuffer(int dataLength) {
-        rawData = ByteBuffer.allocateDirect(dataLength * Float.BYTES * 2);
-        rawData.order(ByteOrder.LITTLE_ENDIAN);
-        return rawData;
-    }
-
-    @Override
-    protected void baseConstructor(int[] dims) {
-        this.dims = dims.clone();
-        this.dataLength = length(dims);
-        rawData = createBuffer(this.dataLength);
-        this.data = rawData.asFloatBuffer();
-        this.multipliers = calculateMultipliers(dims);
-    }
-
-    @Override
-    protected void baseConstructor(int[] dims, ByteBuffer buffer) {
-        this.dims = dims.clone();
-        this.dataLength = length(dims);
-        this.rawData = buffer;
-        this.data = buffer.asFloatBuffer();
-        this.multipliers = calculateMultipliers(dims);
-    }
-
-    @Override
-    public double getReal(int linearIndex) {
-        return get(linearIndex).doubleValue();
-    }
-
-    @Override
-    public double getImag(int linearIndex) {
-        boundaryCheck(linearIndex, length());
-        return 0;
-    }
-
-    @Override
-    public void setReal(float real, int linearIndex) {
+    public void set(Number real, int linearIndex) {
         linearIndex = boundaryCheck(linearIndex, length());
-        data.put(linearIndex, real);
+        data[linearIndex] = real.floatValue();
     }
 
-    @Override
-    public void setReal(double real, int linearIndex) {
-        linearIndex = boundaryCheck(linearIndex, length());
-        data.put(linearIndex, (float)real);
-    }
-    
-    @Override
-    protected Collector<Object, List<Object>, NDArray<Float>> getCollector(int[] dims) {
-        return NDArrayCollectors.toRealF32NDArray(dims);
+    public static Collector<Object, List<Object>, NDArray<Float>> getCollector(int[] dims) {
+        return new RealNDArrayCollector<>(new RealF32NDArray(dims));
     }
 
-    @Override
-    public NDArray<Float> similar() {
-        return new RealF32NDArray(dims);
-    }
-    
-    @Override
-    protected NDArray<Float> similar(NDArray<?> array) {
-        return new RealF32NDArray(array.dims());
-    }
 
-    @Override
-    public NDArray<Float> copy() {
-        return new RealF32NDArray(this);
-    }
-
-    @Override
-    public Buffer getBuffer() {
-        return data;
-    }
-    
-    @Override
-    protected NDArray<Float> copy(NDArray<?> array) {
-        return new RealF32NDArray(array);
-    }
-
-    @Override
-    protected AbstractNDArray<Float> createNewNDArrayOfSameTypeAsMe(int[] dims) {
+    protected RealF32NDArray createNewNDArrayOfSameTypeAsMe(int... dims) {
         return new RealF32NDArray(dims);
     }
 
     @Override
-    public void set(Float value, int linearIndex) {
-        setReal(value, linearIndex);
-    }
-
-    protected Float accumulate(Float acc, Float value, AbstractNDArray.AccumulateOperators operation) {
-        switch (operation) { 
-            case ADD: return Float.valueOf(acc.floatValue() + value.floatValue());
-            case SUBTRACT: return Float.valueOf(acc.floatValue() - value.floatValue());
-            case MULTIPLY: return Float.valueOf(acc.floatValue() * value.floatValue());
-            case DIVIDE: return Float.valueOf(acc.floatValue() / value.floatValue());
-            default: throw new IllegalArgumentException();
-        }
-    }
-
-    protected Float accumulate(Float acc, Double value, AbstractNDArray.AccumulateOperators operation) {
-        switch (operation) { 
-            case ADD: return Float.valueOf(acc.floatValue() + value.floatValue());
-            case SUBTRACT: return Float.valueOf(acc.floatValue() - value.floatValue());
-            case MULTIPLY: return Float.valueOf(acc.floatValue() * value.floatValue());
-            case DIVIDE: return Float.valueOf(acc.floatValue() / value.floatValue());
-            default: throw new IllegalArgumentException();
-        }
-    }
-
-    protected Float accumulate(Float acc, Integer value, AbstractNDArray.AccumulateOperators operation) {
-        switch (operation) { 
-            case ADD: return Float.valueOf(acc.floatValue() + value.floatValue());
-            case SUBTRACT: return Float.valueOf(acc.floatValue() - value.floatValue());
-            case MULTIPLY: return Float.valueOf(acc.floatValue() * value.floatValue());
-            case DIVIDE: return Float.valueOf(acc.floatValue() / value.floatValue());
-            default: throw new IllegalArgumentException();
-        }
-    }
-    @Override
-    public Object eltype() {
-        return Float.class;
-    }
-
-    @Override
-    protected Float zeroT() {
-        return Float.valueOf(0.0f);
-    }
-    @Override
-    protected Float oneT() {
-        return Float.valueOf(1.0f);
-    }
-    @Override
-    protected Float accumulate(Float acc, Complex value, AccumulateOperators operator) {
-        throw new IllegalArgumentException();
+    protected String name() {
+        return "simple";
     }
     
 }
+

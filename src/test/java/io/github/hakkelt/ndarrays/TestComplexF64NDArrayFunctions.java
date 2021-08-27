@@ -14,14 +14,8 @@ class TestComplexF64NDArrayFunctions {
 
     @BeforeEach
     void setup() {
-        int[] dims = { 4, 5, 3 };
-        double[] real = new double[4 * 5 * 3];
-        double[] imag = new double[4 * 5 * 3];
-        for (int i = 0; i < real.length; i++) {
-            real[i] = i;
-            imag[i] = -i;
-        }
-        array = new ComplexF64NDArray(dims, real, imag);
+        array = new ComplexF64NDArray(new int[]{ 4, 5, 3 });
+        array.applyWithLinearIndex((value, index) -> new Complex(index, -index));
     }
 
     @Test
@@ -177,7 +171,7 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testEqual() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
         assertEquals(array, array2);
         array2.set(new Complex(0,0), 10);
         assertNotEquals(array, array2);
@@ -219,7 +213,7 @@ class TestComplexF64NDArrayFunctions {
         final Complex one = new Complex(1,-1);
         NDArray<?> increased = array.stream()
             .map((value) -> value.add(one))
-            .collect(NDArrayCollectors.toComplexF64NDArray(array.dims()));
+            .collect(ComplexF64NDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).add(one), increased.get(i));
     }
@@ -229,7 +223,7 @@ class TestComplexF64NDArrayFunctions {
         final Complex one = new Complex(1,-1);
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value.add(one))
-            .collect(NDArrayCollectors.toComplexF64NDArray(array.dims()));
+            .collect(ComplexF64NDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).add(one), increased.get(i));
     }
@@ -237,7 +231,7 @@ class TestComplexF64NDArrayFunctions {
     @Test
     void testToString() {
         String str = array.toString();
-        assertEquals("NDArray<ComplexF64>(4 × 5 × 3)", str);
+        assertEquals("simple NDArray<Complex Double>(4 × 5 × 3)", str);
     }
 
     @Test
@@ -245,7 +239,7 @@ class TestComplexF64NDArrayFunctions {
         String str = array.contentToString();
         String lineFormat = "%8.5e%+8.5ei\t%8.5e%+8.5ei\t%8.5e%+8.5ei\t%8.5e%+8.5ei\t%8.5e%+8.5ei\t%n";
         String expected = new StringBuilder()
-            .append("NDArray<ComplexF64>(4 × 5 × 3)" + System.lineSeparator())
+            .append("simple NDArray<Complex Double>(4 × 5 × 3)" + System.lineSeparator())
             .append("[:, :, 0] =" + System.lineSeparator())
             .append(String.format(lineFormat, 0.0e+00, +0.0e+00, 4.0e+00, -4.0e+00, 8.0e+00, -8.0e+00, 1.2e+01, -1.2e+01, 1.6e+01, -1.6e+01))
             .append(String.format(lineFormat, 1.0e+00, -1.0e+00, 5.0e+00, -5.0e+00, 9.0e+00, -9.0e+00, 1.3e+01, -1.3e+01, 1.7e+01, -1.7e+01))
@@ -270,23 +264,23 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testAdd() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
-        NDArray<Complex> array3 = array.add(array2);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array3 = array.add(array2);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).multiply(2), array3.get(i));
     }
 
     @Test
     void testAddScalar() {
-        NDArray<Complex> array2 = array.add(5);
+        ComplexNDArray<Double> array2 = array.add(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).add(5), array2.get(i));
     }
 
     @Test
     void testAddMultiple() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
-        NDArray<Complex> array3 = array.add(array2, 5.3, array2, new Complex(3,1));
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array3 = array.add(array2, 5.3, array2, new Complex(3,1));
         for (int i = 0; i < array.length(); i++) {
             Complex expected = array.get(i).multiply(3).add(new Complex(5.3 + 3,1));
             assertTrue(expected.subtract(array3.get(i)).abs() < 1e5);
@@ -295,7 +289,7 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testAddInplace() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
         array2.addInplace(array);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).multiply(2), array2.get(i));
@@ -303,7 +297,7 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
         array2.addInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).add(5), array2.get(i));
@@ -311,7 +305,7 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
         array2.addInplace(array, 5.3, array2, new Complex(3,1));
         for (int i = 0; i < array.length(); i++) {
             Complex expected = array.get(i).multiply(3).add(new Complex(5.3 + 3,1));
@@ -321,23 +315,23 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testSubtract() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
-        NDArray<Complex> array3 = array.subtract(array2);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array3 = array.subtract(array2);
         for (int i = 0; i < array.length(); i++)
             assertEquals(new Complex(0,0), array3.get(i));
     }
 
     @Test
     void testSubtractScalar() {
-        NDArray<Complex> array2 = array.subtract(5);
+        ComplexNDArray<Double> array2 = array.subtract(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).subtract(5), array2.get(i));
     }
 
     @Test
     void testSubtractMultiple() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
-        NDArray<Complex> array3 = array.subtract(array2, 5.3, array2, new Complex(3,1));
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array3 = array.subtract(array2, 5.3, array2, new Complex(3,1));
         for (int i = 0; i < array.length(); i++) {
             Complex expected = array.get(i).multiply(-1).subtract(new Complex(5.3 + 3,1));
             assertTrue(expected.subtract(array3.get(i)).abs() < 1e5);
@@ -346,7 +340,7 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testSubtractInplace() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
         array2.subtractInplace(array);
         for (int i = 0; i < array.length(); i++)
             assertEquals(new Complex(0,0), array2.get(i));
@@ -354,7 +348,7 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testSubtractInplaceScalar() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
         array2.subtractInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).subtract(5), array2.get(i));
@@ -362,7 +356,7 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testSubtractInplaceMultiple() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
         array2.subtractInplace(array, 5.3, array2, new Complex(3,1));
         for (int i = 0; i < array.length(); i++) {
             Complex expected = array.get(i).multiply(-1).subtract(new Complex(5.3 + 3,1));
@@ -372,23 +366,23 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testMultiply() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
-        NDArray<Complex> array3 = array.multiply(array2);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array3 = array.multiply(array2);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).multiply(array.get(i)), array3.get(i));
     }
 
     @Test
     void testMultiplyScalar() {
-        NDArray<Complex> array2 = array.multiply(5);
+        ComplexNDArray<Double> array2 = array.multiply(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).multiply(5), array2.get(i));
     }
 
     @Test
     void testMultiplyMultiple() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
-        NDArray<Complex> array3 = array.multiply(array, 5.3, array2, new Complex(3,1));
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array3 = array.multiply(array, 5.3, array2, new Complex(3,1));
         for (int i = 0; i < array.length(); i++) {
             Complex expected = array.get(i).multiply(array.get(i)).multiply((float)5.3)
                 .multiply(array2.get(i)).multiply(new Complex(3,1));
@@ -398,7 +392,7 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testMultiplyInplace() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
         array2.multiplyInplace(array);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).multiply(array.get(i)), array2.get(i));
@@ -406,7 +400,7 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testMultiplyInplaceScalar() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
         array2.multiplyInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).multiply(5), array2.get(i));
@@ -414,7 +408,7 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testMultiplyInplaceMultiple() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
         array2.multiplyInplace(array, 5.3, array2, new Complex(3,1));
         for (int i = 0; i < array.length(); i++) {
             Complex expected = array.get(i).multiply(array.get(i)).multiply((float)5.3)
@@ -428,8 +422,8 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testDivide() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
-        NDArray<Complex> array3 = array.divide(array2);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array3 = array.divide(array2);
         for (int i = 0; i < array.length(); i++) {
             if (array.get(i).equals(new Complex(0,0)))
                 assertTrue(array3.get(i).isNaN());
@@ -440,15 +434,15 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testDivideScalar() {
-        NDArray<Complex> array2 = array.divide(5);
+        ComplexNDArray<Double> array2 = array.divide(5);
         for (int i = 0; i < array.length(); i++)
             assertTrue(array.get(i).divide(5).subtract(array2.get(i)).abs() < 1e-5);
     }
 
     @Test
     void testDivideMultiple() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
-        NDArray<Complex> array3 = array.divide(array, 5.3, array2, new Complex(3,1));
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array3 = array.divide(array, 5.3, array2, new Complex(3,1));
         for (int i = 0; i < array.length(); i++) {
             Complex expected = array.get(i).divide(array.get(i)).divide((float)5.3)
                 .divide(array2.get(i)).divide(new Complex(3,1));
@@ -461,7 +455,7 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testDivideInplace() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
         array2.divideInplace(array);
         for (int i = 0; i < array.length(); i++)
         if (array.get(i).equals(new Complex(0,0)))
@@ -472,7 +466,7 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testDivideInplaceScalar() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
         array2.divideInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertTrue(array.get(i).divide(5).subtract(array2.get(i)).abs() < 1e-5);
@@ -480,7 +474,7 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testDivideInplaceMultiple() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(array);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(array);
         array2.divideInplace(array, 5.3, array2, new Complex(3,1));
         for (int i = 0; i < array.length(); i++) {
             Complex expected = array.get(i).divide(array.get(i)).divide((float)5.3)
@@ -501,7 +495,7 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testSum1D() {
-        NDArray<Complex> sum = array.sum(1);
+        ComplexNDArray<Double> sum = array.sum(1);
         for (int i = 0; i < sum.dims(0); i++) {
             for (int j = 0; j < sum.dims(1); j++) {
                 double GaussSum = (array.get(i,0,j).getReal() + array.get(i,-1,j).getReal()) * 5 / 2;
@@ -512,7 +506,7 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testSum2D() {
-        NDArray<Complex> sum = array.sum(2, 1);
+        ComplexNDArray<Double> sum = array.sum(2, 1);
         for (int i = 0; i < sum.length(); i++) {
             double GaussSum = (array.get(i,0,0).getReal() + array.get(i,-1,-1).getReal()) * (5 * 3) / 2;
             assertEquals(new Complex(GaussSum, -GaussSum), sum.get(i));
@@ -570,7 +564,7 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testCopy() {
-        NDArray<Complex> array2 = array.copy();
+        ComplexNDArray<Double> array2 = array.copy();
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i), array2.get(i));
         array2.set(new Complex(0,0), 5);
@@ -595,7 +589,7 @@ class TestComplexF64NDArrayFunctions {
     void testPermuteDimsTooShortPermutationVector() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> array.permuteDims(0,2));
         assertEquals(
-            String.format(NDArrayPermuteDimsView.ERROR_PERMUTATOR_SIZE_MISMATCH, "[0, 2]", "4 × 5 × 3"),
+            String.format(AbstractNDArrayPermuteDimsView.ERROR_PERMUTATOR_SIZE_MISMATCH, "[0, 2]", "4 × 5 × 3"),
             exception.getMessage());
     }
 
@@ -603,7 +597,7 @@ class TestComplexF64NDArrayFunctions {
     void testPermuteDimsTooLongPermutationVector() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> array.permuteDims(0,2,1,4));
         assertEquals(
-            String.format(NDArrayPermuteDimsView.ERROR_PERMUTATOR_SIZE_MISMATCH, "[0, 2, 1, 4]", "4 × 5 × 3"),
+            String.format(AbstractNDArrayPermuteDimsView.ERROR_PERMUTATOR_SIZE_MISMATCH, "[0, 2, 1, 4]", "4 × 5 × 3"),
             exception.getMessage());
     }
 
@@ -611,14 +605,14 @@ class TestComplexF64NDArrayFunctions {
     void testPermuteDimsRepeatedDimension() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> array.permuteDims(0,1,1));
         assertEquals(
-            String.format(NDArrayPermuteDimsView.ERROR_INVALID_PERMUTATOR, "[0, 1, 1]", "4 × 5 × 3"),
+            String.format(AbstractNDArrayPermuteDimsView.ERROR_INVALID_PERMUTATOR, "[0, 1, 1]", "4 × 5 × 3"),
             exception.getMessage());
     }
 
     @Test
     void testConcatenate() {
-        NDArray<Complex> array2 = new ComplexF64NDArray(new int[]{4, 2, 3}).fill(1);
-        NDArray<Complex> array3 = array.concatenate(1, array2);
+        ComplexNDArray<Double> array2 = new ComplexF64NDArray(new int[]{4, 2, 3}).fill(1);
+        ComplexNDArray<Double> array3 = array.concatenate(1, array2);
         for (int i = 0; i < array.dims(0); i++)
             for (int j = 0; j < array.dims(1); j++)
                 for (int k = 0; k < array.dims(2); k++)
@@ -631,10 +625,10 @@ class TestComplexF64NDArrayFunctions {
 
     @Test
     void testConcatenateMultiple() {
-        NDArray<Complex> array2 = array.copy().fill(1).slice(":", "1:3", ":");
-        NDArray<Complex> array3 = new ComplexF64NDArray(new int[]{3, 4, 4}).permuteDims(2, 1, 0);
-        NDArray<Complex> array4 = new ComplexF64NDArray(new int[]{12}).fill(new Complex(2, -2)).reshape(4, 1, 3);
-        NDArray<Complex> array5 = array.concatenate(1, array2, array3, array4);
+        ComplexNDArray<Double> array2 = array.copy().fill(1).slice(":", "1:3", ":");
+        ComplexNDArray<Double> array3 = new ComplexF64NDArray(new int[]{3, 4, 4}).permuteDims(2, 1, 0);
+        ComplexNDArray<Double> array4 = new ComplexF64NDArray(new int[]{12}).fill(new Complex(2, -2)).reshape(4, 1, 3);
+        ComplexNDArray<Double> array5 = array.concatenate(1, array2, array3, array4);
         int start = 0;
         int end = array.dims(1);
         for (int i = 0; i < array.dims(0); i++)

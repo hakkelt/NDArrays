@@ -13,11 +13,8 @@ class TestRealF32NDArraySlice {
 
     @BeforeEach
     void setup() {
-        int[] dims = { 4, 5, 3 };
-        double[] real = new double[4 * 5 * 3];
-        for (int i = 0; i < real.length; i++)
-            real[i] = i;
-        array = new RealF32NDArray(dims, real);
+        array = new RealF32NDArray(new int[]{ 4, 5, 3 });
+        array.applyWithLinearIndex((value, index) -> (float)index);
         slice = array.slice(1, "1:4", ":");
     }
 
@@ -212,7 +209,7 @@ class TestRealF32NDArraySlice {
     void testCollector() {
         NDArray<Float> increased = slice.stream()
             .map((value) -> value + 1)
-            .collect(NDArrayCollectors.toRealF32NDArray(slice.dims()));
+            .collect(RealF32NDArray.getCollector(slice.dims()));
         for (int i = 0; i < slice.length(); i++)
             assertEquals(slice.get(i) + 1, increased.get(i));
     }
@@ -221,7 +218,7 @@ class TestRealF32NDArraySlice {
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(NDArrayCollectors.toRealF32NDArray(array.dims()));
+            .collect(RealF32NDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) + 1, increased.get(i));
     }
@@ -229,7 +226,7 @@ class TestRealF32NDArraySlice {
     @Test
     void testToString() {
         String str = slice.toString();
-        assertEquals("NDArray<RealF32>(3 × 3)", str);
+        assertEquals("simple NDArray<Float>(3 × 3)", str);
     }
 
     @Test
@@ -237,7 +234,7 @@ class TestRealF32NDArraySlice {
         String str = slice.contentToString();
         String lineFormat = "%8.5e\t%8.5e\t%8.5e\t%n";
         String expected = new StringBuilder()
-            .append("NDArray<RealF32>(3 × 3)" + System.lineSeparator())
+            .append("simple NDArray<Float>(3 × 3)" + System.lineSeparator())
             .append(String.format(lineFormat, 5.00000e+00, 2.50000e+01, 4.50000e+01))
             .append(String.format(lineFormat, 9.00000e+00, 2.90000e+01, 4.90000e+01))
             .append(String.format(lineFormat, 1.30000e+01, 3.30000e+01, 5.30000e+01))
@@ -322,7 +319,7 @@ class TestRealF32NDArraySlice {
         double norm = slice.stream()
             .filter(value -> value != 0.)
             .count();
-        assertEquals(norm, slice.norm(0));
+        assertTrue(Math.abs(norm - slice.norm(0)) / norm < 1e-6);
     }
 
     @Test
@@ -330,31 +327,31 @@ class TestRealF32NDArraySlice {
         double norm = slice.stream()
             .mapToDouble(value -> Math.abs(value))
             .reduce(0., (acc, item) -> acc + item);
-        assertEquals(norm, slice.norm(1));
+        assertTrue(Math.abs(norm - slice.norm(1)) / norm < 1e-6);
     }
 
     @Test
     void test2Norm() {
-        double norm = Math.sqrt(slice.stream()
-            .mapToDouble(value -> Math.pow(Math.abs(value), 2))
-            .reduce(0., (acc, item) -> acc + item));
-        assertEquals(norm, slice.norm());
+        double norm = (float)Math.sqrt(slice.stream()
+            .map(value -> (float)Math.pow(Math.abs(value), 2))
+            .reduce((float)0., (acc, item) -> acc + item));
+        assertTrue(Math.abs(norm - slice.norm()) / norm < 1e-6);
     }
 
     @Test
     void testPQuasinorm() {
-        double norm = Math.pow(slice.stream()
-            .mapToDouble(value -> Math.pow(Math.abs(value), 0.5))
-            .reduce(0., (acc, item) -> acc + item), 2);
-        assertEquals(norm, slice.norm(0.5));
+        double norm = (float)Math.pow(slice.stream()
+            .map(value -> (float)Math.pow(Math.abs(value), 0.5))
+            .reduce((float)0., (acc, item) -> acc + item), 2);
+        assertTrue(Math.abs(norm - slice.norm(0.5)) / norm < 1e-6);
     }
 
     @Test
     void testPNorm() {
-        double norm = Math.pow(slice.stream()
-            .mapToDouble(value -> Math.pow(Math.abs(value), 3.5))
-            .reduce(0., (acc, item) -> acc + item), 1 / 3.5);
-        assertEquals(norm, slice.norm(3.5));
+        double norm = (float)Math.pow(slice.stream()
+            .map(value -> (float)Math.pow(Math.abs(value), 3.5))
+            .reduce((float)0., (acc, item) -> acc + item), 1 / 3.5);
+        assertTrue(Math.abs(norm - slice.norm(3.5)) / norm < 1e-6);
     }
 
     @Test
@@ -362,7 +359,7 @@ class TestRealF32NDArraySlice {
         double norm = slice.stream()
             .mapToDouble(value -> Math.abs(value))
             .max().getAsDouble();
-        assertEquals(norm, slice.norm(Double.POSITIVE_INFINITY));
+        assertTrue(Math.abs(norm - slice.norm(Double.POSITIVE_INFINITY)) / norm < 1e-6);
     }
 
     @Test
@@ -441,33 +438,5 @@ class TestRealF32NDArraySlice {
         for (int i = start; i < end; i++)
             for (int j = 0; j < array2.dims(1); j++)
                 assertEquals(2, array5.get(i, j));
-    }
-
-    @Test
-    void testReal() {
-        NDArray<Double> real = slice.real();
-        slice.streamLinearIndices()
-            .forEach(i -> assertEquals(slice.get(i).doubleValue(), real.get(i)));
-    }
-
-    @Test
-    void testImag() {
-        NDArray<Double> imag = slice.imaginary();
-        slice.streamLinearIndices()
-            .forEach(i -> assertEquals(0, imag.get(i)));
-    }
-
-    @Test
-    void testAbs() {
-        NDArray<Double> abs = slice.abs();
-        slice.streamLinearIndices()
-            .forEach(i -> assertEquals(Math.abs(slice.get(i).doubleValue()), abs.get(i)));
-    }
-
-    @Test
-    void testAngle() {
-        NDArray<Double> angle = slice.angle();
-        slice.streamLinearIndices()
-            .forEach(i -> assertEquals(0, angle.get(i)));
     }
 }

@@ -1,5 +1,6 @@
 package io.github.hakkelt.ndarrays;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -8,60 +9,43 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
-import io.github.hakkelt.ndarrays.NDArrayCollectors.ComplexF32;
-
 import org.apache.commons.math3.complex.Complex;
 
-class ComplexNDArrayCollector extends AbstractNDArrayCollector<Complex> implements Collector<Object, List<Object>, NDArray<Complex>> {
-    Class<?> dataType;
+class ComplexNDArrayCollector<T extends Number> implements Collector<Object, List<Object>, NDArray<Complex>> {
+    int[] dims;
+    ComplexNDArray<T> destination;
 
-    public ComplexNDArrayCollector(Class<?> dataType, int[] dims) {
-        this.dataType = dataType;
-        this.dims = dims;
+    public ComplexNDArrayCollector(ComplexNDArray<T> destination) {
+        this.destination = destination;
     }
 
-    @Override
     public Supplier<List<Object>> supplier() {
-        return generalSupplier();
+        return ArrayList::new;
     }
 
-    @Override
     public BiConsumer<List<Object>, Object> accumulator() {
-        return generalAccumulator();
+        return (list, value) -> list.add(value);
     }
 
-    @Override
     public BinaryOperator<List<Object>> combiner() {
-        return generalCombiner();
-    }
-
-    public Function<List<Object>, NDArray<Complex>> finisher() {
-        return list -> {
-            NDArray<Complex> array = dataType == ComplexF32.class ?
-                new ComplexF32NDArray(dims) :
-                new ComplexF64NDArray(dims);
-            for (int i = 0; i < array.length(); i++)
-                array.set(wrapValue(list.get(i)), i);
-            return array;
+        return (list1, list2) -> {
+            list1.addAll(list2);
+            return list1;
         };
     }
 
-    @Override
     public Set<Characteristics> characteristics() {
-        return generalCharacteristics();
+        return Set.of();
     }
 
-    @Override
-    protected Complex wrapValue(Object value) {
-        if (value instanceof Float)
-            return new Complex((Float)value, 0);
-        if (value instanceof Double)
-            return new Complex((Double)value, 0);
-        if (value instanceof Integer)
-            return new Complex((Integer)value, 0);
-        if (value instanceof Complex)
-            return (Complex)value;
-        throw new UnsupportedOperationException(String.format(ERROR_TYPE_MISMATCH, value.getClass()));
+    @SuppressWarnings("unchecked")
+    public Function<List<Object>, NDArray<Complex>> finisher() {
+        return list -> {
+            destination.applyWithLinearIndex(
+                (value, index) -> ((AbstractNDArray<Complex,T>)destination).wrapValue(list.get(index))
+            );
+            return destination;
+        };
     }
     
 }

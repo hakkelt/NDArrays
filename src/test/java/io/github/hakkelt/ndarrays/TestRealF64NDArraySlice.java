@@ -13,11 +13,8 @@ class TestRealF64NDArraySlice {
 
     @BeforeEach
     void setup() {
-        int[] dims = { 4, 5, 3 };
-        double[] real = new double[4 * 5 * 3];
-        for (int i = 0; i < real.length; i++)
-            real[i] = i;
-        array = new RealF64NDArray(dims, real);
+        array = new RealF64NDArray(new int[]{ 4, 5, 3 });
+        array.applyWithLinearIndex((value, index) -> (double)index);
         slice = array.slice(1, "1:4", ":");
     }
 
@@ -212,7 +209,7 @@ class TestRealF64NDArraySlice {
     void testCollector() {
         NDArray<Double> increased = slice.stream()
             .map((value) -> value + 1)
-            .collect(NDArrayCollectors.toRealF64NDArray(slice.dims()));
+            .collect(RealF64NDArray.getCollector(slice.dims()));
         for (int i = 0; i < slice.length(); i++)
             assertEquals(slice.get(i) + 1, increased.get(i));
     }
@@ -221,7 +218,7 @@ class TestRealF64NDArraySlice {
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(NDArrayCollectors.toRealF64NDArray(array.dims()));
+            .collect(RealF64NDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) + 1, increased.get(i));
     }
@@ -229,7 +226,7 @@ class TestRealF64NDArraySlice {
     @Test
     void testToString() {
         String str = slice.toString();
-        assertEquals("NDArray<RealF64>(3 × 3)", str);
+        assertEquals("simple NDArray<Double>(3 × 3)", str);
     }
 
     @Test
@@ -237,7 +234,7 @@ class TestRealF64NDArraySlice {
         String str = slice.contentToString();
         String lineFormat = "%8.5e\t%8.5e\t%8.5e\t%n";
         String expected = new StringBuilder()
-            .append("NDArray<RealF64>(3 × 3)" + System.lineSeparator())
+            .append("simple NDArray<Double>(3 × 3)" + System.lineSeparator())
             .append(String.format(lineFormat, 5.00000e+00, 2.50000e+01, 4.50000e+01))
             .append(String.format(lineFormat, 9.00000e+00, 2.90000e+01, 4.90000e+01))
             .append(String.format(lineFormat, 1.30000e+01, 3.30000e+01, 5.30000e+01))
@@ -442,32 +439,5 @@ class TestRealF64NDArraySlice {
             for (int j = 0; j < array2.dims(1); j++)
                 assertEquals(2, array5.get(i, j));
     }
-
-    @Test
-    void testReal() {
-        NDArray<Double> real = slice.real();
-        slice.streamLinearIndices()
-            .forEach(i -> assertEquals(slice.get(i).doubleValue(), real.get(i)));
-    }
-
-    @Test
-    void testImag() {
-        NDArray<Double> imag = slice.imaginary();
-        slice.streamLinearIndices()
-            .forEach(i -> assertEquals(0, imag.get(i)));
-    }
-
-    @Test
-    void testAbs() {
-        NDArray<Double> abs = slice.abs();
-        slice.streamLinearIndices()
-            .forEach(i -> assertEquals(Math.abs(slice.get(i).doubleValue()), abs.get(i)));
-    }
-
-    @Test
-    void testAngle() {
-        NDArray<Double> angle = slice.angle();
-        slice.streamLinearIndices()
-            .forEach(i -> assertEquals(0, angle.get(i)));
-    }
+    
 }

@@ -1,227 +1,589 @@
 package io.github.hakkelt.ndarrays;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.math3.complex.Complex;
 
-abstract class ComplexNDArray extends AbstractNDArray<Complex> {
+/**
+ * General N-dimensional arrays holding either complex or real values.
+ * 
+ * The aim of this package to create an general framework to handle multidimensional data.
+ * The reference implementation is based on array of primitive values or complex values form apache.math3,
+ * it is, however, super easy to write a wrapper to any array- or collection-implementation making it possible to combine
+ * the convenience of this interface with the advantages of the selected collection.
+ * 
+ */
+public interface ComplexNDArray<T extends Number> extends NDArray<Complex> {
 
-    protected abstract void baseConstructor(int[] dims);
-    protected abstract void baseConstructor(int[] dims, ByteBuffer buffer);
+    /** 
+     * Returns the real part of an element specified by linear indexing.
+     * 
+     * <p>Linear indexing: It selects the ith element using the column-major
+     * iteration order that linearly spans the entire array.
+     * 
+     * @param linearIndex linear index
+     * @return the real part of an element specified by linear indexing
+     */
+    public T getReal(int linearIndex);
 
-    protected ComplexNDArray() {}
+    /** 
+     * Returns the real part of an element specified by cartesian indexing.
+     * 
+     * <p>Cartesian indexing: The ordinary way to index into an N-dimensional
+     * array is to use exactly N indices; each index selects the position(s)
+     * in its particular dimension.
+     * 
+     * @param indices cartesian coordinates
+     * @return the real part of an element specified by cartesian indexing
+     */
+    public T getReal(int... indices);
 
-    protected ComplexNDArray(int[] dims) {
-        baseConstructor(dims);
-    }
-
-    protected ComplexNDArray(float[] real) {
-        baseConstructor(new int[] { real.length });
-        set(real);
-    }
-
-    protected ComplexNDArray(double[] real) {
-        baseConstructor(new int[] { real.length });
-        set(real);
-    }
-
-    protected ComplexNDArray(Complex[] compl) {
-        baseConstructor(new int[] { compl.length });
-        set(compl);
-    }
-
-    protected ComplexNDArray(Object[] realOrComplex) {
-        List<Integer> dimsList = new ArrayList<>();
-        baseConstructor(listToArray(computeDims(dimsList, realOrComplex)));
-        set(realOrComplex);
-    }
-
-    protected ComplexNDArray(float[] real, float[] imag) {
-        checkEqualLength(real, imag);
-        baseConstructor(new int[] { real.length });
-        set(real, imag);
-    }
-
-    protected ComplexNDArray(double[] real, double[] imag) {
-        checkEqualLength(real, imag);
-        baseConstructor(new int[] { real.length });
-        set(real, imag);
-    }
-
-    protected ComplexNDArray(Object[] real, Object[] imag) {
-        List<Integer> realDimsList = new ArrayList<>();
-        computeDims(realDimsList, real);
-        List<Integer> imagDimsList = new ArrayList<>();
-        computeDims(imagDimsList, real);
-        checkCompatibleSize(realDimsList, imagDimsList);
-        baseConstructor(listToArray(realDimsList));
-        set(real, imag);
-    }
-
-    protected ComplexNDArray(int[] dims, float[] real) {
-        checkCompatibleSize(dims, real);
-        baseConstructor(dims);
-        set(real);
-    }
-
-    protected ComplexNDArray(int[] dims, double[] real) {
-        checkCompatibleSize(dims, real);
-        baseConstructor(dims);
-        set(real);
-    }
-
-    protected ComplexNDArray(int[] dims, float[] real, float[] imag) {
-        checkEqualLength(real, imag);
-        checkCompatibleSize(dims, real);
-        baseConstructor(dims);
-        set(real, imag);
-    }
-
-    protected ComplexNDArray(int[] dims, double[] real, double[] imag) {
-        checkEqualLength(real, imag);
-        checkCompatibleSize(dims, real);
-        baseConstructor(dims);
-        set(real, imag);
-    }
-
-    protected ComplexNDArray(NDArray<?> array) {
-        this(array.dims());
-        set(array);
-    }
-
-    @Override
-    public void set(float value, int linearIndex) {
-        setReal(value, linearIndex);
-        setImag(0, linearIndex);
-    }
-    @Override
-    public void set(double value, int linearIndex) {
-        setReal(value, linearIndex);
-        setImag(0, linearIndex);
-    }
-
-    @Override
-    public void set(Complex value, int linearIndex) {
-        setReal(value.getReal(), linearIndex);
-        setImag(value.getImaginary(), linearIndex);
-    }
-
-    protected void set(float real, float imag, int linearIndex) {
-        setReal(real, linearIndex);
-        setImag(imag, linearIndex);
-    }
-
-    protected void set(double real, double imag, int linearIndex) {
-        setReal(real, linearIndex);
-        setImag(imag, linearIndex);
-    }
-
-    @Override
-    public Object eltype() {
-        return Complex.class;
-    }
+    /** 
+     * Returns the imaginary part of an element specified by linear indexing.
+     * 
+     * <p>Linear indexing: It selects the ith element using the column-major
+     * iteration order that linearly spans the entire array.
+     * 
+     * @param linearIndex linear index
+     * @return the imaginary part of an element specified by linear indexing
+     */
+    public T getImag(int linearIndex);
     
-    public NDArray<Double> real() {
-        return streamLinearIndices()
-            .mapToObj(this::getReal).collect(NDArrayCollectors.toRealF64NDArray(dims));
-    }
-    public NDArray<Double> imaginary() {
-        return streamLinearIndices()
-            .mapToObj(this::getImag).collect(NDArrayCollectors.toRealF64NDArray(dims));
-    }
-    public NDArray<Double> abs() {
-        return streamLinearIndices()
-            .mapToObj(i -> get(i).abs()).collect(NDArrayCollectors.toRealF64NDArray(dims));
-    }
-    public NDArray<Double> angle() {
-        return streamLinearIndices()
-            .mapToObj(i -> get(i).getArgument()).collect(NDArrayCollectors.toRealF64NDArray(dims));
-    }
+    /** 
+     * Returns the imaginary part of an element specified by cartesian indexing.
+     * 
+     * <p>Cartesian indexing: The ordinary way to index into an N-dimensional
+     * array is to use exactly N indices; each index selects the position(s)
+     * in its particular dimension.
+     * 
+     * @param indices cartesian coordinates
+     * @return the imaginary part of an element specified by cartesian indexing
+     */
+    public T getImag(int... indices);
+    
+    /** 
+     * Sets the real part of an element specified by linear indexing.
+     * 
+     * <p>Linear indexing: It selects the ith element using the column-major
+     * iteration order that linearly spans the entire array.
+     * 
+     * <p>Note: If used on complex arrays, the imaginary part of the assigned
+     * element will be untouched.
+     * 
+     * @param value real value to be assigned as real part of some element
+     * @param linearIndex linear index
+     */
+    public void setReal(Number value, int linearIndex);
 
-    @Override
-    protected String printItem(int index, String format) {
-        Complex item = get(index);
-        String complexFormat = format + (item.getImaginary() < 0 ? "-" : "+") + format + "i";
-        return String.format(complexFormat, item.getReal(), Math.abs(item.getImaginary()));
-    }
+    /** 
+     * Sets the real part of an element specified by cartesian indexing.
+     * 
+     * <p>Cartesian indexing: The ordinary way to index into an N-dimensional
+     * array is to use exactly N indices; each index selects the position(s)
+     * in its particular dimension.
+     * 
+     * <p>Note: If used on complex arrays, the imaginary part of the assigned
+     * element will be untouched.
+     * 
+     * @param value real value to be assigned as real part of some element
+     * @param indices cartesian coordinates
+     */
+    public void setReal(Number value, int... indices);
+    
+    /** 
+     * Sets the imaginary part of an element specified by linear indexing.
+     * 
+     * <p>Linear indexing: It selects the ith element using the column-major
+     * iteration order that linearly spans the entire array.
+     * 
+     * <p>Note: If used on complex arrays, the real part of the assigned
+     * element will be untouched.
+     * 
+     * @param value real value to be assigned as imaginary part of some element
+     * @param linearIndex linear index
+     */
+    public void setImag(Number value, int linearIndex);
 
-    @Override
-    protected Complex zeroT() {
-        return new Complex(0, 0);
-    }
+    /** 
+     * Sets the imaginary part of an element specified by cartesian indexing.
+     * 
+     * <p>Cartesian indexing: The ordinary way to index into an N-dimensional
+     * array is to use exactly N indices; each index selects the position(s)
+     * in its particular dimension.
+     * 
+     * <p>Note: If used on complex arrays, the real part of the assigned
+     * element will be untouched.
+     * 
+     * @param value real value to be assigned as imaginary part of some element
+     * @param indices cartesian coordinates
+     */
+    public void setImag(Number value, int... indices);
 
-    @Override
-    protected Complex oneT() {
-        return new Complex(1, 0);
-    }
+    /** 
+     * Updates this NDArray with the elements of the NDArray given as parameter.
+     * 
+     * <p>Note: the parameter NDArray must have the same size and this NDArray!
+     * 
+     * @param array NDArray from which values are copied to this NDArray
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> copyFrom(NDArray<?> array);
+    
+    /** 
+     * Updates this NDArray with the elements of the array given as parameter.
+     * 
+     * <p>Note: the parameter array must have the same size and this NDArray!
+     * 
+     * @param array array holding the new values to be copied to this NDArray
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> copyFrom(float[] array);
+    
+    /** 
+     * Updates this NDArray with the elements of the array given as parameter.
+     * 
+     * <p>Note: the parameter array must have the same size and this NDArray!
+     * 
+     * @param array array holding the new values to be copied to this NDArray
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> copyFrom(double[] array);
 
-    protected Complex accumulate(Complex acc, Complex value, AbstractNDArray.AccumulateOperators operation) {
-        switch (operation) {
-            case ADD: return acc.add(value);
-            case SUBTRACT: return acc.subtract(value);
-            case MULTIPLY: return acc.multiply(value);
-            case DIVIDE: return acc.divide(value);
-            default: throw new IllegalArgumentException();
-        }
-    }
+    /** 
+     * Updates this NDArray with the elements of the array given as parameter.
+     * 
+     * <p>Note: the parameter array must have the same size and this NDArray!
+     * 
+     * @param array array holding the new values to be copied to this NDArray
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> copyFrom(byte[] array);
+    
+    /** 
+     * Updates this NDArray with the elements of the array given as parameter.
+     * 
+     * <p>Note: the parameter array must have the same size and this NDArray!
+     * 
+     * @param array array holding the new values to be copied to this NDArray
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> copyFrom(short[] array);
+    
+    /** 
+     * Updates this NDArray with the elements of the array given as parameter.
+     * 
+     * <p>Note: the parameter array must have the same size and this NDArray!
+     * 
+     * @param array array holding the new values to be copied to this NDArray
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> copyFrom(int[] array);
+    
+    /** 
+     * Updates this NDArray with the elements of the array given as parameter.
+     * 
+     * <p>Note: the parameter array must have the same size and this NDArray!
+     * 
+     * @param array array holding the new values to be copied to this NDArray
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> copyFrom(long[] array);
+    
+    /** 
+     * Updates this NDArray with the elements of the array given as parameter.
+     * 
+     * <p>Note: the parameter array must have the same size and this NDArray!
+     * 
+     * @param array array holding the new values to be copied to this NDArray
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> copyFrom(Object[] array);
+    
+    /** 
+     * Updates this NDArray with the elements of the arrays given as parameters.
+     * 
+     * <p>Note: both parameter arrays must have the same size and this NDArray!
+     * <p>Note: if this function is called on real arrays, it will throw UnsupportedOperationException!
+     * 
+     * @param real array holding the new values to be copied to this NDArray as real part
+     * @param imag array holding the new values to be copied to this NDArray as imaginary part
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> copyFrom(float[] real, float[] imag);
+    
+    /** 
+     * Updates this NDArray with the elements of the arrays given as parameters.
+     * 
+     * <p>Note: both parameter arrays must have the same size and this NDArray!
+     * <p>Note: if this function is called on real arrays, it will throw UnsupportedOperationException!
+     * 
+     * @param real array holding the new values to be copied to this NDArray as real part
+     * @param imag array holding the new values to be copied to this NDArray as imaginary part
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> copyFrom(double[] real, double[] imag);
+    
+    /** 
+     * Updates this NDArray with the elements of the arrays given as parameters.
+     * 
+     * <p>Note: both parameter arrays must have the same size and this NDArray!
+     * <p>Note: if this function is called on real arrays, it will throw UnsupportedOperationException!
+     * 
+     * @param real array holding the new values to be copied to this NDArray as real part
+     * @param imag array holding the new values to be copied to this NDArray as imaginary part
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> copyFrom(byte[] real, byte[] imag);
+    
+    /** 
+     * Updates this NDArray with the elements of the arrays given as parameters.
+     * 
+     * <p>Note: both parameter arrays must have the same size and this NDArray!
+     * <p>Note: if this function is called on real arrays, it will throw UnsupportedOperationException!
+     * 
+     * @param real array holding the new values to be copied to this NDArray as real part
+     * @param imag array holding the new values to be copied to this NDArray as imaginary part
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> copyFrom(short[] real, short[] imag);
+    
+    /** 
+     * Updates this NDArray with the elements of the arrays given as parameters.
+     * 
+     * <p>Note: both parameter arrays must have the same size and this NDArray!
+     * <p>Note: if this function is called on real arrays, it will throw UnsupportedOperationException!
+     * 
+     * @param real array holding the new values to be copied to this NDArray as real part
+     * @param imag array holding the new values to be copied to this NDArray as imaginary part
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> copyFrom(int[] real, int[] imag);
+    
+    /** 
+     * Updates this NDArray with the elements of the arrays given as parameters.
+     * 
+     * <p>Note: both parameter arrays must have the same size and this NDArray!
+     * <p>Note: if this function is called on real arrays, it will throw UnsupportedOperationException!
+     * 
+     * @param real array holding the new values to be copied to this NDArray as real part
+     * @param imag array holding the new values to be copied to this NDArray as imaginary part
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> copyFrom(long[] real, long[] imag);
 
-    protected Complex accumulate(Complex acc, Double value, AbstractNDArray.AccumulateOperators operation) {
-        switch (operation) {
-            case ADD: return acc.add(value);
-            case SUBTRACT: return acc.subtract(value);
-            case MULTIPLY: return acc.multiply(value);
-            case DIVIDE: return acc.divide(value);
-            default: throw new IllegalArgumentException();
-        }
-    }
+    /** 
+     * Updates this NDArray with the elements of the arrays given as parameters.
+     * 
+     * <p>Note: both parameter arrays must have the same size and this NDArray!
+     * <p>Note: if this function is called on real arrays, it will throw UnsupportedOperationException!
+     * 
+     * @param real array holding the new values to be copied to this NDArray as real part
+     * @param imag array holding the new values to be copied to this NDArray as imaginary part
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> copyFrom(Object[] real, Object[] imag);
+    
+    /** 
+     * Updates this NDArray with the elements of the arrays given as parameters.
+     * 
+     * <p>Note: both parameter arrays must have the same size and this NDArray!
+     * <p>Note: if this function is called on real arrays, it will throw UnsupportedOperationException!
+     * 
+     * @param real array holding the new values to be copied to this NDArray as real part
+     * @param imag array holding the new values to be copied to this NDArray as imaginary part
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> copyFrom(NDArray<? extends Number> real, NDArray<? extends Number> imag);
+    
+    /** 
+     * Returns a new array holding the real part of the array
+     * 
+     * @return the real part of the array
+     */
+    public NDArray<T> real();
 
-    protected Complex accumulate(Complex acc, Float value, AbstractNDArray.AccumulateOperators operation) {
-        switch (operation) {
-            case ADD: return acc.add(value);
-            case SUBTRACT: return acc.subtract(value);
-            case MULTIPLY: return acc.multiply(value);
-            case DIVIDE: return acc.divide(value);
-            default: throw new IllegalArgumentException();
-        }
-    }
+    /** 
+     * Returns a new array holding the imaginary part of the array
+     * 
+     * @return the imaginary part of the array
+     */
+    public NDArray<T> imaginary();
+    
+    /** 
+     * Returns a new array holding the magnitude / absolute values of elements.
+     * 
+     * For real arrays, it returns an array filled with zeros.
+     * 
+     * @return a new array holding the magnitude / absolute values of elements.
+     */
+    public NDArray<T> abs();
 
-    protected Complex accumulate(Complex acc, Integer value, AbstractNDArray.AccumulateOperators operation) {
-        switch (operation) {
-            case ADD: return acc.add(value);
-            case SUBTRACT: return acc.subtract(value);
-            case MULTIPLY: return acc.multiply(value);
-            case DIVIDE: return acc.divide(value);
-            default: throw new IllegalArgumentException();
-        }
-    }
+    /** 
+     * Returns a new array holding the angle / argument of elements.
+     * 
+     * For real arrays, it returns an array filled with zeros.
+     * 
+     * @return a new array holding the angle / argument of elements.
+     */
+    public NDArray<T> angle();
 
-    @Override
-    protected Complex accumulate(Complex acc, NDArray<?> array, int linearIndex, AbstractNDArray.AccumulateOperators operation) {
-        if (array.eltype() == Complex.class)
-            return accumulate(acc, (Complex)array.get(linearIndex), operation);
-        else if (array.eltype() == Double.class)
-            return accumulate(acc, (Double)array.get(linearIndex), operation);
-        else
-            return accumulate(acc, (Float)array.get(linearIndex), operation);
-    }
+    /** 
+     * Creates a new NDArray of the same size, and fills it with the element-wise sum of this NDArray and 
+     * the parameter NDArrays and scalars. If list of parameters contains scalar values than these will be
+     * added to all elements of the resulting array.
+     * 
+     * <p>Note: The type of this NDArray determines type resulting NDArray.
+     * 
+     * @param addends NDArrays and scalars to be added together
+     * @return a new NDArray of the same size, and fills it with the element-wise sum of this NDArray and 
+     * the parameters NDArrays and scalars
+     */
+    public ComplexNDArray<T> add(Object ...addends);
+    
+    /** 
+     * Updates this NDArray with the element-wise sum of this NDArray and the ones given as parameters.
+     * 
+     * The list of parameters can also contain scalar values - these will be
+     * added to all elements of the resulting array.
+     * 
+     * <p>Note: The type of this NDArray determines type resulting NDArray.
+     * 
+     * @param addends NDArrays and scalars to be added to this NDArray
+     * @return this NDArray after addition
+     */
+    public ComplexNDArray<T> addInplace(Object ...addends);
+    
+    /** 
+     * Creates a new NDArray of the same size, and fills it with the result of the element-wise substraction 
+     * the parameter NDArrays and scalars from this NDArray. If list of parameters contains scalar values than these will be
+     * substracted from all elements of this NDArray.
+     * 
+     * <p>Note: The type of this NDArray determines type resulting NDArray.
+     * 
+     * @param subtrahends NDArrays and scalars to be substracted from this NDArray
+     * @return a new NDArray of the same size, and fills it with the result of the element-wise substraction 
+     * the parameter NDArrays and scalars from this NDArray
+     */
+    public ComplexNDArray<T> subtract(Object ...subtrahends);
+    
+    /** 
+     * Updates the elements this NDArray with the result of the element-wise substraction 
+     * the parameter NDArrays and scalars from this NDArray. If list of parameters contains scalar values than these will be
+     * substracted from all elements of this NDArray.
+     * 
+     * <p>Note: The type of this NDArray determines type resulting NDArray.
+     * 
+     * @param subtrahends NDArrays and scalars to be substracted from this NDArray
+     * @return this NDArray after substraction
+     */
+    public ComplexNDArray<T> subtractInplace(Object ...subtrahends);
+    
+    /** 
+     * Creates a new NDArray of the same size, and fills it with the element-wise product of this NDArray and 
+     * the parameter NDArrays and scalars. If list of parameters contains scalar values than these will be
+     * multiplied to all elements of the resulting array.
+     * 
+     * <p>Note: The type of this NDArray determines type resulting NDArray.
+     * 
+     * @param multiplicands NDArrays and scalars to be multiplied together
+     * @return a new NDArray of the same size, and fills it with the element-wise product of this NDArray and 
+     * the parameters NDArrays and scalars
+     */
+    public ComplexNDArray<T> multiply(Object ...multiplicands);
+    
+    /** 
+     * Updates the elements of this NDArray with the element-wise product of this NDArray and 
+     * the parameter NDArrays and scalars. If list of parameters contains scalar values than these will be
+     * multiplied to all elements of the resulting array.
+     * 
+     * <p>Note: The type of this NDArray determines type resulting NDArray.
+     * 
+     * @param multiplicands NDArrays and scalars to be multiplied to this NDArray
+     * @return this NDArray after multiplication
+     */
+    public ComplexNDArray<T> multiplyInplace(Object ...multiplicands);
+    
+    /** 
+     * Creates a new NDArray of the same size, and fills it with the result of the element-wise division 
+     * of this NDArray by the parameter NDArrays and scalars. If list of parameters contains scalar values than
+     * all elements of this NDArray will be divided by them.
+     * 
+     * <p>Note: The type of this NDArray determines type resulting NDArray.
+     * 
+     * @param divisors divisors of this NDArray
+     * @return a new NDArray of the same size, and fills it with the result of the element-wise division 
+     * of this NDArray by the parameter NDArrays and scalars
+     */
+    public ComplexNDArray<T> divide(Object ...divisors);
+    
+    /** 
+     * Updates the elements this NDArray with the result of the element-wise division 
+     * of this NDArray by the parameter NDArrays and scalars. If list of parameters contains scalar values than
+     * all elements of this NDArray will be divided by them.
+     * 
+     * <p>Note: The type of this NDArray determines type resulting NDArray.
+     * 
+     * @param divisors divisors of this NDArray
+     * @return this NDArray after division
+     */
+    public ComplexNDArray<T> divideInplace(Object ...divisors);
+    
+    /** 
+     * Returns the sum of all elements along the specified dimensions in this NDArray.
+     * 
+     * <p>For example, if <code>A</code> is a [5 × 8 × 3] array, then <code>B = A.sum(2)</code> returns
+     * a [5 × 8] array, and <code>B.get(1,1) == A.get(1,1,0) + A.get(1,1,1) + A.get(1,1,2)</code>.
+     * 
+     * @param selectedDims dimensions along which the summation should be performed
+     * @return sum of all elementsalong the specified dimensions
+     */
+    public ComplexNDArray<T> sum(int ...selectedDims);
+    
+    /** 
+     * Fill this NDArray with the specified value
+     * 
+     * @param value value assigned to all elements of this NDArray
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> fill(T value);
+    
+    /** 
+     * Fill this NDArray with the specified value
+     * 
+     * @param value value assigned to all elements of this NDArray
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> fill(float value);
+    
+    /** 
+     * Fill this NDArray with the specified value
+     * 
+     * @param value value assigned to all elements of this NDArray
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> fill(double value);
 
-    protected void checkCompatibleSize(List<Integer> realDimsList, List<Integer> imagDimsList) {
-        if (realDimsList.size() != imagDimsList.size())
-            throw new IllegalArgumentException(ERROR_ARRAYS_DIFFER_IN_SIZE);
-        for (int i = 0; i < realDimsList.size(); i++)
-            if (!realDimsList.get(i).equals(imagDimsList.get(i)))
-                throw new IllegalArgumentException(ERROR_ARRAYS_DIFFER_IN_SIZE);
-    }
+    /** 
+     * Returns a new array of the same size as this NDArray filled with zeros.
+     * 
+     * @return a new array of the same size as this NDArray filled with zeros.
+     */
+    public ComplexNDArray<T> similar();
 
-    protected void checkEqualLength(float[] real, float[] imag) {
-        if (imag.length != real.length)
-            throw new IllegalArgumentException(ERROR_ARRAYS_DIFFER_IN_SIZE);
-    }
+    /** 
+     * Returns a copy of this NDArray.
+     * 
+     * @return a copy of this NDArray.
+     */
+    public ComplexNDArray<T> copy();
+    
+    /** 
+     * Returns a view that references this NDArray as parent, and
+     * skips all singleton dimensions not included in the parameter list.
+     * 
+     * <p>View: An NDArray that references the specified region its parent array.
+     * All modifications in the parent array are reflecten in the view, and vice versa.
+     * 
+     * <p>Singleton dimension: dimension of size 1.
+     * 
+     * @param selectedDims dimensions kept in the returend view
+     * @return  a view that references this NDArray as parent, and
+     * skips all singleton dimensions not included in the parameter list
+     */
+    public ComplexNDArray<T> selectDims(int... selectedDims);
+    
+    /** 
+     * Returns a view that references this NDArray as parent, and
+     * skips all singleton dimensions included in the parameter list.
+     * 
+     * <p>View: An NDArray that references the specified region its parent array.
+     * All modifications in the parent array are reflecten in the view, and vice versa.
+     * 
+     * <p>Singleton dimension: dimension of size 1.
+     * 
+     * @param selectedDims dimensions skipped in the returend view
+     * @return a view that references this NDArray as parent, and
+     * skips all singleton dimensions included in the parameter list.
+     */
+    public ComplexNDArray<T> dropDims(int... selectedDims);
+    
+    /** 
+     * Returns a view that references this NDArray as parent, and
+     * skips all singleton dimensions.
+     * 
+     * <p>View: An NDArray that references the specified region its parent array.
+     * All modifications in the parent array are reflecten in the view, and vice versa.
+     * 
+     * <p>Singleton dimension: dimension of size 1.
+     * 
+     * @return a view that references this NDArray as parent, and
+     * skips all singleton dimensions.
+     */
+    public ComplexNDArray<T> squeeze();
+    
+    /** 
+     * Returns an array view referencing this NDArray as parent that gives read-write access
+     * to a specific multi-dimensional slice of the array.
+     * 
+     * <p>View: An NDArray that references the specified region its parent array.
+     * All modifications in the parent array are reflecten in the view, and vice versa.
+     * 
+     * <p>Possible slicing expressions:
+     * <ul>
+     *  <li>integer values: selects a specific slice along the positionally selected dimension</li>
+     *  <li>range (string that consists of two integer values specifying the start and the end of the range
+     *       separated by a colon): selects a specific range of slices along the positionally selected dimension</li>
+     *  <li>all-range (string literal ":"): selects all slices along the positionally selected dimension</li>
+     * </ul>
+     * 
+     * <p>For example, if <code>A</code> is a [5 × 8 × 3] array, then <code>B = A.slice(1, "2:5", ":")</code> returns
+     * a [3 × 3] array, and <code>B.get(1,1) == A.get(1,3,1)</code>.
+     * 
+     * @param slicingExpressions Slicing expressions
+     * @return an array view that gives read-write access to a specific multi-dimensional slice of the array
+     */
+    public ComplexNDArray<T> slice(Object... slicingExpressions);
+    
+    /** 
+     * Returns a view that references this NDArray as parent but has a different shape.
+     * 
+     * <p>View: An NDArray that references the specified region its parent array.
+     * All modifications in the parent array are reflecten in the view, and vice versa.
+     * 
+     * <p>For example, if <code>A</code> is a [5 × 8 × 3] array, then <code>B = A.reshape(40, 3)</code> returns
+     * a [40 × 3] array, and <code>B.get(10) == B.get(10,0) == A.get(1,0,0) == A.get(10)</code>.
+     * 
+     * <p>Note: the linear indexing of the two arrays remain the same, and the corresponding cartesian indices
+     * determined by column-first ordering.
+     * 
+     * @param newShape new shape/dimensions
+     * @return a view that references this NDArray as parent but has a different shape
+     */
+    public ComplexNDArray<T> reshape(int... newShape);
+    
+    /** 
+     * Returns a view that references this NDArray as parent, but the order of 
+     * dimensions are swiched in this view.
+     * 
+     * <p>View: An NDArray that references the specified region its parent array.
+     * All modifications in the parent array are reflecten in the view, and vice versa.
+     * 
+     * <p>For example, if <code>A</code> is a [5 × 8 × 3] array, then <code>B = A.permuteDims(1, 0, 2)</code> returns
+     * a [8 × 5 × 3] array, and <code>B.get(3,1,0) == A.get(1,3,0)</code>.
+     * 
+     * @param permutation new order of dimensions / permutation vector
+     * @return a view that references this NDArray as parent, but the order of 
+     * dimensions are swiched in this view.
+     */
+    public ComplexNDArray<T> permuteDims(int... permutation);
+    
+    /** 
+     * Creates a new NDArray that contains the elements of this NDArrays and all other NDArrays
+     * concatenated along the dimension/axis specified by the first parameter.
+     * 
+     * @param axis Axis/dimension along which the concatenation should occur.
+     * @param arrays Arrays to be concatenated to this NDArray.
+     * @return a new NDArray that contains the elements of this NDArrays and all other NDArrays
+     * concatenated along the dimension/axis specified by the first parameter.
+     */
+    public ComplexNDArray<T> concatenate(int axis, NDArray<?>... arrays);
 
-    protected void checkEqualLength(double[] real, double[] imag) {
-        if (imag.length != real.length)
-            throw new IllegalArgumentException(ERROR_ARRAYS_DIFFER_IN_SIZE);
-    }
 }

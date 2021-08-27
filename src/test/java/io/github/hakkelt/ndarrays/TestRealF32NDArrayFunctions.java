@@ -13,11 +13,8 @@ class TestRealF32NDArrayFunctions {
 
     @BeforeEach
     void setup() {
-        int[] dims = { 4, 5, 3 };
-        double[] real = new double[4 * 5 * 3];
-        for (int i = 0; i < real.length; i++)
-            real[i] = i;
-        array = new RealF32NDArray(dims, real);
+        array = new RealF32NDArray(new int[]{ 4, 5, 3 });
+        array.applyWithLinearIndex((value, index) -> (float)index);
     }
 
     @Test
@@ -208,7 +205,7 @@ class TestRealF32NDArrayFunctions {
     void testCollector() {
         NDArray<?> increased = array.stream()
             .map((value) -> value + 1)
-            .collect(NDArrayCollectors.toRealF32NDArray(array.dims()));
+            .collect(RealF32NDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) + 1, increased.get(i));
     }
@@ -217,7 +214,7 @@ class TestRealF32NDArrayFunctions {
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(NDArrayCollectors.toRealF32NDArray(array.dims()));
+            .collect(RealF32NDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) + 1, increased.get(i));
     }
@@ -225,7 +222,7 @@ class TestRealF32NDArrayFunctions {
     @Test
     void testToString() {
         String str = array.toString();
-        assertEquals("NDArray<RealF32>(4 × 5 × 3)", str);
+        assertEquals("simple NDArray<Float>(4 × 5 × 3)", str);
     }
 
     @Test
@@ -233,7 +230,7 @@ class TestRealF32NDArrayFunctions {
         String str = array.contentToString();
         String lineFormat = "%8.5e\t%8.5e\t%8.5e\t%8.5e\t%8.5e\t%n";
         String expected = new StringBuilder()
-            .append("NDArray<RealF32>(4 × 5 × 3)" + System.lineSeparator())
+            .append("simple NDArray<Float>(4 × 5 × 3)" + System.lineSeparator())
             .append("[:, :, 0] =" + System.lineSeparator())
             .append(String.format(lineFormat, 0.0e+00, 4.0e+00, 8.0e+00, 1.2e+01, 1.6e+01))
             .append(String.format(lineFormat, 1.0e+00, 5.0e+00, 9.0e+00, 1.3e+01, 1.7e+01))
@@ -521,36 +518,36 @@ class TestRealF32NDArrayFunctions {
         double norm = array.stream()
             .mapToDouble(value -> Math.abs(value))
             .reduce(0., (acc, item) -> acc + item);
-        assertEquals(norm, array.norm(1));
+        assertTrue(Math.abs(norm - array.norm(1)) / norm < 1e-6);
     }
 
     @Test
     void test2Norm() {
-        double norm = Math.sqrt(array.stream()
-            .mapToDouble(value -> Math.pow(Math.abs(value), 2))
-            .reduce(0., (acc, item) -> acc + item));
-        assertEquals(norm, array.norm());
+        double norm = (float)Math.sqrt(array.stream()
+            .map(value -> (float)Math.pow(Math.abs(value), 2))
+            .reduce((float)0., (acc, item) -> acc + item));
+        assertTrue(Math.abs(norm - array.norm()) / norm < 1e-6);
     }
 
     @Test
     void testPQuasinorm() {
-        double norm = Math.pow(array.stream()
-            .mapToDouble(value -> Math.pow(Math.abs(value), 0.5))
-            .reduce(0., (acc, item) -> acc + item), 2);
-        assertEquals(norm, array.norm(0.5));
+        double norm = (float)Math.pow(array.stream()
+            .map(value -> (float)Math.pow(Math.abs(value), 0.5))
+            .reduce((float)0., (acc, item) -> acc + item), 2);
+        assertTrue(Math.abs(norm - array.norm(0.5)) / norm < 5e-6);
     }
 
     @Test
     void testPNorm() {
-        double norm = Math.pow(array.stream()
-            .mapToDouble(value -> Math.pow(Math.abs(value), 3.5))
-            .reduce(0., (acc, item) -> acc + item), 1 / 3.5);
-        assertEquals(norm, array.norm(3.5));
+        double norm = (float)Math.pow(array.stream()
+            .map(value -> (float)Math.pow(Math.abs(value), 3.5))
+            .reduce((float)0., (acc, item) -> acc + item), 1 / 3.5);
+        assertTrue(Math.abs(norm - array.norm(3.5)) / norm < 5e-6);
     }
 
     @Test
     void testInfNorm() {
-        double norm = array.stream()
+        double norm = (float)array.stream()
             .mapToDouble(value -> Math.abs(value))
             .max().getAsDouble();
         assertEquals(norm, array.norm(Double.POSITIVE_INFINITY));
@@ -583,7 +580,7 @@ class TestRealF32NDArrayFunctions {
     void testPermuteDimsTooShortPermutationVector() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> array.permuteDims(0,2));
         assertEquals(
-            String.format(NDArrayPermuteDimsView.ERROR_PERMUTATOR_SIZE_MISMATCH, "[0, 2]", "4 × 5 × 3"),
+            String.format(AbstractNDArrayPermuteDimsView.ERROR_PERMUTATOR_SIZE_MISMATCH, "[0, 2]", "4 × 5 × 3"),
             exception.getMessage());
     }
 
@@ -591,7 +588,7 @@ class TestRealF32NDArrayFunctions {
     void testPermuteDimsTooLongPermutationVector() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> array.permuteDims(0,2,1,4));
         assertEquals(
-            String.format(NDArrayPermuteDimsView.ERROR_PERMUTATOR_SIZE_MISMATCH, "[0, 2, 1, 4]", "4 × 5 × 3"),
+            String.format(AbstractNDArrayPermuteDimsView.ERROR_PERMUTATOR_SIZE_MISMATCH, "[0, 2, 1, 4]", "4 × 5 × 3"),
             exception.getMessage());
     }
 
@@ -599,7 +596,7 @@ class TestRealF32NDArrayFunctions {
     void testPermuteDimsRepeatedDimension() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> array.permuteDims(0,1,1));
         assertEquals(
-            String.format(NDArrayPermuteDimsView.ERROR_INVALID_PERMUTATOR, "[0, 1, 1]", "4 × 5 × 3"),
+            String.format(AbstractNDArrayPermuteDimsView.ERROR_INVALID_PERMUTATOR, "[0, 1, 1]", "4 × 5 × 3"),
             exception.getMessage());
     }
 
@@ -650,30 +647,9 @@ class TestRealF32NDArrayFunctions {
     }
 
     @Test
-    void testReal() {
-        NDArray<Double> real = array.real();
-        array.streamLinearIndices()
-            .forEach(i -> assertEquals(array.get(i).floatValue(), real.get(i)));
-    }
-
-    @Test
-    void testImag() {
-        NDArray<Double> imag = array.imaginary();
-        array.streamLinearIndices()
-            .forEach(i -> assertEquals(0, imag.get(i)));
-    }
-
-    @Test
     void testAbs() {
-        NDArray<Double> abs = array.abs();
+        NDArray<Float> abs = array.abs();
         array.streamLinearIndices()
             .forEach(i -> assertTrue(Math.abs(array.get(i)) - abs.get(i) < 1e-5));
-    }
-
-    @Test
-    void testAngle() {
-        NDArray<Double> angle = array.angle();
-        array.streamLinearIndices()
-            .forEach(i -> assertEquals(0, angle.get(i)));
     }
 }

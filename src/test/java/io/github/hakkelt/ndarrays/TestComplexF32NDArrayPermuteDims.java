@@ -10,18 +10,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class TestComplexF32NDArrayPermuteDims {
-    NDArray<Complex> array, pArray;
+    ComplexNDArray<Float> array, pArray;
 
     @BeforeEach
     void setup() {
-        int[] dims = { 4, 5, 3 };
-        double[] real = new double[4 * 5 * 3];
-        double[] imag = new double[4 * 5 * 3];
-        for (int i = 0; i < real.length; i++) {
-            real[i] = i;
-            imag[i] = -i;
-        }
-        array = new ComplexF32NDArray(dims, real, imag);
+        array = new ComplexF32NDArray(new int[]{ 4, 5, 3 });
+        array.applyWithLinearIndex((value, index) -> new Complex(index, -index));
         pArray = array.permuteDims(0, 2, 1);
     }
 
@@ -178,7 +172,7 @@ class TestComplexF32NDArrayPermuteDims {
 
     @Test
     void testEqual() {
-        NDArray<Complex> array2 = new ComplexF32NDArray(pArray);
+        ComplexNDArray<Float> array2 = new ComplexF32NDArray(pArray);
         assertEquals(pArray, array2);
         array2.set(new Complex(0,0), 5);
         assertNotEquals(pArray, array2);
@@ -221,7 +215,7 @@ class TestComplexF32NDArrayPermuteDims {
         final Complex one = new Complex(1,-1);
         NDArray<Complex> increased = pArray.stream()
             .map((value) -> value.add(one))
-            .collect(NDArrayCollectors.toComplexF32NDArray(pArray.dims()));
+            .collect(ComplexF32NDArray.getCollector(pArray.dims()));
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i).add(one), increased.get(i));
     }
@@ -229,9 +223,9 @@ class TestComplexF32NDArrayPermuteDims {
     @Test
     void testParallelCollector() {
         final Complex one = new Complex(1,-1);
-        NDArray<?> increased = array.stream().parallel()
+        NDArray<Complex> increased = array.stream().parallel()
             .map((value) -> value.add(one))
-            .collect(NDArrayCollectors.toComplexF32NDArray(array.dims()));
+            .collect(ComplexF32NDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).add(one), increased.get(i));
     }
@@ -239,7 +233,7 @@ class TestComplexF32NDArrayPermuteDims {
     @Test
     void testToString() {
         String str = pArray.toString();
-        assertEquals("NDArray<ComplexF32>(4 × 3 × 5)", str);
+        assertEquals("simple NDArray<Complex Float>(4 × 3 × 5)", str);
     }
 
     @Test
@@ -247,7 +241,7 @@ class TestComplexF32NDArrayPermuteDims {
         String str = pArray.contentToString();
         String lineFormat = "%8.5e%+8.5ei\t%8.5e%+8.5ei\t%8.5e%+8.5ei\t%n";
         String expected = new StringBuilder()
-            .append("NDArray<ComplexF32>(4 × 3 × 5)" + System.lineSeparator())
+            .append("simple NDArray<Complex Float>(4 × 3 × 5)" + System.lineSeparator())
             .append("[:, :, 0] =" + System.lineSeparator())
             .append(String.format(lineFormat, 0.0e+00, +0.0e+00, 2.0e+01, -2.0e+01, 4.0e+01, -4.0e+01))
             .append(String.format(lineFormat, 1.0e+00, -1.0e+00, 2.1e+01, -2.1e+01, 4.1e+01, -4.1e+01))
@@ -284,40 +278,40 @@ class TestComplexF32NDArrayPermuteDims {
 
     @Test
     void testAddArrayTopArray() {
-        NDArray<Complex> array2 = new ComplexF32NDArray(pArray);
-        NDArray<Complex> array3 = pArray.add(array2);
+        ComplexNDArray<Float> array2 = new ComplexF32NDArray(pArray);
+        ComplexNDArray<Float> array3 = pArray.add(array2);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i).multiply(2), array3.get(i));
     }
 
     @Test
     void testAddpArrayToArray() {
-        NDArray<Complex> array2 = new ComplexF32NDArray(pArray);
-        NDArray<Complex> array3 = array2.add(pArray);
+        ComplexNDArray<Float> array2 = new ComplexF32NDArray(pArray);
+        ComplexNDArray<Float> array3 = array2.add(pArray);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i).multiply(2), array3.get(i));
     }
 
     @Test
     void testAddpArrayTopArray() {
-        NDArray<Complex> pArray2 = array.permuteDims(0, 2, 1);
-        NDArray<Complex> array3 = pArray2.add(pArray);
+        ComplexNDArray<Float> pArray2 = array.permuteDims(0, 2, 1);
+        ComplexNDArray<Float> array3 = pArray2.add(pArray);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i).multiply(2), array3.get(i));
     }
 
     @Test
     void testAddScalar() {
-        NDArray<Complex> pArray2 = pArray.add(5);
+        ComplexNDArray<Float> pArray2 = pArray.add(5);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i).add(5), pArray2.get(i));
     }
 
     @Test
     void testAddMultiple() {
-        NDArray<Complex> array2 = new ComplexF32NDArray(array);
-        NDArray<Complex> pArray2 = array2.permuteDims(0, 2, 1);
-        NDArray<Complex> array3 = pArray2.add(pArray, 5.3, pArray2, new Complex(3,1));
+        ComplexNDArray<Float> array2 = new ComplexF32NDArray(array);
+        ComplexNDArray<Float> pArray2 = array2.permuteDims(0, 2, 1);
+        ComplexNDArray<Float> array3 = pArray2.add(pArray, 5.3, pArray2, new Complex(3,1));
         for (int i = 0; i < pArray.length(); i++) {
             Complex expected = pArray.get(i).multiply(3).add(new Complex(5.3 + 3,1));
             assertTrue(expected.subtract(array3.get(i)).abs() < 1e5);
@@ -326,8 +320,8 @@ class TestComplexF32NDArrayPermuteDims {
 
     @Test
     void testAddInplace() {
-        NDArray<Complex> array2 = new ComplexF32NDArray(array);
-        NDArray<Complex> pArray2 = array2.permuteDims(0, 2, 1);
+        ComplexNDArray<Float> array2 = new ComplexF32NDArray(array);
+        ComplexNDArray<Float> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(pArray);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i).multiply(2), pArray2.get(i));
@@ -335,8 +329,8 @@ class TestComplexF32NDArrayPermuteDims {
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Complex> array2 = new ComplexF32NDArray(array);
-        NDArray<Complex> pArray2 = array2.permuteDims(0, 2, 1);
+        ComplexNDArray<Float> array2 = new ComplexF32NDArray(array);
+        ComplexNDArray<Float> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(5);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i).add(5), pArray2.get(i));
@@ -344,8 +338,8 @@ class TestComplexF32NDArrayPermuteDims {
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Complex> array2 = new ComplexF32NDArray(array);
-        NDArray<Complex> pArray2 = array2.permuteDims(0, 2, 1);
+        ComplexNDArray<Float> array2 = new ComplexF32NDArray(array);
+        ComplexNDArray<Float> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(pArray, 5.3, pArray2, new Complex(3,1));
         for (int i = 0; i < pArray.length(); i++) {
             Complex expected = pArray.get(i).multiply(3).add(new Complex(5.3 + 3,1));
@@ -365,46 +359,46 @@ class TestComplexF32NDArrayPermuteDims {
     @Test
     void test1Norm() {
         double norm = pArray.stream()
-            .mapToDouble(value -> value.abs())
-            .reduce(0., (acc, item) -> acc + item);
-        assertEquals(norm, pArray.norm(1));
+            .map(value -> (float)value.abs())
+            .reduce((float)0., (acc, item) -> acc + item);
+        assertTrue(Math.abs(norm - pArray.norm(1)) / norm < 1e-6);
     }
 
     @Test
     void test2Norm() {
-        double norm = Math.sqrt(pArray.stream()
-            .mapToDouble(value -> Math.pow(value.abs(), 2))
-            .reduce(0., (acc, item) -> acc + item));
-        assertEquals(norm, pArray.norm());
+        double norm = (float)Math.sqrt(pArray.stream()
+            .mapToDouble(value -> (float)Math.pow(value.abs(), 2))
+            .reduce((float)0., (acc, item) -> acc + item));
+        assertTrue(Math.abs(norm - pArray.norm()) / norm < 1e-6);
     }
 
     @Test
     void testPQuasinorm() {
-        double norm = Math.pow(pArray.stream()
-            .mapToDouble(value -> Math.pow(value.abs(), 0.5))
-            .reduce(0., (acc, item) -> acc + item), 2);
-        assertEquals(norm, pArray.norm(0.5));
+        double norm = (float)Math.pow(pArray.stream()
+            .mapToDouble(value -> (float)Math.pow(value.abs(), 0.5))
+            .reduce((float)0., (acc, item) -> acc + item), 2);
+        assertTrue(Math.abs(norm - pArray.norm(0.5)) / norm < 1e-6);
     }
 
     @Test
     void testPNorm() {
-        double norm = Math.pow(pArray.stream()
-            .mapToDouble(value -> Math.pow(value.abs(), 3.5))
-            .reduce(0., (acc, item) -> acc + item), 1 / 3.5);
-        assertEquals(norm, pArray.norm(3.5));
+        double norm = (float)Math.pow(pArray.stream()
+            .mapToDouble(value -> (float)Math.pow(value.abs(), 3.5))
+            .reduce((float)0., (acc, item) -> acc + item), 1 / 3.5);
+        assertTrue(Math.abs(norm - pArray.norm(3.5)) / norm < 1e-6);
     }
 
     @Test
     void testInfNorm() {
-        double norm = pArray.stream()
+        double norm = (float)pArray.stream()
             .mapToDouble(value -> value.abs())
             .max().getAsDouble();
-        assertEquals(norm, pArray.norm(Double.POSITIVE_INFINITY));
+        assertTrue(Math.abs(norm - pArray.norm(Double.POSITIVE_INFINITY)) / norm < 1e-6);
     }
 
     @Test
     void testCopy() {
-        NDArray<Complex> array2 = pArray.copy();
+        ComplexNDArray<Float> array2 = pArray.copy();
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i), array2.get(i));
         array2.set(new Complex(0,0), 5);
@@ -427,7 +421,7 @@ class TestComplexF32NDArrayPermuteDims {
 
     @Test
     void testSliceAndToArray() {
-        NDArray<Complex> slice = pArray.slice(1, ":", "1:4");
+        ComplexNDArray<Float> slice = pArray.slice(1, ":", "1:4");
         Complex[][] arr = (Complex[][])slice.toArray();
         for (int i = 0; i < slice.dims(0); i++)
             for (int j = 0; j < slice.dims(1); j++)
@@ -436,8 +430,8 @@ class TestComplexF32NDArrayPermuteDims {
 
     @Test
     void testConcatenate() {
-        NDArray<Complex> array2 = new ComplexF32NDArray(new int[]{4, 3, 2}).fill(1);
-        NDArray<Complex> array3 = pArray.concatenate(2, array2);
+        ComplexNDArray<Float> array2 = new ComplexF32NDArray(new int[]{4, 3, 2}).fill(1);
+        ComplexNDArray<Float> array3 = pArray.concatenate(2, array2);
         for (int i = 0; i < pArray.dims(0); i++)
             for (int j = 0; j < pArray.dims(1); j++)
                 for (int k = 0; k < pArray.dims(2); k++)
@@ -450,10 +444,10 @@ class TestComplexF32NDArrayPermuteDims {
 
     @Test
     void testConcatenateMultiple() {
-        NDArray<Complex> array2 = pArray.copy().fill(1).slice(":", ":", "1:3");
-        NDArray<Complex> array3 = new ComplexF32NDArray(new int[]{5, 3, 4}).permuteDims(2, 1, 0);
-        NDArray<Complex> array4 = new ComplexF32NDArray(new int[]{36}).fill(new Complex(2, -2)).reshape(4, 3, 3);
-        NDArray<Complex> array5 = pArray.concatenate(2, array2, array3, array4);
+        ComplexNDArray<Float> array2 = pArray.copy().fill(1).slice(":", ":", "1:3");
+        ComplexNDArray<Float> array3 = new ComplexF32NDArray(new int[]{5, 3, 4}).permuteDims(2, 1, 0);
+        ComplexNDArray<Float> array4 = new ComplexF32NDArray(new int[]{36}).fill(new Complex(2, -2)).reshape(4, 3, 3);
+        ComplexNDArray<Float> array5 = pArray.concatenate(2, array2, array3, array4);
         int start = 0;
         int end = pArray.dims(2);
         for (int i = 0; i < pArray.dims(0); i++)
@@ -482,28 +476,28 @@ class TestComplexF32NDArrayPermuteDims {
 
     @Test
     void testReal() {
-        NDArray<Double> real = pArray.real();
+        NDArray<Float> real = pArray.real();
         pArray.streamLinearIndices()
-            .forEach(i -> assertEquals(pArray.get(i).getReal(), real.get(i)));
+            .forEach(i -> assertEquals(pArray.get(i).getReal(), real.get(i).doubleValue()));
     }
 
     @Test
     void testImag() {
-        NDArray<Double> imag = pArray.imaginary();
+        NDArray<Float> imag = pArray.imaginary();
         pArray.streamLinearIndices()
-            .forEach(i -> assertEquals(pArray.get(i).getImaginary(), imag.get(i)));
+            .forEach(i -> assertEquals(pArray.get(i).getImaginary(), imag.get(i).doubleValue()));
     }
 
     @Test
     void testAbs() {
-        NDArray<Double> abs = pArray.abs();
+        NDArray<Float> abs = pArray.abs();
         pArray.streamLinearIndices()
             .forEach(i -> assertTrue(pArray.get(i).abs() - abs.get(i) < 1e-5));
     }
 
     @Test
     void testAngle() {
-        NDArray<Double> angle = pArray.angle();
+        NDArray<Float> angle = pArray.angle();
         pArray.streamLinearIndices()
             .forEach(i -> assertTrue(pArray.get(i).getArgument() - angle.get(i) < 1e-5));
     }

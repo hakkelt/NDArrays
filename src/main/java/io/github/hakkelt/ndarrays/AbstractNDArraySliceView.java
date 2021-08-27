@@ -3,7 +3,7 @@ package io.github.hakkelt.ndarrays;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-class NDArraySliceView<T> extends AbstractNDArrayView<T> {
+abstract class AbstractNDArraySliceView<T,T2 extends Number> extends AbstractNDArrayView<T,T2> {
     protected SlicingExpression slicingExpression;
 
     protected static final String ERROR_ILLEGAL_SLICING_EXPRESSION =
@@ -98,7 +98,7 @@ class NDArraySliceView<T> extends AbstractNDArrayView<T> {
                         range.addToEnd(parentDims[parentDimsIndex]);
                     else if (range.end() > parentDims[parentDimsIndex])
                         throw new ArrayIndexOutOfBoundsException(
-                            String.format(ERROR_SLICE_OUT_OF_BOUNDS, dimsToString(parentDims), toString()));
+                            String.format(ERROR_SLICE_OUT_OF_BOUNDS, Printer.dimsToString(parentDims), toString()));
                 }
                 parentDimsIndex++;
             }
@@ -107,7 +107,7 @@ class NDArraySliceView<T> extends AbstractNDArrayView<T> {
         public int[] resolveViewDims() {
             if (expressions.length != parentDims.length)
                 throw new IllegalArgumentException(
-                    String.format(ERROR_DIMENSION_MISMATCH, dimsToString(parentDims), toString()));
+                    String.format(ERROR_DIMENSION_MISMATCH, Printer.dimsToString(parentDims), toString()));
             int newNDims = parentDims.length;
             for (Object expr : expressions)
                 if (expr instanceof Integer) newNDims--;
@@ -156,15 +156,16 @@ class NDArraySliceView<T> extends AbstractNDArrayView<T> {
 
     }
 
-    public NDArraySliceView(NDArray<T> parent, Object ...slicingExpressions) {
-        this.parent = (AbstractNDArray<T>)parent;
+    @SuppressWarnings("unchecked")
+    protected AbstractNDArraySliceView(NDArray<T> parent, Object ...slicingExpressions) {
+        this.parent = (AbstractNDArray<T,T2>)parent;
         this.slicingExpression = new SlicingExpression(parent.dims(), slicingExpressions);
         this.dims = slicingExpression.resolveViewDims();
         this.multipliers = calculateMultipliers(this.dims);
         this.dataLength = length(this.dims);
     }
 
-    public NDArraySliceView(NDArraySliceView<T> parent, Object ...slicingExpressions) {
+    protected AbstractNDArraySliceView(AbstractNDArraySliceView<T,T2> parent, Object ...slicingExpressions) {
         this.parent = parent.parent;
         this.slicingExpression = new SlicingExpression(parent.dims(), slicingExpressions);
         this.dims = slicingExpression.resolveViewDims();
@@ -181,76 +182,12 @@ class NDArraySliceView<T> extends AbstractNDArrayView<T> {
         return parent.get(slicingExpression.resolveToParentIndices(indices));
     }
     @Override
-    public double getReal(int linearIndex) {
-        return getReal(linearIndexToViewIndices(linearIndex));
-    }
-    @Override
-    public double getReal(int... indices) {
-        return parent.getReal(slicingExpression.resolveToParentIndices(indices));
-    }
-    @Override
-    public double getImag(int linearIndex) {
-        return getImag(linearIndexToViewIndices(linearIndex));
-    }
-    @Override
-    public double getImag(int... indices) {
-        return parent.getImag(slicingExpression.resolveToParentIndices(indices));
-    }
-    @Override
     public void set(T value, int linearIndex) {
         set(value, linearIndexToViewIndices(linearIndex));
     }
     @Override
     public void set(T value, int... indices) {
         parent.set(value, slicingExpression.resolveToParentIndices(indices));
-    }
-    @Override
-    public void set(float value, int linearIndex) {
-        set(value, linearIndexToViewIndices(linearIndex));
-    }
-    @Override
-    public void set(float value, int... indices) {
-        parent.set(value, slicingExpression.resolveToParentIndices(indices));
-    }
-    @Override
-    public void set(double value, int linearIndex) {
-        set(value, linearIndexToViewIndices(linearIndex));
-    }
-    @Override
-    public void set(double value, int... indices) {
-        parent.set(value, slicingExpression.resolveToParentIndices(indices));
-    }
-    @Override
-    public void setReal(float value, int linearIndex) {
-        setReal(value, linearIndexToViewIndices(linearIndex));
-    }
-    @Override
-    public void setReal(float value, int... indices) {
-        parent.setReal(value, slicingExpression.resolveToParentIndices(indices));
-    }
-    @Override
-    public void setImag(float value, int linearIndex) {
-        setImag(value, linearIndexToViewIndices(linearIndex));
-    }
-    @Override
-    public void setImag(float value, int... indices) {
-        parent.setImag(value, slicingExpression.resolveToParentIndices(indices));
-    }
-    @Override
-    public void setReal(double value, int linearIndex) {
-        setReal(value, linearIndexToViewIndices(linearIndex));
-    }
-    @Override
-    public void setReal(double value, int... indices) {
-        parent.setReal(value, slicingExpression.resolveToParentIndices(indices));
-    }
-    @Override
-    public void setImag(double value, int linearIndex) {
-        setImag(value, linearIndexToViewIndices(linearIndex));
-    }
-    @Override
-    public void setImag(double value, int... indices) {
-        parent.setImag(value, slicingExpression.resolveToParentIndices(indices));
     }
 
     @Override

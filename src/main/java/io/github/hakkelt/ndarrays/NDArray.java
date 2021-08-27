@@ -1,23 +1,20 @@
 package io.github.hakkelt.ndarrays;
 
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Spliterator;
+import java.util.function.BiFunction;
+import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
- * N-dimensional arrays holding either complex or real values.
+ * General N-dimensional arrays holding either complex or real values.
  * 
- * This interface can be parametrized with the following types: Float, Double, and
- * Complex from org.apache.commons.math3.complex.
- * 
- * <p>Goals:
- * <ol><li>Provide an easy way to handle multidimensional data,</li>
- * <li>make it easy to pass data to JNI functions through a FloatBuffer object,</li>
- * <li>Add convenience functions to handle dimensions in a way they are used in [BART](https://github.com/mrirecon/bart)</li></ol>
+ * The aim of this package to create an general framework to handle multidimensional data.
+ * The reference implementation is based on array of primitive values or complex values form apache.math3,
+ * it is, however, super easy to write a wrapper to any array- or collection-implementation making it possible to combine
+ * the convenience of this interface with the advantages of the selected collection.
  * 
  */
 public interface NDArray<T> extends Collection<T> {
@@ -138,52 +135,6 @@ public interface NDArray<T> extends Collection<T> {
     public T get(int ... indices);
 
     /** 
-     * Returns the real part of an element specified by linear indexing.
-     * 
-     * <p>Linear indexing: It selects the ith element using the column-major
-     * iteration order that linearly spans the entire array.
-     * 
-     * @param linearIndex linear index
-     * @return the real part of an element specified by linear indexing
-     */
-    public double getReal(int linearIndex);
-
-    /** 
-     * Returns the real part of an element specified by cartesian indexing.
-     * 
-     * <p>Cartesian indexing: The ordinary way to index into an N-dimensional
-     * array is to use exactly N indices; each index selects the position(s)
-     * in its particular dimension.
-     * 
-     * @param indices cartesian coordinates
-     * @return the real part of an element specified by cartesian indexing
-     */
-    public double getReal(int... indices);
-
-    /** 
-     * Returns the imaginary part of an element specified by linear indexing.
-     * 
-     * <p>Linear indexing: It selects the ith element using the column-major
-     * iteration order that linearly spans the entire array.
-     * 
-     * @param linearIndex linear index
-     * @return the imaginary part of an element specified by linear indexing
-     */
-    public double getImag(int linearIndex);
-    
-    /** 
-     * Returns the imaginary part of an element specified by cartesian indexing.
-     * 
-     * <p>Cartesian indexing: The ordinary way to index into an N-dimensional
-     * array is to use exactly N indices; each index selects the position(s)
-     * in its particular dimension.
-     * 
-     * @param indices cartesian coordinates
-     * @return the imaginary part of an element specified by cartesian indexing
-     */
-    public double getImag(int... indices);
-
-    /** 
      * Sets the value of an element specified by linear indexing.
      * 
      * <p>Linear indexing: It selects the ith element using the column-major
@@ -217,7 +168,7 @@ public interface NDArray<T> extends Collection<T> {
      * @param value value to be assigned
      * @param linearIndex linear coordinates
      */
-    public void set(float value, int linearIndex);
+    public void set(Number value, int linearIndex);
 
     /** 
      * Sets the value of an element specified by cartesian indexing.
@@ -232,150 +183,7 @@ public interface NDArray<T> extends Collection<T> {
      * @param value value to be assigned
      * @param indices cartesian coordinates
      */
-    public void set(float value, int... indices);
-    
-    /** 
-     * Sets the value of an element specified by linear indexing.
-     * 
-     * <p>Linear indexing: It selects the ith element using the column-major
-     * iteration order that linearly spans the entire array.
-     * in its particular dimension.
-     * 
-     * @param value value to be assigned
-     * @param linearIndex linear coordinates
-     */
-    public void set(double value, int linearIndex);
-
-    /** 
-     * Sets the value of an element specified by cartesian indexing.
-     * 
-     * <p>Cartesian indexing: The ordinary way to index into an N-dimensional
-     * array is to use exactly N indices; each index selects the position(s)
-     * in its particular dimension.
-     * 
-     * <p>Note: If used on complex arrays, the imaginary part of the assigned
-     * element will be zero.
-     * 
-     * @param value value to be assigned
-     * @param indices cartesian coordinates
-     */
-    public void set(double value, int... indices);
-
-    /** 
-     * Sets the real part of an element specified by linear indexing.
-     * 
-     * <p>Linear indexing: It selects the ith element using the column-major
-     * iteration order that linearly spans the entire array.
-     * 
-     * <p>Note: If used on complex arrays, the imaginary part of the assigned
-     * element will be untouched.
-     * 
-     * @param value real value to be assigned as real part of some element
-     * @param linearIndex linear index
-     */
-    public void setReal(float value, int linearIndex);
-
-    /** 
-     * Sets the real part of an element specified by linear indexing.
-     * 
-     * <p>Linear indexing: It selects the ith element using the column-major
-     * iteration order that linearly spans the entire array.
-     * 
-     * <p>Note: If used on complex arrays, the imaginary part of the assigned
-     * element will be untouched.
-     * 
-     * @param value real value to be assigned as real part of some element
-     * @param linearIndex linear index
-     */
-    public void setReal(double value, int linearIndex);
-
-    /** 
-     * Sets the real part of an element specified by cartesian indexing.
-     * 
-     * <p>Cartesian indexing: The ordinary way to index into an N-dimensional
-     * array is to use exactly N indices; each index selects the position(s)
-     * in its particular dimension.
-     * 
-     * <p>Note: If used on complex arrays, the imaginary part of the assigned
-     * element will be untouched.
-     * 
-     * @param value real value to be assigned as real part of some element
-     * @param indices cartesian coordinates
-     */
-    public void setReal(float value, int... indices);
-    
-    /** 
-     * Sets the real part of an element specified by cartesian indexing.
-     * 
-     * <p>Cartesian indexing: The ordinary way to index into an N-dimensional
-     * array is to use exactly N indices; each index selects the position(s)
-     * in its particular dimension.
-     * 
-     * <p>Note: If used on complex arrays, the imaginary part of the assigned
-     * element will be untouched.
-     * 
-     * @param value real value to be assigned as real part of some element
-     * @param indices cartesian coordinates
-     */
-    public void setReal(double value, int... indices);
-
-    /** 
-     * Sets the imaginary part of an element specified by linear indexing.
-     * 
-     * <p>Linear indexing: It selects the ith element using the column-major
-     * iteration order that linearly spans the entire array.
-     * 
-     * <p>Note: If used on complex arrays, the real part of the assigned
-     * element will be untouched.
-     * 
-     * @param value real value to be assigned as imaginary part of some element
-     * @param linearIndex linear index
-     */
-    public void setImag(float value, int linearIndex);
-
-    /** 
-     * Sets the imaginary part of an element specified by linear indexing.
-     * 
-     * <p>Linear indexing: It selects the ith element using the column-major
-     * iteration order that linearly spans the entire array.
-     * 
-     * <p>Note: If used on complex arrays, the real part of the assigned
-     * element will be untouched.
-     * 
-     * @param value real value to be assigned as imaginary part of some element
-     * @param linearIndex linear index
-     */
-    public void setImag(double value, int linearIndex);
-    
-    /** 
-     * Sets the imaginary part of an element specified by cartesian indexing.
-     * 
-     * <p>Cartesian indexing: The ordinary way to index into an N-dimensional
-     * array is to use exactly N indices; each index selects the position(s)
-     * in its particular dimension.
-     * 
-     * <p>Note: If used on complex arrays, the real part of the assigned
-     * element will be untouched.
-     * 
-     * @param value real value to be assigned as imaginary part of some element
-     * @param indices cartesian coordinates
-     */
-    public void setImag(float value, int... indices);
-
-    /** 
-     * Sets the imaginary part of an element specified by cartesian indexing.
-     * 
-     * <p>Cartesian indexing: The ordinary way to index into an N-dimensional
-     * array is to use exactly N indices; each index selects the position(s)
-     * in its particular dimension.
-     * 
-     * <p>Note: If used on complex arrays, the real part of the assigned
-     * element will be untouched.
-     * 
-     * @param value real value to be assigned as imaginary part of some element
-     * @param indices cartesian coordinates
-     */
-    public void setImag(double value, int... indices);
+    public void set(Number value, int... indices);
 
     /** 
      * Updates this NDArray with the elements of the NDArray given as parameter.
@@ -385,7 +193,7 @@ public interface NDArray<T> extends Collection<T> {
      * @param array NDArray from which values are copied to this NDArray
      * @return this NDArray
      */
-    public NDArray<T> set(NDArray<?> array);
+    public NDArray<T> copyFrom(NDArray<?> array);
     
     /** 
      * Updates this NDArray with the elements of the array given as parameter.
@@ -395,7 +203,7 @@ public interface NDArray<T> extends Collection<T> {
      * @param array array holding the new values to be copied to this NDArray
      * @return this NDArray
      */
-    public NDArray<T> set(float[] array);
+    public NDArray<T> copyFrom(float[] array);
     
     /** 
      * Updates this NDArray with the elements of the array given as parameter.
@@ -405,7 +213,17 @@ public interface NDArray<T> extends Collection<T> {
      * @param array array holding the new values to be copied to this NDArray
      * @return this NDArray
      */
-    public NDArray<T> set(double[] array);
+    public NDArray<T> copyFrom(double[] array);
+
+    /** 
+     * Updates this NDArray with the elements of the array given as parameter.
+     * 
+     * <p>Note: the parameter array must have the same size and this NDArray!
+     * 
+     * @param array array holding the new values to be copied to this NDArray
+     * @return this NDArray
+     */
+    public NDArray<T> copyFrom(byte[] array);
     
     /** 
      * Updates this NDArray with the elements of the array given as parameter.
@@ -415,76 +233,64 @@ public interface NDArray<T> extends Collection<T> {
      * @param array array holding the new values to be copied to this NDArray
      * @return this NDArray
      */
-    public NDArray<T> set(Object[] array);
+    public NDArray<T> copyFrom(short[] array);
     
     /** 
-     * Updates this NDArray with the elements of the arrays given as parameters.
+     * Updates this NDArray with the elements of the array given as parameter.
      * 
-     * <p>Note: both parameter arrays must have the same size and this NDArray!
-     * <p>Note: if this function is called on real arrays, it will throw UnsupportedOperationException!
+     * <p>Note: the parameter array must have the same size and this NDArray!
      * 
-     * @param real array holding the new values to be copied to this NDArray as real part
-     * @param imag array holding the new values to be copied to this NDArray as imaginary part
+     * @param array array holding the new values to be copied to this NDArray
      * @return this NDArray
      */
-    public NDArray<T> set(float[] real, float[] imag);
+    public NDArray<T> copyFrom(int[] array);
     
     /** 
-     * Updates this NDArray with the elements of the arrays given as parameters.
+     * Updates this NDArray with the elements of the array given as parameter.
      * 
-     * <p>Note: both parameter arrays must have the same size and this NDArray!
-     * <p>Note: if this function is called on real arrays, it will throw UnsupportedOperationException!
+     * <p>Note: the parameter array must have the same size and this NDArray!
      * 
-     * @param real array holding the new values to be copied to this NDArray as real part
-     * @param imag array holding the new values to be copied to this NDArray as imaginary part
+     * @param array array holding the new values to be copied to this NDArray
      * @return this NDArray
      */
-    public NDArray<T> set(double[] real, double[] imag);
-
-    /** 
-     * Updates this NDArray with the elements of the arrays given as parameters.
-     * 
-     * <p>Note: both parameter arrays must have the same size and this NDArray!
-     * <p>Note: if this function is called on real arrays, it will throw UnsupportedOperationException!
-     * 
-     * @param real array holding the new values to be copied to this NDArray as real part
-     * @param imag array holding the new values to be copied to this NDArray as imaginary part
-     * @return this NDArray
-     */
-    public NDArray<T> set(Object[] real, Object[] imag);
+    public NDArray<T> copyFrom(long[] array);
     
     /** 
-     * Updates this NDArray with the elements of the arrays given as parameters.
+     * Updates this NDArray with the elements of the array given as parameter.
      * 
-     * <p>Note: both parameter arrays must have the same size and this NDArray!
-     * <p>Note: if this function is called on real arrays, it will throw UnsupportedOperationException!
+     * <p>Note: the parameter array must have the same size and this NDArray!
      * 
-     * @param real array holding the new values to be copied to this NDArray as real part
-     * @param imag array holding the new values to be copied to this NDArray as imaginary part
+     * @param array array holding the new values to be copied to this NDArray
      * @return this NDArray
      */
-    public NDArray<T> set(NDArray<?> real, NDArray<?> imag);
+    public NDArray<T> copyFrom(Object[] array);
     
-    /** 
-     * Checks if meaning of dimensions within BART calls are already specified by a previous setBartDims call.
+    /**
+     * Apply the given function to each element of the array, and override each entry with the calculated new values.
      * 
-     * @return true if the meaning of dimensions are already specified by a previous setBartDims call
-     */
-    public boolean areBartDimsSpecified();
-
-    /** 
-     * Gets an array containing the meaning of the dimensions within BART calls.
+     * Beware! Entries might not be processed in a sequential order!
      * 
-     * @return an array containing the meaning of the dimensions
+     * @param func function that receives the value of the current entry and returns the new value
      */
-    public BartDimsEnum[] getBartDims();
-
-    /** 
-     * Specifies the meaning of the dimensions within BART calls.
+    public void apply(UnaryOperator<T> func);
+    
+    /**
+     * Apply the given function to each element of the array, and override each entry with the calculated new values.
      * 
-     * @param bartDims meaning of the dimensions within BART calls
+     * Beware! Entries might not be processed in a sequential order!
+     * 
+     * @param func function that receives the value of the current entry and its linear index and returns the new value
      */
-    public void setBartDims(BartDimsEnum... bartDims);
+    public void applyWithLinearIndex(BiFunction<T, Integer, T> func);
+    
+    /**
+     * Apply the given function to each element of the array, and override each entry with the calculated new values.
+     * 
+     * Beware! Entries might not be processed in a sequential order!
+     * 
+     * @param func function that receives the value of the current entry and its Cartesian coordinate and returns the new value
+     */
+    public void applyWithCartesianIndex(BiFunction<T, int[], T> func);
     
     /** 
      * Converts this NDArray to a multidimensional array of Float, Double or Complex.
@@ -513,66 +319,11 @@ public interface NDArray<T> extends Collection<T> {
     public String contentToString();
 
     /** 
-     * Returns a FloatBuffer or DoubleBuffer that holds values of elements.
-     * 
-     * For arrays that hold either ComplexF32 or RealF32 values, a FloatBuffer returned,
-     * otherwise a DoubleBuffer is returned.
-     * For complex arrays, the complex elements are stored as two float/double values put directly
-     * after each other in the buffer. 
-     * 
-     * @return a FloatBuffer or DoubleBuffer that holds values of elements
-     */
-    public Buffer getBuffer();
-
-    /** 
-     * Returns a ByteBuffer that gives raw access to the memory segment that hold the data.
-     * 
-     * Values are stored as little endian floats/doubles.
-     * For complex arrays, the complex elements are stored as two float/double values put directly
-     * after each other in the buffer. 
-     * 
-     * @return a ByteBuffer that holds values of elements
-     */
-    public ByteBuffer getByteBuffer();
-
-    /** 
      * Returns a String representation of element type.
      * 
      * @return "RealF32", "RealF64", "ComplexF32", or "ComplexF64" depending on the type of array
      */
     public String dataTypeAsString();
-    
-    /** 
-     * Returns a new array holding the real part of the array
-     * 
-     * @return the real part of the array
-     */
-    public NDArray<Double> real();
-
-    /** 
-     * Returns a new array holding the imaginary part of the array
-     * 
-     * @return the imaginary part of the array
-     */
-    public NDArray<Double> imaginary();
-    
-    /** 
-     * Returns a new array holding the magnitude / absolute values of elements.
-     * 
-     * For real arrays, it returns an array filled with zeros.
-     * 
-     * @return a new array holding the magnitude / absolute values of elements.
-     */
-    public NDArray<Double> abs();
-
-    /** 
-     * Returns a new array holding the angle / argument of elements.
-     * 
-     * For real arrays, it returns an array filled with zeros.
-     * 
-     * @return a new array holding the angle / argument of elements.
-     */
-    public NDArray<Double> angle();
 
     /** 
      * Creates a new NDArray of the same size, and fills it with the element-wise sum of this NDArray and 
@@ -796,27 +547,6 @@ public interface NDArray<T> extends Collection<T> {
      * skips all singleton dimensions not included in the parameter list
      */
     public NDArray<T> selectDims(int... selectedDims);
-
-    // [50 × 30 × 1 × 1 × 1 × 1 × 1 × 1 × 1 × 10 × 1 × 1 × 10]
-    /** 
-     * Returns a view that references this NDArray as parent, and
-     * skips all singleton dimensions not included in the parameter list.
-     * 
-     * <p>View: An NDArray that references the specified region its parent array.
-     * All modifications in the parent array are reflecten in the view, and vice versa.
-     * 
-     * <p>Singleton dimension: dimension of size 1.
-     * 
-     * <p>For example, if <code>A</code> is a [50 × 30 × 1 × 1 × 1 × 1 × 1 × 1 × 1 × 10 × 1 × 1 × 10] array returned from a BART call,
-     * (and thus the meanings of dimensions are automatically assigned), then
-     * <code>B = A.selectDims(BartDimsEnum._01_READ, BartDimsEnum._02_PHS1, BartDimsEnum._10_TIME, BartDimsEnum._13_SLICE)</code> returns
-     * a [50 × 30 × 10 × 10] array.
-     * 
-     * @param selectedDims dimensions kept in the returend view
-     * @return a view that references this NDArray as parent, and
-     * skips all singleton dimensions not included in the parameter list.
-     */
-    public NDArray<T> selectDims(BartDimsEnum... selectedDims);
     
     /** 
      * Returns a view that references this NDArray as parent, and
@@ -835,26 +565,6 @@ public interface NDArray<T> extends Collection<T> {
     
     /** 
      * Returns a view that references this NDArray as parent, and
-     * skips all singleton dimensions included in the parameter list.
-     * 
-     * <p>View: An NDArray that references the specified region its parent array.
-     * All modifications in the parent array are reflecten in the view, and vice versa.
-     * 
-     * <p>Singleton dimension: dimension of size 1.
-     * 
-     * <p>For example, if <code>A</code> is a [50 × 30 × 1 × 1 × 1 × 1 × 1 × 1 × 1 × 10 × 1 × 1 × 10] array returned from a BART call,
-     * (and thus the meanings of dimensions are automatically assigned), then
-     * <code>B = A.dropDims(BartDimsEnum._03_COIL, BartDimsEnum._11_TIME2, BartDimsEnum._12_LEVEL)</code> returns
-     * a [50 × 30 × 1 × 1 × 1 × 1 × 1 × 1 × 10 × 10] array.
-     * 
-     * @param selectedDims dimensions skipped in the returend view
-     * @return a view that references this NDArray as parent, and
-     * skips all singleton dimensions included in the parameter list.
-     */
-    public NDArray<T> dropDims(BartDimsEnum... selectedDims);
-    
-    /** 
-     * Returns a view that references this NDArray as parent, and
      * skips all singleton dimensions.
      * 
      * <p>View: An NDArray that references the specified region its parent array.
@@ -866,7 +576,6 @@ public interface NDArray<T> extends Collection<T> {
      * skips all singleton dimensions.
      */
     public NDArray<T> squeeze();
-
     
     /** 
      * Returns an array view referencing this NDArray as parent that gives read-write access
@@ -923,24 +632,6 @@ public interface NDArray<T> extends Collection<T> {
      * dimensions are swiched in this view.
      */
     public NDArray<T> permuteDims(int... permutation);
-    
-    /** 
-     * Returns a view that references this NDArray as parent, but the order of 
-     * dimensions are swiched in this view.
-     * 
-     * <p>View: An NDArray that references the specified region its parent array.
-     * All modifications in the parent array are reflecten in the view, and vice versa.
-     * 
-     * <p>For example, if <code>A</code> is a [50 × 30 × 20 × 10] array, and
-     * <code>A.setBartDims(BartDimsEnum._01_READ, BartDimsEnum._02_PHS1, BartDimsEnum._03_PHS2, BartDimsEnum._03_COIL)</code>
-     * then <code>B = A.permuteDims(BartDimsEnum._01_READ, BartDimsEnum._02_PHS1, BartDimsEnum._03_COIL, BartDimsEnum._03_PHS2)</code> returns
-     * a [50 × 30 × 10 × 20] array, and <code>B.get(3,1,0,5) == A.get(3,1,0,5)</code>.
-     * 
-     * @param permutation new order of dimensions
-     * @return a view that references this NDArray as parent, but the order of 
-     * dimensions are swiched in this view.
-     */
-    public NDArray<T> permuteDims(BartDimsEnum... permutation);
     
     /** 
      * Creates a new NDArray that contains the elements of this NDArrays and all other NDArrays
