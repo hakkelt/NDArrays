@@ -36,7 +36,6 @@ abstract class AbstractNDArrayReshapeView<T,T2 extends Number> extends AbstractN
         parent.set(value, linearIndex);
     }
 
-
     protected static void checkNewShape(int[] newShape, int[] parentShape, int expectedLength) {
         int actualLength = length(newShape);
         if (actualLength != expectedLength)

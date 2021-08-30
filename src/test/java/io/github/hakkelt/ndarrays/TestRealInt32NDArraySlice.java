@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +16,7 @@ class TestRealInt32NDArraySlice {
     @BeforeEach
     void setup() {
         array = new RealInt32NDArray(new int[]{ 4, 5, 3 });
-        array.applyWithLinearIndex((value, index) -> index.intValue());
+        array.applyWithLinearIndices((value, index) -> index.intValue());
         slice = array.slice(1, "1:4", ":");
     }
 
@@ -53,7 +55,7 @@ class TestRealInt32NDArraySlice {
     void testWrongGetLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> slice.get(10));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, slice.length(), 10),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, slice.length(), 10),
             exception.getMessage());
     }
 
@@ -61,7 +63,7 @@ class TestRealInt32NDArraySlice {
     void testWrongGetNegativeLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> slice.get(-11));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, slice.length(), -11),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, slice.length(), -11),
             exception.getMessage());
     }
 
@@ -69,7 +71,7 @@ class TestRealInt32NDArraySlice {
     void testWrongGetCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> slice.get(1,3));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "3 × 3", "[1, 3]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "3 × 3", "[1, 3]"),
             exception.getMessage());
     }
 
@@ -77,7 +79,7 @@ class TestRealInt32NDArraySlice {
     void testWrongGetNegativeCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> slice.get(-4,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "3 × 3", "[-4, 1]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "3 × 3", "[-4, 1]"),
             exception.getMessage());
     }
 
@@ -86,7 +88,7 @@ class TestRealInt32NDArraySlice {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> slice.set(0, 10));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, slice.length(), 10),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, slice.length(), 10),
             exception.getMessage());
     }
 
@@ -95,7 +97,7 @@ class TestRealInt32NDArraySlice {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> slice.set(0, -11));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, slice.length(), -11),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, slice.length(), -11),
             exception.getMessage());
     }
 
@@ -104,7 +106,7 @@ class TestRealInt32NDArraySlice {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> slice.set(0, 1,3));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "3 × 3", "[1, 3]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "3 × 3", "[1, 3]"),
             exception.getMessage());
     }
 
@@ -113,7 +115,7 @@ class TestRealInt32NDArraySlice {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> slice.set(0, -4,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "3 × 3", "[-4, 1]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "3 × 3", "[-4, 1]"),
             exception.getMessage());
     }
 
@@ -121,7 +123,7 @@ class TestRealInt32NDArraySlice {
     void testGetDimensionMismatchTooMany() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> slice.get(1,1,0));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 3, 2),
+            String.format(Errors.DIMENSION_MISMATCH, 3, 2),
             exception.getMessage());
     }
 
@@ -130,7 +132,7 @@ class TestRealInt32NDArraySlice {
         NDArray<Integer> slice2 = array.slice("1:4", "1:4", ":");
         Exception exception = assertThrows(IllegalArgumentException.class, () -> slice2.get(1,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 2, 3),
+            String.format(Errors.DIMENSION_MISMATCH, 2, 3),
             exception.getMessage());
     }
 
@@ -139,7 +141,7 @@ class TestRealInt32NDArraySlice {
         Exception exception = assertThrows(IllegalArgumentException.class,
             () -> slice.set(0, 1,1,0));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 3, 2),
+            String.format(Errors.DIMENSION_MISMATCH, 3, 2),
             exception.getMessage());
     }
 
@@ -149,7 +151,7 @@ class TestRealInt32NDArraySlice {
         Exception exception = assertThrows(IllegalArgumentException.class,
             () -> slice2.set(0, 1,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 2, 3),
+            String.format(Errors.DIMENSION_MISMATCH, 2, 3),
             exception.getMessage());
     }
 
@@ -243,6 +245,69 @@ class TestRealInt32NDArraySlice {
     }
 
     @Test
+    void testApply() {
+        NDArray<Integer> slice2 = new RealInt32NDArray(array).slice(1, "1:4", ":");
+        slice2.apply(value -> (int)Math.sqrt(value));
+        for (int i = 0; i < slice.length(); i++)
+            assertEquals((int)Math.sqrt(slice.get(i)), slice2.get(i));
+    }
+
+    @Test
+    void testApplyWithLinearIndices() {
+        NDArray<Integer> slice2 = new RealInt32NDArray(array).slice(1, "1:4", ":");
+        slice2.applyWithLinearIndices((value, index) -> (int)(Math.sqrt(value) + index));
+        for (int i = 0; i < slice.length(); i++)
+            assertEquals((int)(Math.sqrt(slice.get(i)) + i), slice2.get(i));
+    }
+
+    @Test
+    void testApplyWithCartesianIndex() {
+        NDArray<Integer> slice2 = new RealInt32NDArray(array).slice(1, "1:4", ":");
+        slice2.applyWithCartesianIndices((value, indices) -> (int)(Math.sqrt(value) + indices[0]));
+        for (int i = 0; i < slice.dims(0); i++)
+            for (int j = 0; j < slice.dims(1); j++)
+                assertEquals((int)(Math.sqrt(slice.get(i,j)) + i), slice2.get(i,j));
+    }
+
+    @Test
+    void testMap() {
+        NDArray<Integer> slice2 = slice.map(value -> (int)Math.sqrt(value));
+        for (int i = 0; i < slice.length(); i++)
+            assertEquals((int)Math.sqrt(slice.get(i)), slice2.get(i));
+    }
+
+    @Test
+    void testMapWithLinearIndices() {
+        NDArray<Integer> slice2 = slice.mapWithLinearIndices((value, index) -> (int)(Math.sqrt(value) + index));
+        for (int i = 0; i < slice.length(); i++)
+            assertEquals((int)(Math.sqrt(slice.get(i)) + i), slice2.get(i));
+    }
+
+    @Test
+    void testMapWithCartesianIndex() {
+        NDArray<Integer> slice2 = slice.mapWithCartesianIndices((value, indices) -> (int)(Math.sqrt(value) + indices[0]));
+        for (int i = 0; i < slice.dims(0); i++)
+            for (int j = 0; j < slice.dims(1); j++)
+                assertEquals((int)(Math.sqrt(slice.get(i,j)) + i), slice2.get(i,j));
+    }
+
+    @Test
+    void testForEach() {
+        AtomicInteger i = new AtomicInteger(0);
+        slice.forEach(value -> assertEquals(slice.get(i.getAndIncrement()), value));
+    }
+
+    @Test
+    void testForEachWithLinearIndices() {
+        slice.forEachWithLinearIndices((value, index) -> assertEquals(slice.get(index), value));
+    }
+
+    @Test
+    void testForEachWithCartesianIndex() {
+        slice.forEachWithCartesianIndices((value, indices) -> assertEquals(slice.get(indices), value));
+    }
+
+    @Test
     void testAddArrayToSlice() {
         NDArray<Integer> array2 = new RealInt32NDArray(slice);
         NDArray<Integer> array3 = slice.add(array2);
@@ -319,39 +384,39 @@ class TestRealInt32NDArraySlice {
         double norm = slice.stream()
             .filter(value -> value != 0.)
             .count();
-        assertTrue(Math.abs(norm - slice.norm(0)) / norm < 1e-6);
+        assertEquals(norm, slice.norm(0));
     }
 
     @Test
     void test1Norm() {
         double norm = slice.stream()
             .mapToDouble(value -> Math.abs(value))
-            .reduce(0., (acc, item) -> acc + item);
-        assertTrue(Math.abs(norm - slice.norm(1)) / norm < 1e-6);
+            .reduce(0, (acc, item) -> acc + item);
+        assertEquals(norm, slice.norm(1));
     }
 
     @Test
     void test2Norm() {
-        double norm = (float)Math.sqrt(slice.stream()
-            .map(value -> (float)Math.pow(Math.abs(value), 2))
-            .reduce((float)0., (acc, item) -> acc + item));
-        assertTrue(Math.abs(norm - slice.norm()) / norm < 1e-6);
+        double norm = Math.sqrt(slice.stream()
+            .map(value -> Math.pow(Math.abs(value), 2))
+            .reduce(0., (acc, item) -> acc + item));
+        assertEquals(norm, slice.norm());
     }
 
     @Test
     void testPQuasinorm() {
-        double norm = (float)Math.pow(slice.stream()
-            .map(value -> (float)Math.pow(Math.abs(value), 0.5))
-            .reduce((float)0., (acc, item) -> acc + item), 2);
-        assertTrue(Math.abs(norm - slice.norm(0.5)) / norm < 1e-6);
+        double norm = Math.pow(slice.stream()
+            .map(value -> Math.pow(Math.abs(value), 0.5))
+            .reduce(0., (acc, item) -> acc + item), 2);
+        assertEquals(norm, slice.norm(0.5));
     }
 
     @Test
     void testPNorm() {
-        double norm = (float)Math.pow(slice.stream()
-            .map(value -> (float)Math.pow(Math.abs(value), 3.5))
-            .reduce((float)0., (acc, item) -> acc + item), 1 / 3.5);
-        assertTrue(Math.abs(norm - slice.norm(3.5)) / norm < 1e-6);
+        double norm = Math.pow(slice.stream()
+            .map(value -> Math.pow(Math.abs(value), 3.5))
+            .reduce(0., (acc, item) -> acc + item), 1 / 3.5);
+        assertEquals(norm, slice.norm(3.5));
     }
 
     @Test
@@ -359,7 +424,7 @@ class TestRealInt32NDArraySlice {
         double norm = slice.stream()
             .mapToDouble(value -> Math.abs(value))
             .max().getAsDouble();
-        assertTrue(Math.abs(norm - slice.norm(Double.POSITIVE_INFINITY)) / norm < 1e-6);
+        assertEquals(norm, slice.norm(Double.POSITIVE_INFINITY));
     }
 
     @Test

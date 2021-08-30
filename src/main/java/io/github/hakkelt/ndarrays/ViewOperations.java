@@ -23,27 +23,22 @@ class ViewOperations<T,T2 extends Number> {
         return new ComplexNDArraySliceView<>(me, slicingExpressions);
     }
 
-    
     public NDArray<T2> permuteDims(InternalRealNDArray<T2> me, int... permutation) {
         return new RealNDArrayPermuteDimsView<>(me, permutation);
     }
 
-    
     public ComplexNDArray<T2> permuteDims(InternalComplexNDArray<T2> me, int... permutation) {
         return new ComplexNDArrayPermuteDimsView<>(me, permutation);
     }
 
-    
     public NDArray<T2> reshape(InternalRealNDArray<T2> me, int... newShape) {
         return new RealNDArrayReshapeView<>(me, newShape);
     }
 
-    
     public ComplexNDArray<T2> reshape(InternalComplexNDArray<T2> me, int... newShape) {
         return new ComplexNDArrayReshapeView<>(me, newShape);
     }
 
-    
     public NDArray<T> concatenate(AbstractNDArray<T,T2> me, int axis, NDArray<?> ...arrays) {
         checkConcatenationDimensions(me, axis, arrays);
         int[] newDims = me.dims.clone();
@@ -75,63 +70,57 @@ class ViewOperations<T,T2 extends Number> {
     public NDArray<T> selectDims(AbstractNDArray<T,T2> me, int... selectedDims) {
         IntStream.of(selectedDims).forEach(i -> {
             if (i < 0)
-                throw new IllegalArgumentException(String.format(AbstractNDArray.ERROR_CANNOT_SELECT_DIM_NEGATIVE, i, me.ndims()));
+                throw new IllegalArgumentException(String.format(Errors.CANNOT_SELECT_DIM_NEGATIVE, i, me.ndims()));
             if (i >= me.ndims())
-                throw new IllegalArgumentException(String.format(AbstractNDArray.ERROR_CANNOT_SELECT_DIM_OVERFLOW, i, me.ndims()));
+                throw new IllegalArgumentException(String.format(Errors.CANNOT_SELECT_DIM_OVERFLOW, i, me.ndims()));
         });
         Set<Integer> set = IntStream.of(selectedDims).boxed().collect(Collectors.toSet());
         return me.slice(IntStream.range(0, me.ndims()).mapToObj(i -> {
             if (set.contains(i)) return ":";
-            if (me.dims(i) != 1) throw new IllegalArgumentException(String.format(AbstractNDArray.ERROR_DROPDIMS_NOT_SINGLETON, i));
+            if (me.dims(i) != 1) throw new IllegalArgumentException(String.format(Errors.DROPDIMS_NOT_SINGLETON, i));
             return 0;
         }).toArray());
     }
-
 
     @SuppressWarnings("unchecked")
     public ComplexNDArray<T2> selectDims(InternalComplexNDArray<T2> me, int... selectedDims) {
         return (ComplexNDArray<T2>)selectDims((AbstractNDArray<T,T2>)me, selectedDims);
     }
-    
-    
+
     public NDArray<T> dropDims(AbstractNDArray<T,T2> me, int... selectedDims) {
         IntStream.of(selectedDims).forEach(i -> {
             if (i < 0)
-                throw new IllegalArgumentException(String.format(AbstractNDArray.ERROR_CANNOT_DROP_DIM_NEGATIVE, i, me.ndims()));
+                throw new IllegalArgumentException(String.format(Errors.CANNOT_DROP_DIM_NEGATIVE, i, me.ndims()));
             if (i >= me.ndims())
-                throw new IllegalArgumentException(String.format(AbstractNDArray.ERROR_CANNOT_DROP_DIM_OVERFLOW, i, me.ndims()));
+                throw new IllegalArgumentException(String.format(Errors.CANNOT_DROP_DIM_OVERFLOW, i, me.ndims()));
         });
         List<Integer> set = IntStream.of(selectedDims).boxed().collect(Collectors.toList());
         return me.selectDims(IntStream.range(0, me.ndims()).filter(i -> !set.contains(i)).toArray());
     }
 
-
     @SuppressWarnings("unchecked")
     public ComplexNDArray<T2> dropDims(InternalComplexNDArray<T2> me, int... selectedDims) {
         return (ComplexNDArray<T2>)dropDims((AbstractNDArray<T,T2>)me, selectedDims);
     }
-    
 
     public NDArray<T> squeeze(AbstractNDArray<T,T2> me) {
         return me.selectDims(IntStream.range(0, me.dims.length).filter(i -> me.dims[i] != 1).toArray());
     }
-    
 
     public ComplexNDArray<T2> squeeze(InternalComplexNDArray<T2> me) {
         return me.selectDims(IntStream.range(0, me.ndims()).filter(i -> me.dims(i) != 1).toArray());
     }
 
-
     protected void checkConcatenationDimensions(AbstractNDArray<T,T2> me, int axis, NDArray<?> ...arrays) {
         for (NDArray<?> array : arrays) {
             if (array.ndims() != me.ndims())
                 throw new IllegalArgumentException(
-                    String.format(AbstractNDArray.ERROR_CONCATENATION_SIZE_MISMATCH,
+                    String.format(Errors.CONCATENATION_SIZE_MISMATCH,
                     Printer.dimsToString(array.dims()), Printer.dimsToString(me.dims), axis));
             for (int i = 0; i < me.ndims(); i++)
                 if (i != axis && array.dims(i) != me.dims(i))
                     throw new IllegalArgumentException(
-                        String.format(AbstractNDArray.ERROR_CONCATENATION_SIZE_MISMATCH,
+                        String.format(Errors.CONCATENATION_SIZE_MISMATCH,
                         Printer.dimsToString(array.dims()), Printer.dimsToString(me.dims), axis));
         }
     }

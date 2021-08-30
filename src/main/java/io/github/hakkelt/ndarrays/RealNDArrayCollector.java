@@ -38,7 +38,7 @@ class RealNDArrayCollector<T extends Number> implements Collector<Object, List<O
 
     public Function<List<Object>, NDArray<T>> finisher() {
         return list -> {
-            destination.applyWithLinearIndex(
+            destination.applyWithLinearIndices(
                 (value, index) -> ((AbstractRealNDArray<T>)destination).wrapValue(list.get(index))
             );
             return destination;

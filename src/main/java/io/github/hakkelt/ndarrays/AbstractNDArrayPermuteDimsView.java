@@ -8,11 +8,6 @@ import java.util.stream.IntStream;
 abstract class AbstractNDArrayPermuteDimsView<T,T2 extends Number> extends AbstractNDArrayView<T,T2> {
     int[] dimsOrder;
 
-    static final String ERROR_PERMUTATOR_SIZE_MISMATCH =
-        "The permutation vector (%s) doesn't fit the size of the array to be permutated (%s)!";
-    static final String ERROR_INVALID_PERMUTATOR =
-        "The permutation vector (%s) is not a valid permutation vector for the array to be permutated (%s)!";
-
     @SuppressWarnings("unchecked")
     protected AbstractNDArrayPermuteDimsView(NDArray<T> parent, int ...dimsOrder) {
         checkDimsOrder(dimsOrder, parent.dims());
@@ -70,13 +65,13 @@ abstract class AbstractNDArrayPermuteDimsView<T,T2 extends Number> extends Abstr
     protected static void checkDimsOrder(int[] dimsOrder, int[] dims) {
         if (dimsOrder.length != dims.length)
             throw new IllegalArgumentException(
-                String.format(ERROR_PERMUTATOR_SIZE_MISMATCH,
+                String.format(Errors.PERMUTATOR_SIZE_MISMATCH,
                     Printer.printVector(dimsOrder),
                     Printer.dimsToString(dims)));
         List<Integer> dimsOrderSet = IntStream.of(dimsOrder).boxed().collect(Collectors.toList());
         if (IntStream.of(dimsOrder).anyMatch(num -> num < 0 || num >= dims.length || Collections.frequency(dimsOrderSet, num) > 1))
             throw new IllegalArgumentException(
-                String.format(ERROR_INVALID_PERMUTATOR,
+                String.format(Errors.INVALID_PERMUTATOR,
                     Printer.printVector(dimsOrder),
                     Printer.dimsToString(dims)));
     }

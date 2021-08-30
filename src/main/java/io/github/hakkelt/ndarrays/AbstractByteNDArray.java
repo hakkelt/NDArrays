@@ -5,7 +5,7 @@ abstract class AbstractByteNDArray extends AbstractRealNDArray<Byte> {
     protected Byte wrapValue(Number value) {
         return Byte.valueOf(value.byteValue());
     }
-    
+
     protected Byte zeroT() {
         return Byte.valueOf((byte) 0);
     }
@@ -20,7 +20,7 @@ abstract class AbstractByteNDArray extends AbstractRealNDArray<Byte> {
         }
         throw new UnsupportedOperationException();
     }
-    
+
     public Object eltype() {
         return Byte.class;
     }
@@ -28,7 +28,12 @@ abstract class AbstractByteNDArray extends AbstractRealNDArray<Byte> {
     public void set(Byte real, int linearIndex) {
         set((Number)real, linearIndex);
     }
-    
+
+    @Override
+    protected double absSum() {
+        return stream().mapToLong(Byte::longValue).reduce(0, (a,b) -> a + Math.abs(b));
+    }
+
     protected Byte accumulateAtIndex(int linearIndex, AccumulateOperators operator, Object ...objects) {
         Byte acc = get(linearIndex);
         for (Object item : objects) {

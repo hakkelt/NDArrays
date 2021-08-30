@@ -53,7 +53,6 @@ abstract class AbstractRealNDArray<T extends Number> extends AbstractNDArray<T,T
     protected T accumulate(Complex acc, NDArray<?> array, int linearIndex, AbstractNDArray.AccumulateOperators operation) {
         throw new UnsupportedOperationException();
     }
-    
 
     protected T accumulate(Byte acc, Number value, AbstractNDArray.AccumulateOperators operation) {
         switch (operation) { 
@@ -64,7 +63,6 @@ abstract class AbstractRealNDArray<T extends Number> extends AbstractNDArray<T,T
             default: throw new IllegalArgumentException();
         }
     }
-    
 
     protected T accumulate(Short acc, Number value, AbstractNDArray.AccumulateOperators operation) {
         switch (operation) { 
@@ -75,7 +73,6 @@ abstract class AbstractRealNDArray<T extends Number> extends AbstractNDArray<T,T
             default: throw new IllegalArgumentException();
         }
     }
-    
 
     protected T accumulate(Integer acc, Number value, AbstractNDArray.AccumulateOperators operation) {
        switch (operation) { 
@@ -86,7 +83,6 @@ abstract class AbstractRealNDArray<T extends Number> extends AbstractNDArray<T,T
             default: throw new IllegalArgumentException();
         }
     }
-    
 
     protected T accumulate(Long acc, Number value, AbstractNDArray.AccumulateOperators operation) {
         switch (operation) { 
@@ -97,7 +93,6 @@ abstract class AbstractRealNDArray<T extends Number> extends AbstractNDArray<T,T
             default: throw new IllegalArgumentException();
         }
     }
-    
 
     protected T accumulate(Float acc, Number value, AbstractNDArray.AccumulateOperators operation) {
         switch (operation) { 
@@ -108,7 +103,6 @@ abstract class AbstractRealNDArray<T extends Number> extends AbstractNDArray<T,T
             default: throw new IllegalArgumentException();
         }
     }
-    
 
     protected T accumulate(Double acc, Number value, AbstractNDArray.AccumulateOperators operation) {
         switch (operation) { 

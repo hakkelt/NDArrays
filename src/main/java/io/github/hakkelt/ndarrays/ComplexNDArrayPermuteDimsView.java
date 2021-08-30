@@ -65,12 +65,10 @@ public class ComplexNDArrayPermuteDimsView<T extends Number> extends AbstractNDA
             .mapToObj(this::getReal).collect(parent.getRealCollectorInternal(dims));
     }
 
-
     public NDArray<T> imaginary() {
         return streamLinearIndices()
             .mapToObj(this::getImag).collect(parent.getRealCollectorInternal(dims));
     }
-
 
     @Override
     public NDArray<T> abs() {
@@ -78,19 +76,16 @@ public class ComplexNDArrayPermuteDimsView<T extends Number> extends AbstractNDA
             .mapToObj(i -> (get(i)).abs()).collect(parent.getRealCollectorInternal(dims));
     }
 
-
     public NDArray<T> angle() {
         return streamLinearIndices()
             .mapToObj(i -> (get(i)).getArgument()).collect(parent.getRealCollectorInternal(dims));
     }
-
 
     @Override
     @SuppressWarnings("unchecked")
     public ComplexNDArray<T> similar() {
         return ((ComplexNDArray<T>)parent.createNewNDArrayOfSameTypeAsMe(dims));
     }
-
 
     @Override
     @SuppressWarnings("unchecked")
@@ -99,36 +94,40 @@ public class ComplexNDArrayPermuteDimsView<T extends Number> extends AbstractNDA
         return newInstance.copyFrom(this);
     }
 
-    
     @Override
     protected Complex accumulate(Complex acc, NDArray<?> array, int linearIndex, AbstractNDArray.AccumulateOperators operator) {
         return parent.accumulate(acc, array, linearIndex, operator);
     }
 
+    @Override
     protected Complex accumulate(Float acc, Number item, AccumulateOperators operator) {
         throw new UnsupportedOperationException();   
     }
 
+    @Override
     protected Complex accumulate(Double acc, Number item, AccumulateOperators operator) {
         throw new UnsupportedOperationException();   
     }
 
+    @Override
     protected Complex accumulate(Byte acc, Number item, AccumulateOperators operator) {
         throw new UnsupportedOperationException();   
     }
 
+    @Override
     protected Complex accumulate(Short acc, Number item, AccumulateOperators operator) {
         throw new UnsupportedOperationException();   
     }
 
+    @Override
     protected Complex accumulate(Integer acc, Number item, AccumulateOperators operator) {
         throw new UnsupportedOperationException();   
     }
 
+    @Override
     protected Complex accumulate(Long acc, Number item, AccumulateOperators operator) {
         throw new UnsupportedOperationException();   
     }
-
 
     @Override
     protected Complex accumulate(Complex acc, Complex value, AbstractNDArray.AccumulateOperators operation) {
@@ -141,6 +140,7 @@ public class ComplexNDArrayPermuteDimsView<T extends Number> extends AbstractNDA
         }
     }
 
+    @Override
     protected Complex accumulate(Complex acc, Number value, AbstractNDArray.AccumulateOperators operation) {
         switch (operation) {
             case ADD: return acc.add(value.doubleValue());

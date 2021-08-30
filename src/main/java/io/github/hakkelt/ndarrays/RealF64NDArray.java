@@ -80,7 +80,6 @@ public class RealF64NDArray extends AbstractDoubleNDArray {
         return new RealNDArrayCollector<>(new RealF64NDArray(dims));
     }
 
-
     protected RealF64NDArray createNewNDArrayOfSameTypeAsMe(int... dims) {
         return new RealF64NDArray(dims);
     }

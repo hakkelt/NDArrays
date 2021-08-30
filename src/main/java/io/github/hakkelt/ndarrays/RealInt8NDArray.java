@@ -80,7 +80,6 @@ public class RealInt8NDArray extends AbstractByteNDArray {
         return new RealNDArrayCollector<>(new RealInt8NDArray(dims));
     }
 
-
     protected RealInt8NDArray createNewNDArrayOfSameTypeAsMe(int... dims) {
         return new RealInt8NDArray(dims);
     }

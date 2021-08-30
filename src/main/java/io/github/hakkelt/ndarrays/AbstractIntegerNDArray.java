@@ -5,7 +5,7 @@ abstract class AbstractIntegerNDArray extends AbstractRealNDArray<Integer> {
     protected Integer wrapValue(Number value) {
         return Integer.valueOf(value.intValue());
     }
-    
+
     protected Integer zeroT() {
         return Integer.valueOf(0);
     }
@@ -20,7 +20,7 @@ abstract class AbstractIntegerNDArray extends AbstractRealNDArray<Integer> {
         }
         throw new UnsupportedOperationException();
     }
-    
+
     public Object eltype() {
         return Integer.class;
     }
@@ -28,7 +28,12 @@ abstract class AbstractIntegerNDArray extends AbstractRealNDArray<Integer> {
     public void set(Integer real, int linearIndex) {
         set((Number)real, linearIndex);
     }
-    
+
+    @Override
+    protected double absSum() {
+        return stream().mapToLong(Integer::longValue).reduce(0, (a,b) -> a + Math.abs(b));
+    }
+
     protected Integer accumulateAtIndex(int linearIndex, AccumulateOperators operator, Object ...objects) {
         Integer acc = get(linearIndex);
         for (Object item : objects) {

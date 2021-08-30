@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.commons.math3.complex.Complex;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +17,7 @@ class TestComplexF64NDArrayReshape {
     @BeforeEach
     void setup() {
         array = new ComplexF64NDArray(new int[]{ 4, 5, 3 });
-        array.applyWithLinearIndex((value, index) -> new Complex(index, -index));
+        array.applyWithLinearIndices((value, index) -> new Complex(index, -index));
         reshaped = array.reshape(20, 3);
     }
 
@@ -49,7 +51,7 @@ class TestComplexF64NDArrayReshape {
     void testWrongGetLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> reshaped.get(60));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, reshaped.length(), 60),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, reshaped.length(), 60),
             exception.getMessage());
     }
 
@@ -57,7 +59,7 @@ class TestComplexF64NDArrayReshape {
     void testWrongGetNegativeLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> reshaped.get(-61));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, reshaped.length(), -61),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, reshaped.length(), -61),
             exception.getMessage());
     }
 
@@ -65,7 +67,7 @@ class TestComplexF64NDArrayReshape {
     void testWrongGetCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> reshaped.get(1,3));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "20 × 3", "[1, 3]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "20 × 3", "[1, 3]"),
             exception.getMessage());
     }
 
@@ -73,7 +75,7 @@ class TestComplexF64NDArrayReshape {
     void testWrongGetNegativeCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> reshaped.get(-21,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "20 × 3", "[-21, 1]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "20 × 3", "[-21, 1]"),
             exception.getMessage());
     }
 
@@ -83,7 +85,7 @@ class TestComplexF64NDArrayReshape {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> reshaped.set(zero, 60));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, reshaped.length(), 60),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, reshaped.length(), 60),
             exception.getMessage());
     }
 
@@ -93,7 +95,7 @@ class TestComplexF64NDArrayReshape {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> reshaped.set(zero, -61));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, reshaped.length(), -61),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, reshaped.length(), -61),
             exception.getMessage());
     }
 
@@ -103,7 +105,7 @@ class TestComplexF64NDArrayReshape {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> reshaped.set(zero, 1,3));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "20 × 3", "[1, 3]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "20 × 3", "[1, 3]"),
             exception.getMessage());
     }
 
@@ -113,7 +115,7 @@ class TestComplexF64NDArrayReshape {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> reshaped.set(zero, -21,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "20 × 3", "[-21, 1]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "20 × 3", "[-21, 1]"),
             exception.getMessage());
     }
 
@@ -122,7 +124,7 @@ class TestComplexF64NDArrayReshape {
         reshaped = array.reshape(5,4,3);
         Exception exception = assertThrows(IllegalArgumentException.class, () -> reshaped.get(1,1,1,0));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 4, 3),
+            String.format(Errors.DIMENSION_MISMATCH, 4, 3),
             exception.getMessage());
     }
 
@@ -131,7 +133,7 @@ class TestComplexF64NDArrayReshape {
         reshaped = array.reshape(5,4,3);
         Exception exception = assertThrows(IllegalArgumentException.class, () -> reshaped.get(1,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 2, 3),
+            String.format(Errors.DIMENSION_MISMATCH, 2, 3),
             exception.getMessage());
     }
 
@@ -142,7 +144,7 @@ class TestComplexF64NDArrayReshape {
         Exception exception = assertThrows(IllegalArgumentException.class,
             () -> reshaped.set(zero, 1,1,1,0));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 4, 3),
+            String.format(Errors.DIMENSION_MISMATCH, 4, 3),
             exception.getMessage());
     }
 
@@ -153,7 +155,7 @@ class TestComplexF64NDArrayReshape {
         Exception exception = assertThrows(IllegalArgumentException.class,
             () -> reshaped.set(zero, 1,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 2, 3),
+            String.format(Errors.DIMENSION_MISMATCH, 2, 3),
             exception.getMessage());
     }
 
@@ -266,6 +268,80 @@ class TestComplexF64NDArrayReshape {
             .append(String.format(lineFormat, 1.9e+01, -1.9e+01, 3.9e+01, -3.9e+01, 5.9e+01, -5.9e+01))        
             .toString();
         assertEquals(expected, str);
+    }
+
+    @Test
+    void testApply() {
+        NDArray<Complex> reshaped2 = new ComplexF32NDArray(array).reshape(20, 3).apply(value -> value.atan());
+        for (int i = 1; i < array.length(); i++) {
+            assertTrue(Math.abs(reshaped.get(i).atan().getReal() - reshaped2.get(i).getReal()) / reshaped2.get(i).getReal() < 1e-6);
+            assertTrue(Math.abs(reshaped.get(i).atan().getImaginary() - reshaped2.get(i).getImaginary()) / reshaped2.get(i).getImaginary() < 1e-6);
+        }
+    }
+
+    @Test
+    void testApplyWithLinearIndices() {
+        NDArray<Complex> reshaped2 = new ComplexF32NDArray(array).reshape(20, 3).applyWithLinearIndices((value, index) -> value.atan().add(index));
+        for (int i = 1; i < reshaped.length(); i++) {
+            assertTrue(Math.abs(reshaped.get(i).atan().add(i).getReal() - reshaped2.get(i).getReal()) / reshaped2.get(i).getReal() < 1e-6);
+            assertTrue(Math.abs(reshaped.get(i).atan().add(i).getImaginary() - reshaped2.get(i).getImaginary()) / reshaped2.get(i).getImaginary() < 1e-6);
+        }
+    }
+
+    @Test
+    void testApplyWithCartesianIndex() {
+        NDArray<Complex> reshaped2 = new ComplexF32NDArray(array).reshape(20, 3).applyWithCartesianIndices((value, indices) -> value.atan().add(indices[0]));
+        for (int i = 0; i < reshaped.dims(0); i++)
+            for (int j = 0; j < reshaped.dims(1); j++) {
+                if (i == 0 && j == 0) continue;
+                assertTrue(Math.abs(reshaped.get(i,j).atan().add(i).getReal() - reshaped2.get(i,j).getReal()) / reshaped2.get(i,j).getReal() < 1e-6);
+                assertTrue(Math.abs(reshaped.get(i,j).atan().add(i).getImaginary() - reshaped2.get(i,j).getImaginary()) / reshaped2.get(i,j).getImaginary() < 1e-6);
+            }
+    }
+
+    @Test
+    void testMap() {
+        NDArray<Complex> reshaped2 = reshaped.map(value -> value.atan());
+        for (int i = 1; i < reshaped.length(); i++) {
+            assertTrue(Math.abs(reshaped.get(i).atan().getReal() - reshaped2.get(i).getReal()) / reshaped2.get(i).getReal() < 1e-6);
+            assertTrue(Math.abs(reshaped.get(i).atan().getImaginary() - reshaped2.get(i).getImaginary()) / reshaped2.get(i).getImaginary() < 1e-6);
+        }
+    }
+
+    @Test
+    void testMapWithLinearIndices() {
+        NDArray<Complex> reshaped2 = reshaped.mapWithLinearIndices((value, index) -> value.atan().add(index));
+        for (int i = 1; i < reshaped.length(); i++) {
+            assertTrue(Math.abs(reshaped.get(i).atan().add(i).getReal() - reshaped2.get(i).getReal()) / reshaped2.get(i).getReal() < 1e-6);
+            assertTrue(Math.abs(reshaped.get(i).atan().add(i).getImaginary() - reshaped2.get(i).getImaginary()) / reshaped2.get(i).getImaginary() < 1e-6);
+        }
+    }
+
+    @Test
+    void testMapWithCartesianIndex() {
+        NDArray<Complex> reshaped2 = reshaped.mapWithCartesianIndices((value, indices) -> value.atan().add(indices[0]));
+        for (int i = 0; i < reshaped.dims(0); i++)
+            for (int j = 0; j < reshaped.dims(1); j++) {
+                if (i == 0 && j == 0) continue;
+                assertTrue(Math.abs(reshaped.get(i,j).atan().add(i).getReal() - reshaped2.get(i,j).getReal()) / reshaped2.get(i,j).getReal() < 1e-6);
+                assertTrue(Math.abs(reshaped.get(i,j).atan().add(i).getImaginary() - reshaped2.get(i,j).getImaginary()) / reshaped2.get(i,j).getImaginary() < 1e-6);
+            }
+    }
+
+    @Test
+    void testForEach() {
+        AtomicInteger i = new AtomicInteger(0);
+        reshaped.forEach(value -> assertEquals(reshaped.get(i.getAndIncrement()), value));
+    }
+
+    @Test
+    void testForEachWithLinearIndices() {
+        reshaped.forEachWithLinearIndices((value, index) -> assertEquals(reshaped.get(index), value));
+    }
+
+    @Test
+    void testForEachWithCartesianIndex() {
+        reshaped.forEachWithCartesianIndices((value, indices) -> assertEquals(reshaped.get(indices), value));
     }
 
     @Test
@@ -429,7 +505,7 @@ class TestComplexF64NDArrayReshape {
         reshaped = array.reshape(5,4,3);
         Exception exception = assertThrows(IllegalArgumentException.class, () -> reshaped.permuteDims(0,2));
         assertEquals(
-            String.format(AbstractNDArrayPermuteDimsView.ERROR_PERMUTATOR_SIZE_MISMATCH, "[0, 2]", "5 × 4 × 3"),
+            String.format(Errors.PERMUTATOR_SIZE_MISMATCH, "[0, 2]", "5 × 4 × 3"),
             exception.getMessage());
     }
 
@@ -438,7 +514,7 @@ class TestComplexF64NDArrayReshape {
         reshaped = array.reshape(5,4,3);
         Exception exception = assertThrows(IllegalArgumentException.class, () -> reshaped.permuteDims(0,2,1,4));
         assertEquals(
-            String.format(AbstractNDArrayPermuteDimsView.ERROR_PERMUTATOR_SIZE_MISMATCH, "[0, 2, 1, 4]", "5 × 4 × 3"),
+            String.format(Errors.PERMUTATOR_SIZE_MISMATCH, "[0, 2, 1, 4]", "5 × 4 × 3"),
             exception.getMessage());
     }
 
@@ -446,7 +522,7 @@ class TestComplexF64NDArrayReshape {
     void testPermuteDimsRepeatedDimension() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> reshaped.permuteDims(1,1));
         assertEquals(
-            String.format(AbstractNDArrayPermuteDimsView.ERROR_INVALID_PERMUTATOR, "[1, 1]", "20 × 3"),
+            String.format(Errors.INVALID_PERMUTATOR, "[1, 1]", "20 × 3"),
             exception.getMessage());
     }
 

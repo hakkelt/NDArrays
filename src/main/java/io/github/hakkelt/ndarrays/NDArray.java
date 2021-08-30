@@ -3,7 +3,9 @@ package io.github.hakkelt.ndarrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Spliterator;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.ObjIntConsumer;
 import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -271,8 +273,59 @@ public interface NDArray<T> extends Collection<T> {
      * Beware! Entries might not be processed in a sequential order!
      * 
      * @param func function that receives the value of the current entry and returns the new value
+     * @return itself after the update
      */
-    public void apply(UnaryOperator<T> func);
+    public NDArray<T> apply(UnaryOperator<T> func);
+    
+    /**
+     * Apply the given function to each element of the array, and override each entry with the calculated new values.
+     * 
+     * Beware! Entries might not be processed in a sequential order!
+     * 
+     * @param func function that receives the value of the current entry and its linear index and returns the new value
+     * @return itself after the update
+     */
+    public NDArray<T> applyWithLinearIndices(BiFunction<T, Integer, T> func);
+    
+    /**
+     * Apply the given function to each element of the array, and override each entry with the calculated new values.
+     * 
+     * Beware! Entries might not be processed in a sequential order!
+     * 
+     * @param func function that receives the value of the current entry and its Cartesian coordinate and returns the new value
+     * @return itself after the update
+     */
+    public NDArray<T> applyWithCartesianIndices(BiFunction<T, int[], T> func);
+    
+    /**
+     * Apply the given function to each element of the array, and create a new NDArray with the calculated new values.
+     * 
+     * Beware! Entries might not be processed in a sequential order!
+     * 
+     * @param func function that receives the value of the current entry and returns the new value
+     * @return the new NDArray with the calculated new values
+     */
+    public NDArray<T> map(UnaryOperator<T> func);
+    
+    /**
+     * Apply the given function to each element of the array, and create a new NDArray with the calculated new values.
+     * 
+     * Beware! Entries might not be processed in a sequential order!
+     * 
+     * @param func function that receives the value of the current entry and its linear index and returns the new value
+     * @return the new NDArray with the calculated new values
+     */
+    public NDArray<T> mapWithLinearIndices(BiFunction<T, Integer, T> func);
+    
+    /**
+     * Apply the given function to each element of the array, and create a new NDArray with the calculated new values.
+     * 
+     * Beware! Entries might not be processed in a sequential order!
+     * 
+     * @param func function that receives the value of the current entry and its Cartesian coordinate and returns the new value
+     * @return the new NDArray with the calculated new values
+     */
+    public NDArray<T> mapWithCartesianIndices(BiFunction<T, int[], T> func);
     
     /**
      * Apply the given function to each element of the array, and override each entry with the calculated new values.
@@ -281,7 +334,7 @@ public interface NDArray<T> extends Collection<T> {
      * 
      * @param func function that receives the value of the current entry and its linear index and returns the new value
      */
-    public void applyWithLinearIndex(BiFunction<T, Integer, T> func);
+    public void forEachWithLinearIndices(ObjIntConsumer<T> func);
     
     /**
      * Apply the given function to each element of the array, and override each entry with the calculated new values.
@@ -290,7 +343,7 @@ public interface NDArray<T> extends Collection<T> {
      * 
      * @param func function that receives the value of the current entry and its Cartesian coordinate and returns the new value
      */
-    public void applyWithCartesianIndex(BiFunction<T, int[], T> func);
+    public void forEachWithCartesianIndices(BiConsumer<T, int[]> func);
     
     /** 
      * Converts this NDArray to a multidimensional array of Float, Double or Complex.
@@ -653,7 +706,6 @@ public interface NDArray<T> extends Collection<T> {
      */
     public IntStream streamLinearIndices();
 
-    
     /**
      * Returns a stream of cartesian indices.
      * 

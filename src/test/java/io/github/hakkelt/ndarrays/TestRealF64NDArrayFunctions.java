@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +16,7 @@ class TestRealF64NDArrayFunctions {
     @BeforeEach
     void setup() {
         array = new RealF64NDArray(new int[]{ 4, 5, 3 });
-        array.applyWithLinearIndex((value, index) -> (double)index);
+        array.applyWithLinearIndices((value, index) -> (double)index);
     }
 
     @Test
@@ -47,7 +49,7 @@ class TestRealF64NDArrayFunctions {
     void testWrongGetLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> array.get(60));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, array.length(), 60),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, array.length(), 60),
             exception.getMessage());
     }
 
@@ -55,7 +57,7 @@ class TestRealF64NDArrayFunctions {
     void testWrongGetNegativeLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> array.get(-61));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, array.length(), -61),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, array.length(), -61),
             exception.getMessage());
     }
 
@@ -63,7 +65,7 @@ class TestRealF64NDArrayFunctions {
     void testWrongGetCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> array.get(1,1,3));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "4 × 5 × 3", "[1, 1, 3]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "4 × 5 × 3", "[1, 1, 3]"),
             exception.getMessage());
     }
 
@@ -71,7 +73,7 @@ class TestRealF64NDArrayFunctions {
     void testWrongGetNegativeCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> array.get(1,-6,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "4 × 5 × 3", "[1, -6, 1]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "4 × 5 × 3", "[1, -6, 1]"),
             exception.getMessage());
     }
 
@@ -80,7 +82,7 @@ class TestRealF64NDArrayFunctions {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> array.set(0, 60));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, array.length(), 60),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, array.length(), 60),
             exception.getMessage());
     }
 
@@ -89,7 +91,7 @@ class TestRealF64NDArrayFunctions {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> array.set(0, -61));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, array.length(), -61),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, array.length(), -61),
             exception.getMessage());
     }
 
@@ -98,7 +100,7 @@ class TestRealF64NDArrayFunctions {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> array.set(0, 1,1,3));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "4 × 5 × 3", "[1, 1, 3]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "4 × 5 × 3", "[1, 1, 3]"),
             exception.getMessage());
     }
 
@@ -107,7 +109,7 @@ class TestRealF64NDArrayFunctions {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> array.set(0, 1,-6,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "4 × 5 × 3", "[1, -6, 1]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "4 × 5 × 3", "[1, -6, 1]"),
             exception.getMessage());
     }
 
@@ -115,7 +117,7 @@ class TestRealF64NDArrayFunctions {
     void testGetDimensionMismatchTooMany() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> array.get(1,1,1,0));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 4, 3),
+            String.format(Errors.DIMENSION_MISMATCH, 4, 3),
             exception.getMessage());
     }
 
@@ -123,7 +125,7 @@ class TestRealF64NDArrayFunctions {
     void testGetDimensionMismatchNotEnough() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> array.get(1,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 2, 3),
+            String.format(Errors.DIMENSION_MISMATCH, 2, 3),
             exception.getMessage());
     }
 
@@ -132,7 +134,7 @@ class TestRealF64NDArrayFunctions {
         Exception exception = assertThrows(IllegalArgumentException.class,
             () -> array.set(0, 1,1,1,0));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 4, 3),
+            String.format(Errors.DIMENSION_MISMATCH, 4, 3),
             exception.getMessage());
     }
 
@@ -141,7 +143,7 @@ class TestRealF64NDArrayFunctions {
         Exception exception = assertThrows(IllegalArgumentException.class,
             () -> array.set(0, 1,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 2, 3),
+            String.format(Errors.DIMENSION_MISMATCH, 2, 3),
             exception.getMessage());
     }
 
@@ -251,6 +253,71 @@ class TestRealF64NDArrayFunctions {
             .append(System.lineSeparator())
             .toString();
         assertEquals(expected, str);
+    }
+
+    @Test
+    void testApply() {
+        NDArray<Double> array2 = new RealF64NDArray(array);
+        array2.apply(value -> Math.sqrt(value));
+        for (int i = 0; i < array.length(); i++)
+            assertEquals(Math.sqrt(array.get(i)), array2.get(i));
+    }
+
+    @Test
+    void testApplyWithLinearIndices() {
+        NDArray<Double> array2 = new RealF64NDArray(array);
+        array2.applyWithLinearIndices((value, index) -> Math.sqrt(value) + index);
+        for (int i = 0; i < array.length(); i++)
+            assertEquals((Math.sqrt(array.get(i)) + i), array2.get(i));
+    }
+
+    @Test
+    void testApplyWithCartesianIndex() {
+        NDArray<Double> array2 = new RealF64NDArray(array);
+        array2.applyWithCartesianIndices((value, indices) -> Math.sqrt(value) + indices[0]);
+        for (int i = 0; i < array.dims(0); i++)
+            for (int j = 0; j < array.dims(1); j++)
+                for (int k = 0; k < array.dims(2); k++)
+                    assertEquals((Math.sqrt(array.get(i,j,k)) + i), array2.get(i,j,k));
+    }
+
+    @Test
+    void testMap() {
+        NDArray<Double> array2 = array.map(value -> Math.sqrt(value));
+        for (int i = 0; i < array.length(); i++)
+            assertEquals(Math.sqrt(array.get(i)), array2.get(i));
+    }
+
+    @Test
+    void testMapWithLinearIndices() {
+        NDArray<Double> array2 = array.mapWithLinearIndices((value, index) -> Math.sqrt(value) + index);
+        for (int i = 0; i < array.length(); i++)
+            assertEquals((Math.sqrt(array.get(i)) + i), array2.get(i));
+    }
+
+    @Test
+    void testMapWithCartesianIndex() {
+        NDArray<Double> array2 = array.mapWithCartesianIndices((value, indices) -> Math.sqrt(value) + indices[0]);
+        for (int i = 0; i < array.dims(0); i++)
+            for (int j = 0; j < array.dims(1); j++)
+                for (int k = 0; k < array.dims(2); k++)
+                    assertEquals((Math.sqrt(array.get(i,j,k)) + i), array2.get(i,j,k));
+    }
+
+    @Test
+    void testForEach() {
+        AtomicInteger i = new AtomicInteger(0);
+        array.forEach(value -> assertEquals(array.get(i.getAndIncrement()), value));
+    }
+
+    @Test
+    void testForEachWithLinearIndices() {
+        array.forEachWithLinearIndices((value, index) -> assertEquals(array.get(index), value));
+    }
+
+    @Test
+    void testForEachWithCartesianIndex() {
+        array.forEachWithCartesianIndices((value, indices) -> assertEquals(array.get(indices), value));
     }
 
     @Test
@@ -487,7 +554,7 @@ class TestRealF64NDArrayFunctions {
         NDArray<Double> sum = array.sum(1);
         for (int i = 0; i < sum.dims(0); i++) {
             for (int j = 0; j < sum.dims(1); j++) {
-                double GaussSum = (array.get(i,0,j) + array.get(i,-1,j)) * (float)array.dims(1) / 2.;
+                double GaussSum = (array.get(i,0,j) + array.get(i,-1,j)) * array.dims(1) / 2.;
                 assertEquals(GaussSum, sum.get(i,j));
             }
         }
@@ -561,7 +628,7 @@ class TestRealF64NDArrayFunctions {
     }
 
     @Test
-    void testFillFloat() {
+    void testFillDouble() {
         array.fill(3);
         for (Double elem : array)
             assertEquals(3, elem);
@@ -578,7 +645,7 @@ class TestRealF64NDArrayFunctions {
     void testPermuteDimsTooShortPermutationVector() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> array.permuteDims(0,2));
         assertEquals(
-            String.format(AbstractNDArrayPermuteDimsView.ERROR_PERMUTATOR_SIZE_MISMATCH, "[0, 2]", "4 × 5 × 3"),
+            String.format(Errors.PERMUTATOR_SIZE_MISMATCH, "[0, 2]", "4 × 5 × 3"),
             exception.getMessage());
     }
 
@@ -586,7 +653,7 @@ class TestRealF64NDArrayFunctions {
     void testPermuteDimsTooLongPermutationVector() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> array.permuteDims(0,2,1,4));
         assertEquals(
-            String.format(AbstractNDArrayPermuteDimsView.ERROR_PERMUTATOR_SIZE_MISMATCH, "[0, 2, 1, 4]", "4 × 5 × 3"),
+            String.format(Errors.PERMUTATOR_SIZE_MISMATCH, "[0, 2, 1, 4]", "4 × 5 × 3"),
             exception.getMessage());
     }
 
@@ -594,7 +661,7 @@ class TestRealF64NDArrayFunctions {
     void testPermuteDimsRepeatedDimension() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> array.permuteDims(0,1,1));
         assertEquals(
-            String.format(AbstractNDArrayPermuteDimsView.ERROR_INVALID_PERMUTATOR, "[0, 1, 1]", "4 × 5 × 3"),
+            String.format(Errors.INVALID_PERMUTATOR, "[0, 1, 1]", "4 × 5 × 3"),
             exception.getMessage());
     }
 

@@ -80,7 +80,6 @@ public class RealInt16NDArray extends AbstractShortNDArray {
         return new RealNDArrayCollector<>(new RealInt16NDArray(dims));
     }
 
-
     protected RealInt16NDArray createNewNDArrayOfSameTypeAsMe(int... dims) {
         return new RealInt16NDArray(dims);
     }

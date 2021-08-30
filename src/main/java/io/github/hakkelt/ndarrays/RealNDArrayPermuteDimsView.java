@@ -6,7 +6,6 @@ public class RealNDArrayPermuteDimsView<T extends Number> extends AbstractNDArra
         super(parent, dimsOrder);
     }
 
-
     public RealNDArrayPermuteDimsView(AbstractNDArraySliceView<T,T> parent, int ...dimsOrder) {
         super(parent, dimsOrder);
     }

@@ -52,6 +52,13 @@ abstract class AbstractNDArrayView<T,T2 extends Number> extends AbstractNDArray<
     }
 
     @Override
+    protected double absSum() {
+        if (eltype() == Complex.class)
+            return stream().map(value -> ((Complex)value).abs()).reduce(0., Double::sum);
+        return stream().map(value -> ((Number)value).doubleValue()).reduce(0., (a,b) -> Double.sum(a, Math.abs(b)));
+    }
+
+    @Override
     protected T accumulate(T acc, T value, AbstractNDArray.AccumulateOperators operator) {
         return parent.accumulate(acc, value, operator);
     }
@@ -84,7 +91,6 @@ abstract class AbstractNDArrayView<T,T2 extends Number> extends AbstractNDArray<
         return parent.accumulate(acc, array, linearIndex, operator);
     }
 
-
     protected T accumulate(Byte acc, Number value, AbstractNDArray.AccumulateOperators operation) {
         switch (operation) { 
             case ADD: return wrapValue(acc.byteValue() + value.byteValue());
@@ -94,7 +100,6 @@ abstract class AbstractNDArrayView<T,T2 extends Number> extends AbstractNDArray<
             default: throw new IllegalArgumentException();
         }
     }
-    
 
     protected T accumulate(Short acc, Number value, AbstractNDArray.AccumulateOperators operation) {
         switch (operation) { 
@@ -105,7 +110,6 @@ abstract class AbstractNDArrayView<T,T2 extends Number> extends AbstractNDArray<
             default: throw new IllegalArgumentException();
         }
     }
-    
 
     protected T accumulate(Integer acc, Number value, AbstractNDArray.AccumulateOperators operation) {
        switch (operation) { 
@@ -116,7 +120,6 @@ abstract class AbstractNDArrayView<T,T2 extends Number> extends AbstractNDArray<
             default: throw new IllegalArgumentException();
         }
     }
-    
 
     protected T accumulate(Long acc, Number value, AbstractNDArray.AccumulateOperators operation) {
         switch (operation) { 
@@ -127,7 +130,6 @@ abstract class AbstractNDArrayView<T,T2 extends Number> extends AbstractNDArray<
             default: throw new IllegalArgumentException();
         }
     }
-    
 
     protected T accumulate(Float acc, Number value, AbstractNDArray.AccumulateOperators operation) {
         switch (operation) { 
@@ -138,7 +140,6 @@ abstract class AbstractNDArrayView<T,T2 extends Number> extends AbstractNDArray<
             default: throw new IllegalArgumentException();
         }
     }
-    
 
     protected T accumulate(Double acc, Number value, AbstractNDArray.AccumulateOperators operation) {
         switch (operation) { 
@@ -268,7 +269,7 @@ abstract class AbstractNDArrayView<T,T2 extends Number> extends AbstractNDArray<
             int end = m.group(2).equals("") ? dims[dimension] : Integer.parseInt(m.group(2));
             return new AbstractNDArraySliceView.Range(start, end);
         } else {
-            throw new IllegalArgumentException(String.format(ERROR_INVALID_RANGE_EXPRESSION, str));
+            throw new IllegalArgumentException(String.format(Errors.INVALID_RANGE_EXPRESSION, str));
         }
     }
 }

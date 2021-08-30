@@ -5,15 +5,6 @@ import java.util.stream.Collectors;
 
 abstract class AbstractNDArraySliceView<T,T2 extends Number> extends AbstractNDArrayView<T,T2> {
     protected SlicingExpression slicingExpression;
-
-    protected static final String ERROR_ILLEGAL_SLICING_EXPRESSION =
-        "Illegal slicing expression: %s";
-    protected static final String ERROR_DIMENSION_MISMATCH =
-        "Dimension mismatch: cannot slice %s array with the following slicing expression: %s";
-    protected static final String ERROR_SLICE_OUT_OF_BOUNDS =
-        "Bounds error: cannot slice %s array with the following slicing expression: %s";
-    static final String ERROR_INVALID_RANGE =
-        "Invalid range: [%d, %d)";
     
     static class Range {
         private int start;
@@ -21,7 +12,7 @@ abstract class AbstractNDArraySliceView<T,T2 extends Number> extends AbstractNDA
 
         public Range(int start, int end) {
             if (end < start && end > 0)
-                throw new IllegalArgumentException(String.format(ERROR_INVALID_RANGE, start, end));
+                throw new IllegalArgumentException(String.format(Errors.INVALID_RANGE, start, end));
             this.start = start;
             this.end = end;
         }
@@ -55,7 +46,7 @@ abstract class AbstractNDArraySliceView<T,T2 extends Number> extends AbstractNDA
         public SlicingExpression(int[] parentDims, Object ...expressions) {
             for (Object expr : expressions)
                 if (!(expr instanceof Integer) && expr != ":" && !(expr instanceof Range))
-                    throw new IllegalArgumentException(String.format(ERROR_ILLEGAL_SLICING_EXPRESSION, expr));
+                    throw new IllegalArgumentException(String.format(Errors.ILLEGAL_SLICING_EXPRESSION, expr));
             this.expressions = expressions;
             this.parentDims = parentDims;
             checkAgainstParentDims();
@@ -64,7 +55,7 @@ abstract class AbstractNDArraySliceView<T,T2 extends Number> extends AbstractNDA
         public SlicingExpression(SlicingExpression prevSlicingExpression, Object ...newExpressions) {
             for (Object expr : newExpressions)
                 if (!(expr instanceof Integer) && expr != ":" && !(expr instanceof Range))
-                    throw new IllegalArgumentException(String.format(ERROR_ILLEGAL_SLICING_EXPRESSION, expr));
+                    throw new IllegalArgumentException(String.format(Errors.ILLEGAL_SLICING_EXPRESSION, expr));
             parentDims = prevSlicingExpression.parentDims;
             expressions = new Object[prevSlicingExpression.expressions.length];
             int exprIndex = 0;
@@ -98,7 +89,7 @@ abstract class AbstractNDArraySliceView<T,T2 extends Number> extends AbstractNDA
                         range.addToEnd(parentDims[parentDimsIndex]);
                     else if (range.end() > parentDims[parentDimsIndex])
                         throw new ArrayIndexOutOfBoundsException(
-                            String.format(ERROR_SLICE_OUT_OF_BOUNDS, Printer.dimsToString(parentDims), toString()));
+                            String.format(Errors.SLICE_OUT_OF_BOUNDS, Printer.dimsToString(parentDims), toString()));
                 }
                 parentDimsIndex++;
             }
@@ -107,7 +98,7 @@ abstract class AbstractNDArraySliceView<T,T2 extends Number> extends AbstractNDA
         public int[] resolveViewDims() {
             if (expressions.length != parentDims.length)
                 throw new IllegalArgumentException(
-                    String.format(ERROR_DIMENSION_MISMATCH, Printer.dimsToString(parentDims), toString()));
+                    String.format(Errors.SLICE_DIMENSION_MISMATCH, Printer.dimsToString(parentDims), toString()));
             int newNDims = parentDims.length;
             for (Object expr : expressions)
                 if (expr instanceof Integer) newNDims--;

@@ -80,7 +80,6 @@ public class RealInt32NDArray extends AbstractIntegerNDArray {
         return new RealNDArrayCollector<>(new RealInt32NDArray(dims));
     }
 
-
     protected RealInt32NDArray createNewNDArrayOfSameTypeAsMe(int... dims) {
         return new RealInt32NDArray(dims);
     }

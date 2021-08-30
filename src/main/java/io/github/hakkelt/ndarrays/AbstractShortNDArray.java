@@ -5,7 +5,7 @@ abstract class AbstractShortNDArray extends AbstractRealNDArray<Short> {
     protected Short wrapValue(Number value) {
         return Short.valueOf(value.shortValue());
     }
-    
+
     protected Short zeroT() {
         return Short.valueOf((short) 0);
     }
@@ -20,7 +20,7 @@ abstract class AbstractShortNDArray extends AbstractRealNDArray<Short> {
         }
         throw new UnsupportedOperationException();
     }
-    
+
     public Object eltype() {
         return Short.class;
     }
@@ -28,7 +28,12 @@ abstract class AbstractShortNDArray extends AbstractRealNDArray<Short> {
     public void set(Short real, int linearIndex) {
         set((Number)real, linearIndex);
     }
-    
+
+    @Override
+    protected double absSum() {
+        return stream().mapToLong(Short::longValue).reduce(0, (a,b) -> a + Math.abs(b));
+    }
+
     protected Short accumulateAtIndex(int linearIndex, AccumulateOperators operator, Object ...objects) {
         Short acc = get(linearIndex);
         for (Object item : objects) {

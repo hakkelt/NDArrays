@@ -80,7 +80,6 @@ public class RealInt64NDArray extends AbstractLongNDArray {
         return new RealNDArrayCollector<>(new RealInt64NDArray(dims));
     }
 
-
     protected RealInt64NDArray createNewNDArrayOfSameTypeAsMe(int... dims) {
         return new RealInt64NDArray(dims);
     }

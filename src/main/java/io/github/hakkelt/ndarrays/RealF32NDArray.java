@@ -80,7 +80,6 @@ public class RealF32NDArray extends AbstractFloatNDArray {
         return new RealNDArrayCollector<>(new RealF32NDArray(dims));
     }
 
-
     protected RealF32NDArray createNewNDArrayOfSameTypeAsMe(int... dims) {
         return new RealF32NDArray(dims);
     }

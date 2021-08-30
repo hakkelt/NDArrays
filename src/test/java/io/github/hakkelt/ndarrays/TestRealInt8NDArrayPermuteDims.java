@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +16,7 @@ class TestRealInt8NDArrayPermuteDims {
     @BeforeEach
     void setup() {
         array = new RealInt8NDArray(new int[]{ 4, 5, 3 });
-        array.applyWithLinearIndex((value, index) -> index.byteValue());
+        array.applyWithLinearIndices((value, index) -> index.byteValue());
         pArray = array.permuteDims(0, 2, 1);
     }
 
@@ -48,7 +50,7 @@ class TestRealInt8NDArrayPermuteDims {
     void testWrongGetLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> pArray.get(60));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, pArray.length(), 60),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, pArray.length(), 60),
             exception.getMessage());
     }
 
@@ -56,7 +58,7 @@ class TestRealInt8NDArrayPermuteDims {
     void testWrongGetNegativeLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> pArray.get(-61));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, pArray.length(), -61),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, pArray.length(), -61),
             exception.getMessage());
     }
 
@@ -64,7 +66,7 @@ class TestRealInt8NDArrayPermuteDims {
     void testWrongGetCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> pArray.get(1,3,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "4 × 3 × 5", "[1, 3, 1]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "4 × 3 × 5", "[1, 3, 1]"),
             exception.getMessage());
     }
 
@@ -72,7 +74,7 @@ class TestRealInt8NDArrayPermuteDims {
     void testWrongGetNegativeCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> pArray.get(1,1,-6));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "4 × 3 × 5", "[1, 1, -6]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "4 × 3 × 5", "[1, 1, -6]"),
             exception.getMessage());
     }
 
@@ -81,7 +83,7 @@ class TestRealInt8NDArrayPermuteDims {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> pArray.set(0, 60));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, pArray.length(), 60),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, pArray.length(), 60),
             exception.getMessage());
     }
 
@@ -90,7 +92,7 @@ class TestRealInt8NDArrayPermuteDims {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> pArray.set(0, -61));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, pArray.length(), -61),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, pArray.length(), -61),
             exception.getMessage());
     }
 
@@ -99,7 +101,7 @@ class TestRealInt8NDArrayPermuteDims {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> pArray.set(0, 1,3,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "4 × 3 × 5", "[1, 3, 1]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "4 × 3 × 5", "[1, 3, 1]"),
             exception.getMessage());
     }
 
@@ -108,7 +110,7 @@ class TestRealInt8NDArrayPermuteDims {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> pArray.set(0, 1,1,-6));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "4 × 3 × 5", "[1, 1, -6]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "4 × 3 × 5", "[1, 1, -6]"),
             exception.getMessage());
     }
 
@@ -116,7 +118,7 @@ class TestRealInt8NDArrayPermuteDims {
     void testGetDimensionMismatchTooMany() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> pArray.get(1,1,1,0));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 4, 3),
+            String.format(Errors.DIMENSION_MISMATCH, 4, 3),
             exception.getMessage());
     }
 
@@ -124,7 +126,7 @@ class TestRealInt8NDArrayPermuteDims {
     void testGetDimensionMismatchNotEnough() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> pArray.get(1,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 2, 3),
+            String.format(Errors.DIMENSION_MISMATCH, 2, 3),
             exception.getMessage());
     }
 
@@ -133,7 +135,7 @@ class TestRealInt8NDArrayPermuteDims {
         Exception exception = assertThrows(IllegalArgumentException.class,
             () -> pArray.set(0, 1, 1, 1, 0));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 4, 3),
+            String.format(Errors.DIMENSION_MISMATCH, 4, 3),
             exception.getMessage());
     }
 
@@ -142,7 +144,7 @@ class TestRealInt8NDArrayPermuteDims {
         Exception exception = assertThrows(IllegalArgumentException.class,
             () -> pArray.set(0, 1,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 2, 3),
+            String.format(Errors.DIMENSION_MISMATCH, 2, 3),
             exception.getMessage());
     }
 
@@ -268,6 +270,71 @@ class TestRealInt8NDArrayPermuteDims {
     }
 
     @Test
+    void testApply() {
+        NDArray<Byte> pArray2 = new RealInt8NDArray(array).permuteDims(0, 2, 1);
+        pArray2.apply(value -> (byte)Math.sqrt(value));
+        for (int i = 0; i < pArray.length(); i++)
+            assertEquals((byte)Math.sqrt(pArray.get(i)), pArray2.get(i));
+    }
+
+    @Test
+    void testApplyWithLinearIndices() {
+        NDArray<Byte> pArray2 = new RealInt8NDArray(array).permuteDims(0, 2, 1);
+        pArray2.applyWithLinearIndices((value, index) -> (byte)(Math.sqrt(value) + index));
+        for (int i = 0; i < pArray.length(); i++)
+            assertEquals((byte)(Math.sqrt(pArray.get(i)) + i), pArray2.get(i));
+    }
+
+    @Test
+    void testApplyWithCartesianIndex() {
+        NDArray<Byte> pArray2 = new RealInt8NDArray(array).permuteDims(0, 2, 1);
+        pArray2.applyWithCartesianIndices((value, indices) -> (byte)(Math.sqrt(value) + indices[0]));
+        for (int i = 0; i < pArray.dims(0); i++)
+            for (int j = 0; j < pArray.dims(1); j++)
+                for (int k = 0; k < pArray.dims(2); k++)
+                    assertEquals((byte)(Math.sqrt(pArray.get(i,j,k)) + i), pArray2.get(i,j,k));
+    }
+
+    @Test
+    void testMap() {
+        NDArray<Byte> pArray2 = pArray.map(value -> (byte)Math.sqrt(value));
+        for (int i = 0; i < pArray.length(); i++)
+            assertEquals((byte)Math.sqrt(pArray.get(i)), pArray2.get(i));
+    }
+
+    @Test
+    void testMapWithLinearIndices() {
+        NDArray<Byte> pArray2 = pArray.mapWithLinearIndices((value, index) -> (byte)(Math.sqrt(value) + index));
+        for (int i = 0; i < pArray.length(); i++)
+            assertEquals((byte)(Math.sqrt(pArray.get(i)) + i), pArray2.get(i));
+    }
+
+    @Test
+    void testMapWithCartesianIndex() {
+        NDArray<Byte> pArray2 = pArray.mapWithCartesianIndices((value, indices) -> (byte)(Math.sqrt(value) + indices[0]));
+        for (int i = 0; i < pArray.dims(0); i++)
+            for (int j = 0; j < pArray.dims(1); j++)
+                for (int k = 0; k < pArray.dims(2); k++)
+                    assertEquals((byte)(Math.sqrt(pArray.get(i,j,k)) + i), pArray2.get(i,j,k));
+    }
+
+    @Test
+    void testForEach() {
+        AtomicInteger i = new AtomicInteger(0);
+        pArray.forEach(value -> assertEquals(pArray.get(i.getAndIncrement()), value));
+    }
+
+    @Test
+    void testForEachWithLinearIndices() {
+        pArray.forEachWithLinearIndices((value, index) -> assertEquals(pArray.get(index), value));
+    }
+
+    @Test
+    void testForEachWithCartesianIndex() {
+        pArray.forEachWithCartesianIndices((value, indices) -> assertEquals(pArray.get(indices), value));
+    }
+
+    @Test
     void testAddArrayTopArray() {
         NDArray<Byte> array2 = new RealInt8NDArray(pArray);
         NDArray<Byte> array3 = pArray.add(array2);
@@ -344,39 +411,39 @@ class TestRealInt8NDArrayPermuteDims {
         double norm = pArray.stream()
             .filter(value -> value != 0.)
             .count();
-        assertTrue(Math.abs(norm - pArray.norm(0)) / norm < 1e-6);
+        assertEquals(norm, pArray.norm(0));
     }
 
     @Test
     void test1Norm() {
         double norm = pArray.stream()
             .mapToDouble(value -> Math.abs(value))
-            .reduce((byte)0, (acc, item) -> (byte)(acc + item));
-        assertTrue(Math.abs(norm - pArray.norm(1)) / norm < 1e-6);
+            .reduce(0, (acc, item) -> acc + item);
+        assertEquals(norm, pArray.norm(1));
     }
 
     @Test
     void test2Norm() {
-        double norm = (float)Math.sqrt(pArray.stream()
-            .mapToDouble(value -> (float)Math.pow(Math.abs(value), 2))
-            .reduce((float)0., (acc, item) -> acc + item));
-        assertTrue(Math.abs(norm - pArray.norm()) / norm < 1e-6);
+        double norm = Math.sqrt(pArray.stream()
+            .mapToDouble(value -> Math.pow(Math.abs(value), 2))
+            .reduce(0., (acc, item) -> acc + item));
+        assertEquals(norm, pArray.norm());
     }
 
     @Test
     void testPQuasinorm() {
-        double norm = (float)Math.pow(pArray.stream()
-            .mapToDouble(value -> (float)Math.pow(Math.abs(value), 0.5))
-            .reduce((float)0., (acc, item) -> acc + item), 2);
-        assertTrue(Math.abs(norm - pArray.norm(0.5)) / norm < 1e-6);
+        double norm = Math.pow(pArray.stream()
+            .mapToDouble(value -> Math.pow(Math.abs(value), 0.5))
+            .reduce(0., (acc, item) -> acc + item), 2);
+        assertEquals(norm, pArray.norm(0.5));
     }
 
     @Test
     void testPNorm() {
-        double norm = (float)Math.pow(pArray.stream()
-            .mapToDouble(value -> (float)Math.pow(Math.abs(value), 3.5))
-            .reduce((float)0., (acc, item) -> acc + item), 1 / 3.5);
-        assertTrue(Math.abs(norm - pArray.norm(3.5)) / norm < 1e-6);
+        double norm = Math.pow(pArray.stream()
+            .mapToDouble(value -> Math.pow(Math.abs(value), 3.5))
+            .reduce(0., (acc, item) -> acc + item), 1 / 3.5);
+        assertEquals(norm, pArray.norm(3.5));
     }
 
     @Test
@@ -384,7 +451,7 @@ class TestRealInt8NDArrayPermuteDims {
         double norm = pArray.stream()
             .mapToDouble(value -> Math.abs(value))
             .max().getAsDouble();
-        assertTrue(Math.abs(norm - pArray.norm(Double.POSITIVE_INFINITY)) / norm < 1e-6);
+        assertEquals(norm, pArray.norm(Double.POSITIVE_INFINITY));
     }
 
     @Test

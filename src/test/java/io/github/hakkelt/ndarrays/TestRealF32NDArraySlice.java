@@ -14,7 +14,7 @@ class TestRealF32NDArraySlice {
     @BeforeEach
     void setup() {
         array = new RealF32NDArray(new int[]{ 4, 5, 3 });
-        array.applyWithLinearIndex((value, index) -> (float)index);
+        array.applyWithLinearIndices((value, index) -> (float)index);
         slice = array.slice(1, "1:4", ":");
     }
 
@@ -53,7 +53,7 @@ class TestRealF32NDArraySlice {
     void testWrongGetLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> slice.get(10));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, slice.length(), 10),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, slice.length(), 10),
             exception.getMessage());
     }
 
@@ -61,7 +61,7 @@ class TestRealF32NDArraySlice {
     void testWrongGetNegativeLinearIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> slice.get(-11));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, slice.length(), -11),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, slice.length(), -11),
             exception.getMessage());
     }
 
@@ -69,7 +69,7 @@ class TestRealF32NDArraySlice {
     void testWrongGetCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> slice.get(1,3));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "3 × 3", "[1, 3]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "3 × 3", "[1, 3]"),
             exception.getMessage());
     }
 
@@ -77,7 +77,7 @@ class TestRealF32NDArraySlice {
     void testWrongGetNegativeCartesianIndexing() {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> slice.get(-4,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "3 × 3", "[-4, 1]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "3 × 3", "[-4, 1]"),
             exception.getMessage());
     }
 
@@ -86,7 +86,7 @@ class TestRealF32NDArraySlice {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> slice.set(0, 10));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, slice.length(), 10),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, slice.length(), 10),
             exception.getMessage());
     }
 
@@ -95,7 +95,7 @@ class TestRealF32NDArraySlice {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> slice.set(0, -11));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_LINEAR_BOUNDS_ERROR, slice.length(), -11),
+            String.format(Errors.LINEAR_BOUNDS_ERROR, slice.length(), -11),
             exception.getMessage());
     }
 
@@ -104,7 +104,7 @@ class TestRealF32NDArraySlice {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> slice.set(0, 1,3));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "3 × 3", "[1, 3]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "3 × 3", "[1, 3]"),
             exception.getMessage());
     }
 
@@ -113,7 +113,7 @@ class TestRealF32NDArraySlice {
         Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class,
             () -> slice.set(0, -4,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_CARTESIAN_BOUNDS_ERROR, "3 × 3", "[-4, 1]"),
+            String.format(Errors.CARTESIAN_BOUNDS_ERROR, "3 × 3", "[-4, 1]"),
             exception.getMessage());
     }
 
@@ -121,7 +121,7 @@ class TestRealF32NDArraySlice {
     void testGetDimensionMismatchTooMany() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> slice.get(1,1,0));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 3, 2),
+            String.format(Errors.DIMENSION_MISMATCH, 3, 2),
             exception.getMessage());
     }
 
@@ -130,7 +130,7 @@ class TestRealF32NDArraySlice {
         NDArray<Float> slice2 = array.slice("1:4", "1:4", ":");
         Exception exception = assertThrows(IllegalArgumentException.class, () -> slice2.get(1,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 2, 3),
+            String.format(Errors.DIMENSION_MISMATCH, 2, 3),
             exception.getMessage());
     }
 
@@ -139,7 +139,7 @@ class TestRealF32NDArraySlice {
         Exception exception = assertThrows(IllegalArgumentException.class,
             () -> slice.set(0, 1,1,0));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 3, 2),
+            String.format(Errors.DIMENSION_MISMATCH, 3, 2),
             exception.getMessage());
     }
 
@@ -149,7 +149,7 @@ class TestRealF32NDArraySlice {
         Exception exception = assertThrows(IllegalArgumentException.class,
             () -> slice2.set(0, 1,1));
         assertEquals(
-            String.format(AbstractNDArray.ERROR_DIMENSION_MISMATCH, 2, 3),
+            String.format(Errors.DIMENSION_MISMATCH, 2, 3),
             exception.getMessage());
     }
 

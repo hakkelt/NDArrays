@@ -41,7 +41,7 @@ class ComplexNDArrayCollector<T extends Number> implements Collector<Object, Lis
     @SuppressWarnings("unchecked")
     public Function<List<Object>, NDArray<Complex>> finisher() {
         return list -> {
-            destination.applyWithLinearIndex(
+            destination.applyWithLinearIndices(
                 (value, index) -> ((AbstractNDArray<Complex,T>)destination).wrapValue(list.get(index))
             );
             return destination;

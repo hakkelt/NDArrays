@@ -11,9 +11,11 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
+import java.util.function.ObjIntConsumer;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -26,67 +28,6 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
     protected int[] dims;
     protected int[] multipliers; // used to calculate the index in the internal array
     protected int dataLength;
-    
-    protected static final String ERROR_PARAMETER_MUST_BE_BETWEEN =
-        "Parameter '%s' must be between %d and %d, but %d is given!";
-    protected static final String ERROR_DIMENSION_MISMATCH =
-        "Number of indices (%d) doesn't match the number of dimensions (%d)!";
-    protected static final String ERROR_CARTESIAN_BOUNDS_ERROR =
-        "Bounds error: Attempt to access element of %s array at index %s!";
-    protected static final String ERROR_LINEAR_BOUNDS_ERROR =
-        "Bounds error: Attempt to access element of array with %d elements at linear index %d!";
-    protected static final String ERROR_ITERATOR_OUT_OF_BOUNDS =
-        "Bounds error: Iterator already reached the end of the array!";
-    protected static final String ERROR_COMBINE_SIZE_MISMATCH =
-        "Size of array (%s) given as parameter doesn't match the size of the array (%s) on the left side!";
-    protected static final String ERROR_COMBINE_TYPE_MISMATCH_WITH_COMPLEX =
-        "All parameters of %s must be either NDArray, Integer, Float, Double or Complex, but %s is given!";
-    protected static final String ERROR_COMBINE_TYPE_MISMATCH =
-        "All parameters of %s must be either NDArray, Integer, Float or Double, but %s is given!";
-    protected static final String ERROR_INVALID_RANGE_EXPRESSION =
-        "Invalid range expression: %s!";
-    protected static final String ERROR_RS2D_DATA_SET_TOO_HIGH_DIMENSIONAL =
-        "RS2D DataSet can only be up to 5 dimensional, but the current array is %d-dimensional!";
-    protected static final String ERROR_SIMPLE_ITK_COMPLEX_NOT_SUPPORTED =
-        "Conversion to Simple ITK Image is only supported for NDArrays with real elements!";
-    protected static final String ERROR_CONCATENATION_SIZE_MISMATCH =
-        "Cannot concatenate %s array to the current array of size %s along dimension %d!";
-    protected static final String ERROR_NOT_FLOAT_ARRAY =
-        "The input object must be a (multidimensional) primitive array!";
-    protected static final String ERROR_NOT_FLOAT_ARRAYS =
-        "Both of the input objects must be (multidimensional) primitive array!";
-    protected static final String ERROR_ARRAYS_DIFFER_IN_SIZE =
-        "Input arrays differ in size!";
-    protected static final String ERROR_COPY_FROM_TYPE_MISMATCH =
-        "Cannot initialize new ComplexNDArray from NDArray of type %s!";
-    protected static final String ERROR_INCOMPATIBLE_SIZE =
-        "The size of the input (%d) is incompatible with the given dimensions: %s!";
-    protected static final String ERROR_SET_BART_DIMS_SIZE_MISMATCH =
-        "The length of the list of BART dimensions doesn't match the number of dimensions (%d)!";
-    protected static final String ERROR_SET_BART_DIMS_DUPLICATES =
-        "The list of BART dimensions contains duplicates!";
-    protected static final String ERROR_DROPDIMS_NOT_SINGLETON =
-        "Cannot drop dimension %d because it is not singleton!";
-    protected static final String ERROR_COPY_FROM_COMPLEX_UNSUPPORTED =
-        "Cannot assign imaginary part to this real array!";
-    protected static final String ERROR_UNINITIALIZED_BART_DIMS =
-        "Meanings of dimension aren't specified yet!";
-    protected static final String ERROR_NEGATIVE_NORM =
-        "p must be a positive real number!";
-    protected static final String ERROR_CANNOT_SELECT_DIM_NEGATIVE =
-        "Axis %d cannot be selected";
-    protected static final String ERROR_CANNOT_SELECT_DIM_OVERFLOW =
-        "Axis %d cannot be selected because the array has only %d dimensions";
-    protected static final String ERROR_CANNOT_DROP_DIM_NEGATIVE =
-        "Axis %d cannot be dropped";
-    protected static final String ERROR_CANNOT_DROP_DIM_OVERFLOW =
-        "Axis %d cannot be dropped because the array has only %d dimensions";
-    protected static final String ERROR_TYPE_MISMATCH =
-        "Cannot collect type %s!";
-    protected static final String ERROR_INEXACT =
-        "Cannot convert value %f to type %s!";
-    protected static final String ERROR_INPUT_MUST_BE_ARRAY =
-        "A (multidimensional) primitive array is expected as input!";
 
     class NDArrayIterator implements Iterator<T> {
         int current = 0;
@@ -98,7 +39,7 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
 
         public T next() {
             if (!hasNext())
-                throw new NoSuchElementException(ERROR_ITERATOR_OUT_OF_BOUNDS);
+                throw new NoSuchElementException(Errors.ITERATOR_OUT_OF_BOUNDS);
             return get(current++);
         }
     }
@@ -148,22 +89,18 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
             return ORDERED | SIZED | IMMUTABLE | SUBSIZED;
         }
     }
-    
 
     public NDArray<T> similar() {
         return createNewNDArrayOfSameTypeAsMe(dims);
     }
 
-
     protected enum AccumulateOperators {
         ADD, SUBTRACT, MULTIPLY, DIVIDE
     }
 
-    
     public Iterator<T> iterator() {
         return new NDArrayIterator();
     }
-
 
     @Override
     public Object[] toArray() {
@@ -178,54 +115,44 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
         return new NDArraySpliterator<>(this, 0, dataLength);
     }
 
-    
     @Override
     public String toString() {
         return name() + " NDArray<" + dataTypeAsString() + ">(" + Printer.dimsToString(dims) + ")";
     }
 
-    
     public String contentToString() {
         return Printer.contentToString(this::resolveIndices, this::dataTypeAsString, this::printItem, name(), dims);
     }
-
 
     public int size() {
         return dataLength;
     }
 
-    
     public int length() {
         return dataLength;
     }
 
-    
     public int ndims() {
         return dims.length;
     }
 
-    
     public int[] dims() {
         return dims;
     }
 
-    
     public int dims(int axis) {
         if (axis < 0 || axis >= ndims())
-            throw new IllegalArgumentException(String.format(ERROR_PARAMETER_MUST_BE_BETWEEN, "axis", 0, ndims() - 1, axis));
+            throw new IllegalArgumentException(String.format(Errors.PARAMETER_MUST_BE_BETWEEN, "axis", 0, ndims() - 1, axis));
         return dims[axis];
     }
 
-    
     public T get(int ... indices) {
         return get(resolveIndices(indices));
     }
 
-
     public void set(T value, int... indices) {
         set(value, resolveIndices(indices));
     }
-
 
     public boolean equals(Object obj) {
         if (!(obj instanceof NDArray)) return false;
@@ -238,26 +165,50 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
             .allMatch(i -> get(i).equals(((NDArray<?>)obj).get(i)));
     }
 
-    
     public int hashCode() {
         throw new UnsupportedOperationException();
     }
 
-
-    public void apply(UnaryOperator<T> func) {
+    public NDArray<T> apply(UnaryOperator<T> func) {
         streamLinearIndices().parallel().forEach(linearIndex -> set(func.apply(get(linearIndex)), linearIndex));
+        return this;
     }
-    
 
-    public void applyWithLinearIndex(BiFunction<T, Integer, T> func) {
+    public NDArray<T> applyWithLinearIndices(BiFunction<T, Integer, T> func) {
         streamLinearIndices().parallel().forEach(linearIndex -> set(func.apply(get(linearIndex), linearIndex), linearIndex));
-    }
-    
-    
-    public void applyWithCartesianIndex(BiFunction<T, int[], T> func) {
-        streamCartesianIndices().parallel().forEach(indices -> set(func.apply(get(indices), indices), indices));
+        return this;
     }
 
+    public NDArray<T> applyWithCartesianIndices(BiFunction<T, int[], T> func) {
+        streamCartesianIndices().parallel().forEach(indices -> set(func.apply(get(indices), indices), indices));
+        return this;
+    }
+
+    public NDArray<T> map(UnaryOperator<T> func) {
+        NDArray<T> newInstance = copy();
+        newInstance.apply(func);
+        return newInstance;
+    }
+
+    public NDArray<T> mapWithLinearIndices(BiFunction<T, Integer, T> func) {
+        NDArray<T> newInstance = copy();
+        newInstance.applyWithLinearIndices(func);
+        return newInstance;
+    }
+
+    public NDArray<T> mapWithCartesianIndices(BiFunction<T, int[], T> func) {
+        NDArray<T> newInstance = copy();
+        newInstance.applyWithCartesianIndices(func);
+        return newInstance;
+    }
+
+    public void forEachWithLinearIndices(ObjIntConsumer<T> func) {
+        streamLinearIndices().parallel().forEach(linearIndex -> func.accept(get(linearIndex), linearIndex));
+    }
+
+    public void forEachWithCartesianIndices(BiConsumer<T, int[]> func) {
+        streamCartesianIndices().parallel().forEach(indices -> func.accept(get(indices), indices));
+    }
 
     public NDArray<T> copy() {
         AbstractNDArray<T,T2> newArray = createNewNDArrayOfSameTypeAsMe(dims);
@@ -284,7 +235,6 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
             }).collect(getRealCollectorInternal(dims));
     }
 
-    
     public T sum() {
         return stream().parallel().reduce(zeroT(), (acc, item) -> accumulate(acc, item, AccumulateOperators.ADD));
     }
@@ -337,14 +287,13 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
         }
     }
 
-
     public double norm(Double p) {
         if (p < 0)
-            throw new IllegalArgumentException(ERROR_NEGATIVE_NORM);
+            throw new IllegalArgumentException(Errors.NEGATIVE_NORM);
         else if (p == 0)
             return countNonZero();
         else if (p == 1)
-            return streamAbs().reduce(zeroT2(), new NumberAccumulator()).doubleValue();
+            return absSum();
         else if (p == 2)
             return norm();
         else if (p == Double.POSITIVE_INFINITY) {
@@ -353,7 +302,6 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
         } else
             return Math.pow(streamAbs().map(value -> Math.pow(value.doubleValue(), p)).reduce(0., (acc, item) -> acc + item), 1 / p);
     }
-
 
     public double norm(int p) {
         return norm((double)p);
@@ -366,7 +314,6 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
     public Stream<int[]> streamCartesianIndices() {
         return streamLinearIndices().mapToObj(i -> linearIndexToCartesianIndices(i, multipliers, ndims(), length()));
     }
-
 
     protected abstract String name();
     protected abstract Object eltype2();
@@ -418,7 +365,6 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
 
     protected abstract String printItem(int index, String format);
 
-    
     protected static int[] calculateMultipliers(int[] dims) {
         int arraySize = 1;
         int[] multipliers = new int[dims.length];
@@ -428,32 +374,29 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
         }
         return multipliers;
     }
-    
-    
+
     protected static int boundaryCheck(int linearIndex, int length) {
         if (linearIndex < -length || linearIndex >= length)
             throw new ArrayIndexOutOfBoundsException(
-                String.format(ERROR_LINEAR_BOUNDS_ERROR, length, linearIndex));
+                String.format(Errors.LINEAR_BOUNDS_ERROR, length, linearIndex));
         return linearIndex < 0 ? linearIndex + length : linearIndex;
     }
 
-    
     protected static int[] boundaryCheck(int[] indices, int[] dims) {
         indices = indices.clone();
         if (indices.length != dims.length)
             throw new IllegalArgumentException(
-                String.format(ERROR_DIMENSION_MISMATCH, indices.length, dims.length));
+                String.format(Errors.DIMENSION_MISMATCH, indices.length, dims.length));
         for (int i = 0; i < indices.length; i++) {
             if (indices[i] < -dims[i] || indices[i] >= dims[i])
                 throw new ArrayIndexOutOfBoundsException(
-                    String.format(ERROR_CARTESIAN_BOUNDS_ERROR, Printer.dimsToString(dims), Arrays.toString(indices)));
+                    String.format(Errors.CARTESIAN_BOUNDS_ERROR, Printer.dimsToString(dims), Arrays.toString(indices)));
             if (indices[i] < 0)
                 indices[i] += dims[i];
         }
         return indices;
     }
 
-    
     protected static int length(int[] dims) {
         int len = 1;
         for (int i = 0; i < dims.length; i++)
@@ -461,7 +404,6 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
         return len;
     }
 
-    
     protected static int[] linearIndexToCartesianIndices(int linearIndex, int[] multipliers, int ndims, int length) {
         linearIndex = boundaryCheck(linearIndex, length);
         int[] indices = new int[ndims];
@@ -472,13 +414,11 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
         return indices;
     }
 
-
     protected static int[] computeDims(Object[] input) {
         List<Integer> dimsList = new ArrayList<>();
         return listToArray(computeDimsInternal(dimsList, input));
     }
 
-    
     protected static List<Integer> computeDimsInternal(List<Integer> dimsSoFar, Object[] input) {
         dimsSoFar.add(input.length);
         if (input[0].getClass().equals(float[].class)) {
@@ -490,13 +430,12 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
         } else if (input[0].getClass().isArray())
             return computeDimsInternal(dimsSoFar, (Object[])input[0]);
         else
-            throw new IllegalArgumentException(ERROR_INPUT_MUST_BE_ARRAY);
+            throw new IllegalArgumentException(Errors.INPUT_MUST_BE_ARRAY);
     }
 
     protected static int[] listToArray(List<Integer> input) {
         return input.stream().mapToInt(Integer::intValue).toArray();
     }
-
 
     protected void baseConstuctor(int... dims) {
         this.dims = dims.clone();
@@ -504,6 +443,9 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
         this.multipliers = calculateMultipliers(dims);
     }
 
+    protected double absSum() {
+        return streamAbs().reduce(zeroT2(), new NumberAccumulator()).doubleValue();
+    }
 
     protected Stream<T2> streamAbs() {
         if (eltype() == Complex.class)
@@ -523,7 +465,6 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
         throw new UnsupportedOperationException();
     }
 
-    
     protected void incrementSlicingExpression(Object[] expressions, int dimension, int[] remainingDimsIndices) {
         if ((int)expressions[dimension] == dims(dimension) - 1) {
             expressions[dimension] = 0;
@@ -533,14 +474,12 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
         }
     }
 
-    
     protected int[] calculateRemainingDims(int... selectedDims) {
         Set<Integer> remainingDims = IntStream.range(0, ndims()).boxed().collect(Collectors.toSet());
         remainingDims.removeAll(IntStream.of(selectedDims).boxed().collect(Collectors.toSet()));
         return Stream.of(remainingDims.toArray()).mapToInt(i -> ((Integer)i).intValue()).sorted().toArray();
     }
 
-    
     protected void copyToArray(int dimension, int[] index, Object[] destination) {
         int[] localDims = dims;
         for (int i = 0; i < localDims[dimension]; i++) {
@@ -552,7 +491,6 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
         }
     }
 
-    
     protected int resolveIndices(int... indices) {
         indices = boundaryCheck(indices, dims);
         int internalIndex = 0;

@@ -39,7 +39,6 @@ class Printer {
         return String.join(" × ", IntStream.of(dims).mapToObj(item -> "" + item).collect(Collectors.toList()));
     }
 
-    
     static String printVector(int[] indices) {
         return "[" + StringUtils.join(ArrayUtils.toObject(indices), ", ") + "]";
     }
@@ -53,7 +52,6 @@ class Printer {
         return str.toString();
     }
 
-    
     static String printMatrix(int startIndex, int width, int height, String format, BiFunction<Integer, String, String> printItem) {
         StringBuilder str = new StringBuilder();
         for (int i = 0; i < height; i++) {
@@ -63,12 +61,10 @@ class Printer {
         return str.toString();
     }
 
-    
     private static String printIndices(int[] indices) {
         return "[:, :, " + StringUtils.join(ArrayUtils.toObject(indices), ", ") + "]";
     }
 
-    
     static String printNDArray(
             int dimension,
             int[] indices,
