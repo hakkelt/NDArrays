@@ -1,6 +1,6 @@
 package io.github.hakkelt.ndarrays;
 
-abstract class AbstractFloatNDArray extends AbstractRealNDArray<Float> {
+public abstract class AbstractFloatNDArray extends AbstractRealNDArray<Float> {
 
     protected Float wrapValue(Number value) {
         return Float.valueOf(value.floatValue());

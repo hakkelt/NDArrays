@@ -3,13 +3,11 @@ package io.github.hakkelt.ndarrays;
 import java.lang.reflect.Type;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
 
 import org.apache.commons.math3.complex.Complex;
 
-abstract class AbstractComplexNDArray<T extends Number> extends AbstractNDArray<Complex,T> implements InternalComplexNDArray<T> {
+public abstract class AbstractComplexNDArray<T extends Number> extends AbstractNDArray<Complex,T> implements ComplexNDArrayTrait<T> {
 
     public Object eltype() {
         return Complex.class;
@@ -89,44 +87,8 @@ abstract class AbstractComplexNDArray<T extends Number> extends AbstractNDArray<
         return createNewNDArrayOfSameTypeAsMe(dims);
     }
 
-    @Override
-    public ComplexNDArray<T> apply(UnaryOperator<Complex> func) {
-        super.apply(func);
-        return this;
-    }
-
-    @Override
-    public ComplexNDArray<T> applyWithLinearIndices(BiFunction<Complex, Integer, Complex> func) {
-        super.applyWithLinearIndices(func);
-        return this;
-    }
-
-    @Override
-    public ComplexNDArray<T> applyWithCartesianIndices(BiFunction<Complex, int[], Complex> func) {
-        super.applyWithCartesianIndices(func);
-        return this;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public ComplexNDArray<T> map(UnaryOperator<Complex> func) {
-        return (ComplexNDArray<T>)super.map(func);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public ComplexNDArray<T> mapWithLinearIndices(BiFunction<Complex,Integer,Complex> func) {
-        return (ComplexNDArray<T>)super.mapWithLinearIndices(func);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public ComplexNDArray<T> mapWithCartesianIndices(BiFunction<Complex,int[],Complex> func) {
-        return (ComplexNDArray<T>)super.mapWithCartesianIndices(func);
-    }
-
-    protected abstract AbstractComplexNDArray<T> createNewNDArrayOfSameTypeAsMe(int... dims);
-    protected abstract AbstractRealNDArray<T> createNewRealNDArrayOfSameTypeAsMe(int... dims);
+    protected abstract ComplexNDArray<T> createNewNDArrayOfSameTypeAsMe(int... dims);
+    protected abstract NDArray<T> createNewRealNDArrayOfSameTypeAsMe(int... dims);
 
     protected Complex accumulateAtIndex(int linearIndex, AccumulateOperators operator, Object ...objects) {
         Complex acc = get(linearIndex);

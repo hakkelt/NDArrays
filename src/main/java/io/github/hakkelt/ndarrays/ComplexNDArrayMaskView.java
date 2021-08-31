@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 
 import org.apache.commons.math3.complex.Complex;
 
-class ComplexNDArrayMaskView<T extends Number> extends AbstractNDArrayMaskView<Complex,T> implements InternalComplexNDArray<T> {
+class ComplexNDArrayMaskView<T extends Number> extends AbstractNDArrayMaskView<Complex,T> implements ComplexNDArrayTrait<T> {
     
     @SuppressWarnings("unchecked")
     public ComplexNDArrayMaskView(NDArray<Complex> parent, NDArray<?> mask, boolean isInverse) {

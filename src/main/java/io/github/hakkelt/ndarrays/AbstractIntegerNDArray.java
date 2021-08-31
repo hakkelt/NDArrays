@@ -1,6 +1,6 @@
 package io.github.hakkelt.ndarrays;
 
-abstract class AbstractIntegerNDArray extends AbstractRealNDArray<Integer> {
+public abstract class AbstractIntegerNDArray extends AbstractRealNDArray<Integer> {
 
     protected Integer wrapValue(Number value) {
         return Integer.valueOf(value.intValue());

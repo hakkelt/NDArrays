@@ -1,6 +1,6 @@
 package io.github.hakkelt.ndarrays;
 
-abstract class AbstractLongNDArray extends AbstractRealNDArray<Long> {
+public abstract class AbstractLongNDArray extends AbstractRealNDArray<Long> {
 
     protected Long wrapValue(Number value) {
         return Long.valueOf(value.longValue());

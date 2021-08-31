@@ -235,12 +235,12 @@ abstract class AbstractNDArrayView<T,T2 extends Number> extends AbstractNDArray<
     }
 
     @Override
-    protected AbstractNDArray<T,T2> createNewNDArrayOfSameTypeAsMe(int... dims) {
+    protected NDArray<T> createNewNDArrayOfSameTypeAsMe(int... dims) {
         return parent.createNewNDArrayOfSameTypeAsMe(dims);
     }
 
     @Override
-    protected AbstractRealNDArray<T2> createNewRealNDArrayOfSameTypeAsMe(int... dims) {
+    protected NDArray<T2> createNewRealNDArrayOfSameTypeAsMe(int... dims) {
         return parent.createNewRealNDArrayOfSameTypeAsMe(dims);
     }
 

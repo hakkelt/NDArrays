@@ -44,49 +44,47 @@ class CopyFromOperations<T,T2 extends Number> {
     @SuppressWarnings("unchecked")
     public NDArray<T2> copyFrom(InternalRealNDArray<T2> me, NDArray<? extends Number> array) {
         me.streamLinearIndices().parallel()
-            .forEach(i -> {
-                me.set(((AbstractNDArray<T2,T2>)me).wrapValue(array.get(i)), i);
-            });
+            .forEach(i -> me.set(((AbstractNDArray<T2,T2>)me).wrapValue(array.get(i)), i));
         return me;
     }
 
     @SuppressWarnings("unchecked")
-    public ComplexNDArray<T2> copyFrom(InternalComplexNDArray<T2> me, float[] array) {
+    public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, float[] array) {
         return (ComplexNDArray<T2>)copyFrom((AbstractNDArray<T,T2>)me, array);
     }
 
     @SuppressWarnings("unchecked")
-    public ComplexNDArray<T2> copyFrom(InternalComplexNDArray<T2> me, double[] array) {
+    public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, double[] array) {
         return (ComplexNDArray<T2>)copyFrom((AbstractNDArray<T,T2>)me, array);
     }
 
     @SuppressWarnings("unchecked")
-    public ComplexNDArray<T2> copyFrom(InternalComplexNDArray<T2> me, byte[] array) {
+    public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, byte[] array) {
         return (ComplexNDArray<T2>)copyFrom((AbstractNDArray<T,T2>)me, array);
     }
 
     @SuppressWarnings("unchecked")
-    public ComplexNDArray<T2> copyFrom(InternalComplexNDArray<T2> me, short[] array) {
+    public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, short[] array) {
         return (ComplexNDArray<T2>)copyFrom((AbstractNDArray<T,T2>)me, array);
     }
 
     @SuppressWarnings("unchecked")
-    public ComplexNDArray<T2> copyFrom(InternalComplexNDArray<T2> me, int[] array) {
+    public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, int[] array) {
         return (ComplexNDArray<T2>)copyFrom((AbstractNDArray<T,T2>)me, array);
     }
 
     @SuppressWarnings("unchecked")
-    public ComplexNDArray<T2> copyFrom(InternalComplexNDArray<T2> me, long[] array) {
+    public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, long[] array) {
         return (ComplexNDArray<T2>)copyFrom((AbstractNDArray<T,T2>)me, array);
     }
 
     @SuppressWarnings("unchecked")
-    public ComplexNDArray<T2> copyFrom(InternalComplexNDArray<T2> me, Object[] array) {
+    public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, Object[] array) {
         return (ComplexNDArray<T2>)copyFrom((AbstractNDArray<T,T2>)me, array);
     }
 
     @SuppressWarnings("unchecked")
-    public ComplexNDArray<T2> copyFrom(InternalComplexNDArray<T2> me, NDArray<?> array) {
+    public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, NDArray<?> array) {
         me.streamLinearIndices().parallel()
             .forEach(i -> {
                 if (array.eltype() == Complex.class)
@@ -97,42 +95,42 @@ class CopyFromOperations<T,T2 extends Number> {
         return me;
     }
 
-    public ComplexNDArray<T2> copyFrom(InternalComplexNDArray<T2> me, float[] real, float[] imag) {
+    public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, float[] real, float[] imag) {
         flatten(me, real, imag, 0, 0);
         return me;
     }
 
-    public ComplexNDArray<T2> copyFrom(InternalComplexNDArray<T2> me, double[] real, double[] imag) {
+    public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, double[] real, double[] imag) {
         flatten(me, real, imag, 0, 0);
         return me;
     }
 
-    public ComplexNDArray<T2> copyFrom(InternalComplexNDArray<T2> me, byte[] real, byte[] imag) {
+    public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, byte[] real, byte[] imag) {
         flatten(me, real, imag, 0, 0);
         return me;
     }
 
-    public ComplexNDArray<T2> copyFrom(InternalComplexNDArray<T2> me, short[] real, short[] imag) {
+    public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, short[] real, short[] imag) {
         flatten(me, real, imag, 0, 0);
         return me;
     }
 
-    public ComplexNDArray<T2> copyFrom(InternalComplexNDArray<T2> me, int[] real, int[] imag) {
+    public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, int[] real, int[] imag) {
         flatten(me, real, imag, 0, 0);
         return me;
     }
 
-    public ComplexNDArray<T2> copyFrom(InternalComplexNDArray<T2> me, long[] real, long[] imag) {
+    public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, long[] real, long[] imag) {
         flatten(me, real, imag, 0, 0);
         return me;
     }
 
-    public ComplexNDArray<T2> copyFrom(InternalComplexNDArray<T2> me, Object[] real, Object[] imag) {
+    public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, Object[] real, Object[] imag) {
         flatten(me, real, imag, 0, 0);
         return me;
     }
 
-    public ComplexNDArray<T2> copyFrom(InternalComplexNDArray<T2> me, NDArray<? extends Number> real, NDArray<? extends Number> imag) {
+    public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, NDArray<? extends Number> real, NDArray<? extends Number> imag) {
         if (real.eltype() == Complex.class || imag.eltype() == Complex.class)
             throw new IllegalArgumentException();
         me.streamLinearIndices().parallel()
@@ -191,13 +189,13 @@ class CopyFromOperations<T,T2 extends Number> {
     }
 
     @SuppressWarnings("unchecked")
-    protected void flatten(InternalComplexNDArray<T2> me, Complex[] compl, int startIndex, int dimension) {
+    protected void flatten(ComplexNDArrayTrait<T2> me, Complex[] compl, int startIndex, int dimension) {
         IntStream.range(0, compl.length).parallel()
             .forEach(i -> me.set(compl[i], startIndex + i * ((AbstractNDArray<T,T2>)me).multipliers[dimension]));
     }
 
     @SuppressWarnings("unchecked")
-    protected void flatten(InternalComplexNDArray<T2> me, float[] real, float[] imag, int startIndex, int dimension) {
+    protected void flatten(ComplexNDArrayTrait<T2> me, float[] real, float[] imag, int startIndex, int dimension) {
         if (real.length != imag.length)
             throw new IllegalArgumentException(Errors.ARRAYS_DIFFER_IN_SIZE);
         IntStream.range(0, real.length).parallel()
@@ -208,7 +206,7 @@ class CopyFromOperations<T,T2 extends Number> {
     }
 
     @SuppressWarnings("unchecked")
-    protected void flatten(InternalComplexNDArray<T2> me, double[] real, double[] imag, int startIndex, int dimension) {
+    protected void flatten(ComplexNDArrayTrait<T2> me, double[] real, double[] imag, int startIndex, int dimension) {
         if (real.length != imag.length)
             throw new IllegalArgumentException(Errors.ARRAYS_DIFFER_IN_SIZE);
         IntStream.range(0, real.length).parallel()
@@ -219,7 +217,7 @@ class CopyFromOperations<T,T2 extends Number> {
     }
 
     @SuppressWarnings("unchecked")
-    protected void flatten(InternalComplexNDArray<T2> me, byte[] real, byte[] imag, int startIndex, int dimension) {
+    protected void flatten(ComplexNDArrayTrait<T2> me, byte[] real, byte[] imag, int startIndex, int dimension) {
         if (real.length != imag.length)
             throw new IllegalArgumentException(Errors.ARRAYS_DIFFER_IN_SIZE);
         IntStream.range(0, real.length).parallel()
@@ -230,7 +228,7 @@ class CopyFromOperations<T,T2 extends Number> {
     }
 
     @SuppressWarnings("unchecked")
-    protected void flatten(InternalComplexNDArray<T2> me, short[] real, short[] imag, int startIndex, int dimension) {
+    protected void flatten(ComplexNDArrayTrait<T2> me, short[] real, short[] imag, int startIndex, int dimension) {
         if (real.length != imag.length)
             throw new IllegalArgumentException(Errors.ARRAYS_DIFFER_IN_SIZE);
         IntStream.range(0, real.length).parallel()
@@ -241,7 +239,7 @@ class CopyFromOperations<T,T2 extends Number> {
     }
 
     @SuppressWarnings("unchecked")
-    protected void flatten(InternalComplexNDArray<T2> me, int[] real, int[] imag, int startIndex, int dimension) {
+    protected void flatten(ComplexNDArrayTrait<T2> me, int[] real, int[] imag, int startIndex, int dimension) {
         if (real.length != imag.length)
             throw new IllegalArgumentException(Errors.ARRAYS_DIFFER_IN_SIZE);
         IntStream.range(0, real.length).parallel()
@@ -252,7 +250,7 @@ class CopyFromOperations<T,T2 extends Number> {
     }
 
     @SuppressWarnings("unchecked")
-    protected void flatten(InternalComplexNDArray<T2> me, long[] real, long[] imag, int startIndex, int dimension) {
+    protected void flatten(ComplexNDArrayTrait<T2> me, long[] real, long[] imag, int startIndex, int dimension) {
         if (real.length != imag.length)
             throw new IllegalArgumentException(Errors.ARRAYS_DIFFER_IN_SIZE);
         IntStream.range(0, real.length).parallel()
@@ -263,7 +261,7 @@ class CopyFromOperations<T,T2 extends Number> {
     }
 
     @SuppressWarnings("unchecked")
-    protected void flatten(InternalComplexNDArray<T2> me, Object[] real, Object[] imag, int startIndex, int dimension) {
+    protected void flatten(ComplexNDArrayTrait<T2> me, Object[] real, Object[] imag, int startIndex, int dimension) {
         for (int i = 0; i < real.length; i++) {
             if (real[i].getClass().equals(float[].class) && imag[i].getClass().equals(float[].class))
                 flatten(me, (float[]) real[i], (float[]) imag[i], startIndex + i * ((AbstractNDArray<T,T2>)me).multipliers[dimension], dimension + 1);

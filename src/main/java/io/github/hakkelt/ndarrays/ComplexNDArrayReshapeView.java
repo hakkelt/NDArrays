@@ -2,7 +2,7 @@ package io.github.hakkelt.ndarrays;
 
 import org.apache.commons.math3.complex.Complex;
 
-class ComplexNDArrayReshapeView<T extends Number> extends AbstractNDArrayReshapeView<Complex,T> implements InternalComplexNDArray<T> {
+class ComplexNDArrayReshapeView<T extends Number> extends AbstractNDArrayReshapeView<Complex,T> implements ComplexNDArrayTrait<T> {
     
     public ComplexNDArrayReshapeView(NDArray<Complex> parent, int ...newShape) {
         super(parent, newShape);

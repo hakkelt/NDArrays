@@ -12,11 +12,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.ObjIntConsumer;
-import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -169,39 +167,6 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
         throw new UnsupportedOperationException();
     }
 
-    public NDArray<T> apply(UnaryOperator<T> func) {
-        streamLinearIndices().parallel().forEach(linearIndex -> set(func.apply(get(linearIndex)), linearIndex));
-        return this;
-    }
-
-    public NDArray<T> applyWithLinearIndices(BiFunction<T, Integer, T> func) {
-        streamLinearIndices().parallel().forEach(linearIndex -> set(func.apply(get(linearIndex), linearIndex), linearIndex));
-        return this;
-    }
-
-    public NDArray<T> applyWithCartesianIndices(BiFunction<T, int[], T> func) {
-        streamCartesianIndices().parallel().forEach(indices -> set(func.apply(get(indices), indices), indices));
-        return this;
-    }
-
-    public NDArray<T> map(UnaryOperator<T> func) {
-        NDArray<T> newInstance = copy();
-        newInstance.apply(func);
-        return newInstance;
-    }
-
-    public NDArray<T> mapWithLinearIndices(BiFunction<T, Integer, T> func) {
-        NDArray<T> newInstance = copy();
-        newInstance.applyWithLinearIndices(func);
-        return newInstance;
-    }
-
-    public NDArray<T> mapWithCartesianIndices(BiFunction<T, int[], T> func) {
-        NDArray<T> newInstance = copy();
-        newInstance.applyWithCartesianIndices(func);
-        return newInstance;
-    }
-
     public void forEachWithLinearIndices(ObjIntConsumer<T> func) {
         streamLinearIndices().parallel().forEach(linearIndex -> func.accept(get(linearIndex), linearIndex));
     }
@@ -210,8 +175,9 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
         streamCartesianIndices().parallel().forEach(indices -> func.accept(get(indices), indices));
     }
 
+    @SuppressWarnings("unchecked")
     public NDArray<T> copy() {
-        AbstractNDArray<T,T2> newArray = createNewNDArrayOfSameTypeAsMe(dims);
+        AbstractNDArray<T,T2> newArray = (AbstractNDArray<T,T2>)createNewNDArrayOfSameTypeAsMe(dims);
         newArray.baseConstuctor(dims);
         return newArray.copyFrom(this);
     }
@@ -358,8 +324,8 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
     protected abstract T accumulate(Complex acc, Complex value, AccumulateOperators operator);
     protected abstract T accumulateAtIndex(int linearIndex, AccumulateOperators operator, Object ...objects);
     
-    protected abstract AbstractNDArray<T,T2> createNewNDArrayOfSameTypeAsMe(int... dims);
-    protected abstract AbstractRealNDArray<T2> createNewRealNDArrayOfSameTypeAsMe(int... dims);
+    protected abstract NDArray<T> createNewNDArrayOfSameTypeAsMe(int... dims);
+    protected abstract NDArray<T2> createNewRealNDArrayOfSameTypeAsMe(int... dims);
     protected abstract Collector<Object, List<Object>, NDArray<T>> getCollectorInternal(int[] dims);
     protected abstract Collector<Object, List<Object>, NDArray<T2>> getRealCollectorInternal(int[] dims);
 

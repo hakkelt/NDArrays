@@ -1,6 +1,6 @@
 package io.github.hakkelt.ndarrays;
 
-abstract class AbstractShortNDArray extends AbstractRealNDArray<Short> {
+public abstract class AbstractShortNDArray extends AbstractRealNDArray<Short> {
 
     protected Short wrapValue(Number value) {
         return Short.valueOf(value.shortValue());

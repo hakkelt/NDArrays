@@ -1,6 +1,6 @@
 package io.github.hakkelt.ndarrays;
 
-abstract class AbstractByteNDArray extends AbstractRealNDArray<Byte> {
+public abstract class AbstractByteNDArray extends AbstractRealNDArray<Byte> {
 
     protected Byte wrapValue(Number value) {
         return Byte.valueOf(value.byteValue());

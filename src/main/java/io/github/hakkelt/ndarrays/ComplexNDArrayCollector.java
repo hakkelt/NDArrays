@@ -11,7 +11,7 @@ import java.util.stream.Collector;
 
 import org.apache.commons.math3.complex.Complex;
 
-class ComplexNDArrayCollector<T extends Number> implements Collector<Object, List<Object>, NDArray<Complex>> {
+public class ComplexNDArrayCollector<T extends Number> implements Collector<Object, List<Object>, NDArray<Complex>> {
     int[] dims;
     ComplexNDArray<T> destination;
 

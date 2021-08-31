@@ -1,6 +1,6 @@
 package io.github.hakkelt.ndarrays;
 
-abstract class AbstractDoubleNDArray extends AbstractRealNDArray<Double> {
+public abstract class AbstractDoubleNDArray extends AbstractRealNDArray<Double> {
 
     protected Double wrapValue(Number value) {
         return Double.valueOf(value.doubleValue());

@@ -1,6 +1,6 @@
 package io.github.hakkelt.ndarrays;
 
-class Errors {
+public class Errors {
 
     private Errors() {}
     
@@ -64,9 +64,9 @@ class Errors {
         "Cannot convert value %f to type %s!";
     public static final String INPUT_MUST_BE_ARRAY =
         "A (multidimensional) primitive array is expected as input!";
-    static final String PERMUTATOR_SIZE_MISMATCH =
+    public static final String PERMUTATOR_SIZE_MISMATCH =
         "The permutation vector (%s) doesn't fit the size of the array to be permutated (%s)!";
-    static final String INVALID_PERMUTATOR =
+    public static final String INVALID_PERMUTATOR =
         "The permutation vector (%s) is not a valid permutation vector for the array to be permutated (%s)!";
     public static final String ILLEGAL_SLICING_EXPRESSION =
         "Illegal slicing expression: %s";

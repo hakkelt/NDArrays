@@ -2,7 +2,7 @@ package io.github.hakkelt.ndarrays;
 
 import org.apache.commons.math3.complex.Complex;
 
-class ComplexNDArraySliceView<T extends Number> extends AbstractNDArraySliceView<Complex,T> implements InternalComplexNDArray<T> {
+class ComplexNDArraySliceView<T extends Number> extends AbstractNDArraySliceView<Complex,T> implements ComplexNDArrayTrait<T> {
     
     public ComplexNDArraySliceView(NDArray<Complex> parent, Object ...slicingExpressions) {
         super(parent, slicingExpressions);

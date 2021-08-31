@@ -5,7 +5,7 @@ import java.util.stream.Collector;
 
 import org.apache.commons.math3.complex.Complex;
 
-abstract class AbstractRealNDArray<T extends Number> extends AbstractNDArray<T,T> implements InternalRealNDArray<T> {
+public abstract class AbstractRealNDArray<T extends Number> extends AbstractNDArray<T,T> implements InternalRealNDArray<T> {
     
     @Override
     public void set(Number value, int... indices) {

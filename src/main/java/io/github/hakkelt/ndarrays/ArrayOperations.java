@@ -83,9 +83,7 @@ class ArrayOperations<T,T2 extends Number> {
     }
 
     public NDArray<T> fill(AbstractNDArray<T,T2> me, float value) {
-        me.streamLinearIndices().parallel().forEach(i -> {
-            me.set(value, i);
-        });
+        me.streamLinearIndices().parallel().forEach(i -> me.set(value, i));
         return me;
     }
 

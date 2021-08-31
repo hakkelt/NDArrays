@@ -2,7 +2,7 @@ package io.github.hakkelt.ndarrays;
 
 import org.apache.commons.math3.complex.Complex;
 
-public class ComplexNDArrayPermuteDimsView<T extends Number> extends AbstractNDArrayPermuteDimsView<Complex,T> implements InternalComplexNDArray<T> {
+public class ComplexNDArrayPermuteDimsView<T extends Number> extends AbstractNDArrayPermuteDimsView<Complex,T> implements ComplexNDArrayTrait<T> {
 
     public ComplexNDArrayPermuteDimsView(NDArray<Complex> parent, int ...dimsOrder) {
         super(parent, dimsOrder);

@@ -25,7 +25,7 @@ class ViewOperations<T,T2 extends Number> {
         return new RealNDArraySliceView<>(me, slicingExpressions);
     }
     
-    public ComplexNDArray<T2> slice(InternalComplexNDArray<T2> me, Object ...slicingExpressions) {
+    public ComplexNDArray<T2> slice(ComplexNDArrayTrait<T2> me, Object ...slicingExpressions) {
         if (Stream.of(slicingExpressions).allMatch(obj -> obj instanceof String && ((String)obj).equals(":"))) return me;
         prepareSlicingExpressions(me, slicingExpressions);
         return new ComplexNDArraySliceView<>(me, slicingExpressions);
@@ -36,7 +36,7 @@ class ViewOperations<T,T2 extends Number> {
         return view.length() == me.length() ? me.reshape(me.length()) : view;
     }
     
-    public ComplexNDArray<T2> mask(InternalComplexNDArray<T2> me, NDArray<?> mask, boolean isInverse) {
+    public ComplexNDArray<T2> mask(ComplexNDArrayTrait<T2> me, NDArray<?> mask, boolean isInverse) {
         ComplexNDArray<T2> view = new ComplexNDArrayMaskView<>(me, mask, isInverse);
         return view.length() == me.length() ? me.reshape(me.length()) : view;
     }
@@ -46,7 +46,7 @@ class ViewOperations<T,T2 extends Number> {
         return view.length() == me.length() ? me.reshape(me.length()) : view;
     }
     
-    public ComplexNDArray<T2> mask(InternalComplexNDArray<T2> me, Predicate<Complex> func) {
+    public ComplexNDArray<T2> mask(ComplexNDArrayTrait<T2> me, Predicate<Complex> func) {
         ComplexNDArray<T2> view = new ComplexNDArrayMaskView<>(me, func);
         return view.length() == me.length() ? me.reshape(me.length()) : view;
     }
@@ -56,7 +56,7 @@ class ViewOperations<T,T2 extends Number> {
         return view.length() == me.length() ? me.reshape(me.length()) : view;
     }
     
-    public ComplexNDArray<T2> mask(InternalComplexNDArray<T2> me, BiPredicate<Complex,?> func, boolean withLinearIndices) {
+    public ComplexNDArray<T2> mask(ComplexNDArrayTrait<T2> me, BiPredicate<Complex,?> func, boolean withLinearIndices) {
         ComplexNDArray<T2> view = new ComplexNDArrayMaskView<>(me, func, withLinearIndices);
         return view.length() == me.length() ? me.reshape(me.length()) : view;
     }
@@ -68,7 +68,7 @@ class ViewOperations<T,T2 extends Number> {
     }
 
     @SuppressWarnings("unchecked")
-    public ComplexNDArray<T2> permuteDims(InternalComplexNDArray<T2> me, int... permutation) {
+    public ComplexNDArray<T2> permuteDims(ComplexNDArrayTrait<T2> me, int... permutation) {
         if (IntStream.range(0, me.ndims()).allMatch(i -> i == permutation[i])) return me;
         ComplexNDArrayPermuteDimsView<T2> view = new ComplexNDArrayPermuteDimsView<>(me, permutation);
         return IntStream.range(0, me.ndims()).allMatch(i -> i == view.dimsOrder[i]) ? (ComplexNDArray<T2>)view.parent : view;
@@ -82,19 +82,20 @@ class ViewOperations<T,T2 extends Number> {
     }
 
     @SuppressWarnings("unchecked")
-    public ComplexNDArray<T2> reshape(InternalComplexNDArray<T2> me, int... newShape) {
+    public ComplexNDArray<T2> reshape(ComplexNDArrayTrait<T2> me, int... newShape) {
         if (Arrays.equals(newShape, me.dims())) return me;
         if (me instanceof ComplexNDArrayReshapeView && Arrays.equals(((ComplexNDArrayReshapeView<T2>)me).parent.dims(), me.dims()))
             return (ComplexNDArray<T2>)((ComplexNDArrayReshapeView<T2>)me).parent;
         return new ComplexNDArrayReshapeView<>(me, newShape);
     }
 
+    @SuppressWarnings("unchecked")
     public NDArray<T> concatenate(AbstractNDArray<T,T2> me, int axis, NDArray<?> ...arrays) {
         checkConcatenationDimensions(me, axis, arrays);
         int[] newDims = me.dims.clone();
         for (NDArray<?> array : arrays)
             newDims[axis] += array.dims(axis);
-        AbstractNDArray<T,T2> newArray = me.createNewNDArrayOfSameTypeAsMe(newDims);
+        AbstractNDArray<T,T2> newArray = (AbstractNDArray<T,T2>)me.createNewNDArrayOfSameTypeAsMe(newDims);
         Object[] slicingExpressions = new Object[me.ndims()];
         for (int i = 0; i < me.ndims(); i++) slicingExpressions[i] = ":";
         int start = 0;
@@ -113,7 +114,7 @@ class ViewOperations<T,T2 extends Number> {
     }
 
     @SuppressWarnings("unchecked")
-    public ComplexNDArray<T2> concatenate(InternalComplexNDArray<T2> me, int axis, NDArray<?> ...arrays) {
+    public ComplexNDArray<T2> concatenate(ComplexNDArrayTrait<T2> me, int axis, NDArray<?> ...arrays) {
         return (ComplexNDArray<T2>)concatenate((AbstractNDArray<T,T2>)me, axis, arrays);
     }
     
@@ -134,7 +135,7 @@ class ViewOperations<T,T2 extends Number> {
     }
 
     @SuppressWarnings("unchecked")
-    public ComplexNDArray<T2> selectDims(InternalComplexNDArray<T2> me, int... selectedDims) {
+    public ComplexNDArray<T2> selectDims(ComplexNDArrayTrait<T2> me, int... selectedDims) {
         return (ComplexNDArray<T2>)selectDims((AbstractNDArray<T,T2>)me, selectedDims);
     }
 
@@ -151,7 +152,7 @@ class ViewOperations<T,T2 extends Number> {
     }
 
     @SuppressWarnings("unchecked")
-    public ComplexNDArray<T2> dropDims(InternalComplexNDArray<T2> me, int... selectedDims) {
+    public ComplexNDArray<T2> dropDims(ComplexNDArrayTrait<T2> me, int... selectedDims) {
         return (ComplexNDArray<T2>)dropDims((AbstractNDArray<T,T2>)me, selectedDims);
     }
 
@@ -159,7 +160,7 @@ class ViewOperations<T,T2 extends Number> {
         return me.selectDims(IntStream.range(0, me.dims.length).filter(i -> me.dims[i] != 1).toArray());
     }
 
-    public ComplexNDArray<T2> squeeze(InternalComplexNDArray<T2> me) {
+    public ComplexNDArray<T2> squeeze(ComplexNDArrayTrait<T2> me) {
         return me.selectDims(IntStream.range(0, me.ndims()).filter(i -> me.dims(i) != 1).toArray());
     }
 

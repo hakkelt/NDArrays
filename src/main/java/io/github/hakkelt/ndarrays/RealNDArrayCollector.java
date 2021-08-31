@@ -9,7 +9,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
-class RealNDArrayCollector<T extends Number> implements Collector<Object, List<Object>, NDArray<T>> {
+public class RealNDArrayCollector<T extends Number> implements Collector<Object, List<Object>, NDArray<T>> {
     int[] dims;
     NDArray<T> destination;
 

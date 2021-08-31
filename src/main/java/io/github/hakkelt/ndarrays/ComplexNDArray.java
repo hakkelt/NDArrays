@@ -1,7 +1,9 @@
 package io.github.hakkelt.ndarrays;
 
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 import org.apache.commons.math3.complex.Complex;
 
@@ -296,6 +298,66 @@ public interface ComplexNDArray<T extends Number> extends NDArray<Complex> {
      */
     public ComplexNDArray<T> copyFrom(NDArray<? extends Number> real, NDArray<? extends Number> imag);
     
+    /**
+     * Apply the given function to each element of the array, and override each entry with the calculated new values.
+     * 
+     * Beware! Entries might not be processed in a sequential order!
+     * 
+     * @param func function that receives the value of the current entry and returns the new value
+     * @return itself after the update
+     */
+    public ComplexNDArray<T> apply(UnaryOperator<Complex> func);
+    
+    /**
+     * Apply the given function to each element of the array, and override each entry with the calculated new values.
+     * 
+     * Beware! Entries might not be processed in a sequential order!
+     * 
+     * @param func function that receives the value of the current entry and its linear index and returns the new value
+     * @return itself after the update
+     */
+    public ComplexNDArray<T> applyWithLinearIndices(BiFunction<Complex, Integer, Complex> func);
+    
+    /**
+     * Apply the given function to each element of the array, and override each entry with the calculated new values.
+     * 
+     * Beware! Entries might not be processed in a sequential order!
+     * 
+     * @param func function that receives the value of the current entry and its Cartesian coordinate and returns the new value
+     * @return itself after the update
+     */
+    public ComplexNDArray<T> applyWithCartesianIndices(BiFunction<Complex, int[], Complex> func);
+    
+    /**
+     * Apply the given function to each element of the array, and create a new NDArray with the calculated new values.
+     * 
+     * Beware! Entries might not be processed in a sequential order!
+     * 
+     * @param func function that receives the value of the current entry and returns the new value
+     * @return the new NDArray with the calculated new values
+     */
+    public ComplexNDArray<T> map(UnaryOperator<Complex> func);
+    
+    /**
+     * Apply the given function to each element of the array, and create a new NDArray with the calculated new values.
+     * 
+     * Beware! Entries might not be processed in a sequential order!
+     * 
+     * @param func function that receives the value of the current entry and its linear index and returns the new value
+     * @return the new NDArray with the calculated new values
+     */
+    public ComplexNDArray<T> mapWithLinearIndices(BiFunction<Complex, Integer, Complex> func);
+    
+    /**
+     * Apply the given function to each element of the array, and create a new NDArray with the calculated new values.
+     * 
+     * Beware! Entries might not be processed in a sequential order!
+     * 
+     * @param func function that receives the value of the current entry and its Cartesian coordinate and returns the new value
+     * @return the new NDArray with the calculated new values
+     */
+    public ComplexNDArray<T> mapWithCartesianIndices(BiFunction<Complex, int[], Complex> func);
+    
     /** 
      * Returns a new array holding the real part of the array
      * 
@@ -439,6 +501,14 @@ public interface ComplexNDArray<T extends Number> extends NDArray<Complex> {
      * @return sum of all elementsalong the specified dimensions
      */
     public ComplexNDArray<T> sum(int ...selectedDims);
+    
+    /** 
+     * Fill this NDArray with the specified value
+     * 
+     * @param value value assigned to all elements of this NDArray
+     * @return this NDArray
+     */
+    public ComplexNDArray<T> fill(Complex value);
     
     /** 
      * Fill this NDArray with the specified value
