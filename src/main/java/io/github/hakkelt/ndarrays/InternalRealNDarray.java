@@ -1,5 +1,8 @@
 package io.github.hakkelt.ndarrays;
 
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
+
 interface InternalRealNDArray<T extends Number> extends NDArray<T> {
 
     @SuppressWarnings("unchecked")
@@ -64,6 +67,26 @@ interface InternalRealNDArray<T extends Number> extends NDArray<T> {
 
     public default NDArray<T> slice(Object ...slicingExpressions) {
         return new ViewOperations<T,T>().slice(this, slicingExpressions);
+    }
+
+    public default NDArray<T> mask(NDArray<?> mask) {
+        return new ViewOperations<T,T>().mask(this, mask, false);
+    }
+
+    public default NDArray<T> mask(Predicate<T> func) {
+        return new ViewOperations<T,T>().mask(this, func);
+    }
+
+    public default NDArray<T> maskWithLinearIndices(BiPredicate<T, Integer> func) {
+        return new ViewOperations<T,T>().mask(this, func, true);
+    }
+
+    public default NDArray<T> maskWithCartesianIndices(BiPredicate<T, int[]> func) {
+        return new ViewOperations<T,T>().mask(this, func, false);
+    }
+
+    public default NDArray<T> inverseMask(NDArray<?> mask) {
+        return new ViewOperations<T,T>().mask(this, mask, true);
     }
 
     public NDArray<T> abs();

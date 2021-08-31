@@ -21,6 +21,12 @@ class TestRealInt8NDArrayReshape {
     }
 
     @Test
+    void testReshapeReshaped() {
+        NDArray<Byte> reshaped2 = reshaped.reshape(4, 5, 3);
+        array.forEachWithCartesianIndices((value, indices) -> assertEquals(value, reshaped2.get(indices)));
+    }
+
+    @Test
     void testGetNegativeLinearIndexing() {
         assertEquals((byte)55, reshaped.get(-5));
     }
@@ -504,6 +510,39 @@ class TestRealInt8NDArrayReshape {
         assertEquals(
             String.format(Errors.INVALID_PERMUTATOR, "[1, 1]", "20 × 3"),
             exception.getMessage());
+    }
+
+    @Test
+    void testMaskReshaped() {
+        NDArray<Byte> mask = new RealInt8NDArray(reshaped.map(value -> value > 20 ? (byte)1 : (byte)0));
+        NDArray<Byte> masked = reshaped.mask(mask);
+        masked.forEach((value) -> assertTrue(value > 20));
+        masked.fill(0);
+        array.forEach(value -> assertTrue(value <= 20));
+    }
+
+    @Test
+    void testMaskReshapedWithPredicate() {
+        NDArray<Byte> masked = reshaped.mask(value -> value > 20);
+        masked.forEach((value) -> assertTrue(value > 20));
+        masked.fill(0);
+        array.forEach(value -> assertTrue(value <= 20));
+    }
+
+    @Test
+    void testMaskReshapedWithPredicateWithLinearIndices() {
+        NDArray<Byte> masked = reshaped.maskWithLinearIndices((value, i) -> value > 20 && i < 10);
+        masked.forEachWithLinearIndices((value, i) -> assertTrue(value > 20 && i < 10));
+        masked.fill(0);
+        reshaped.forEachWithLinearIndices((value, i) -> assertTrue(value <= 20 || i >= 10));
+    }
+
+    @Test
+    void testMaskReshapedWithPredicateWithCartesianIndices() {
+        NDArray<Byte> masked = reshaped.maskWithCartesianIndices((value, idx) -> value > 20 && idx[0] == 0);
+        masked.forEach(value -> assertTrue(value > 20));
+        masked.fill(0);
+        reshaped.forEachWithCartesianIndices((value, idx) -> assertTrue(value <= 20 || idx[0] != 0));
     }
 
     @Test

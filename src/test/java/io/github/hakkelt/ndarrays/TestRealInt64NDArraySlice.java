@@ -21,6 +21,12 @@ class TestRealInt64NDArraySlice {
     }
 
     @Test
+    void testSliceSlice() {
+        NDArray<Long> slice2 = slice.slice(":", 2);
+        slice2.forEachWithCartesianIndices((value, indices) -> assertEquals(value, array.get(1, indices[0] + 1, 2)));
+    }
+
+    @Test
     void testGetNegativeLinearIndexing() {
         assertEquals((long)45, slice.get(-3));
     }
@@ -200,7 +206,7 @@ class TestRealInt64NDArraySlice {
     void testParallelStream() {
         Long sum = slice.stream().parallel()
             .reduce((long)0, (acc, item) -> (long)(acc + item));
-        float acc = 0;
+        long acc = 0;
         for (int i = 1; i < array.dims(1) - 1; i++)
             for (int j = 0; j < array.dims(2); j++)
                 acc = acc + array.get(1, i, j);
@@ -344,7 +350,7 @@ class TestRealInt64NDArraySlice {
         NDArray<Long> slice2 = array2.slice(1, "1:4", ":");
         NDArray<Long> array3 = slice2.add(slice, 5.3, slice2, 3);
         for (int i = 0; i < slice.length(); i++) {
-            float expected = slice.get(i) * 3.f + 5.3f + 3.f;
+            long expected = slice.get(i) * 3 + 5 + 3;
             assertTrue(Math.abs(expected - array3.get(i)) < 1e5);
         }
     }
@@ -373,7 +379,7 @@ class TestRealInt64NDArraySlice {
         NDArray<Long> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(slice, 5.3, slice2, 3);
         for (int i = 0; i < slice.length(); i++) {
-            float expected = slice.get(i) * 3.f + 5.3f + 3.f;
+            long expected = slice.get(i) * 3 + 5 + 3;
             assertTrue(Math.abs(expected - array2.get(i)) < 1e5);
         }
     }
@@ -437,7 +443,7 @@ class TestRealInt64NDArraySlice {
     }
 
     @Test
-    void testFillFloat() {
+    void testFillLong() {
         slice.fill(3);
         for (Long elem : slice)
             assertEquals((long)3, elem);
@@ -463,6 +469,39 @@ class TestRealInt64NDArraySlice {
         for (int i = 0; i < pArray.dims(0); i++)
             for (int j = 0; j < pArray.dims(1); j++)
                 assertEquals(array.get(1, 1 + i, j), arr[j][i]);
+    }
+
+    @Test
+    void testMaskSlice() {
+        NDArray<Byte> mask = new RealInt8NDArray(slice.map(value -> value > 20 ? (long)1 : (long)0));
+        NDArray<Long> masked = slice.mask(mask);
+        masked.forEach((value) -> assertTrue(value > 20));
+        masked.fill(0);
+        slice.forEach(value -> assertTrue(value <= 20));
+    }
+
+    @Test
+    void testMaskSliceWithPredicate() {
+        NDArray<Long> masked = slice.mask(value -> value > 20);
+        masked.forEach((value) -> assertTrue(value > 20));
+        masked.fill(0);
+        slice.forEach(value -> assertTrue(value <= 20));
+    }
+
+    @Test
+    void testMaskSliceWithPredicateWithLinearIndices() {
+        NDArray<Long> masked = slice.maskWithLinearIndices((value, i) -> value > 20 && i < 10);
+        masked.forEachWithLinearIndices((value, i) -> assertTrue(value > 20 && i < 10));
+        masked.fill(0);
+        slice.forEachWithLinearIndices((value, i) -> assertTrue(value <= 20 || i >= 10));
+    }
+
+    @Test
+    void testMaskSliceWithPredicateWithCartesianIndices() {
+        NDArray<Long> masked = slice.maskWithCartesianIndices((value, idx) -> value > 20 && idx[0] == 0);
+        masked.forEach(value -> assertTrue(value > 20));
+        masked.fill(0);
+        slice.forEachWithCartesianIndices((value, idx) -> assertTrue(value <= 20 || idx[0] != 0));
     }
 
     @Test

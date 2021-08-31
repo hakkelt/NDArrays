@@ -22,6 +22,12 @@ class TestComplexF64NDArraySlice {
     }
 
     @Test
+    void testSliceSlice() {
+        ComplexNDArray<Double> slice2 = slice.slice(":", 2);
+        slice2.forEachWithCartesianIndices((value, indices) -> assertEquals(value, array.get(1, indices[0] + 1, 2)));
+    }
+
+    @Test
     void testGetNegativeLinearIndexing() {
         assertEquals(new Complex(45, -45), slice.get(-3));
     }
@@ -483,6 +489,39 @@ class TestComplexF64NDArraySlice {
         for (int i = 0; i < pArray.dims(0); i++)
             for (int j = 0; j < pArray.dims(1); j++)
                 assertEquals(array.get(1, 1 + i, j), arr[j][i]);
+    }
+
+    @Test
+    void testMaskSlice() {
+        NDArray<Byte> mask = new RealInt8NDArray(slice.abs().map(value -> value > 20 ? 1. : 0.));
+        ComplexNDArray<Double> masked = slice.mask(mask);
+        masked.forEach((value) -> assertTrue(value.abs() > 20));
+        masked.fill(0);
+        slice.forEach(value -> assertTrue(value.abs() <= 20));
+    }
+
+    @Test
+    void testMaskSliceWithPredicate() {
+        ComplexNDArray<Double> masked = slice.mask(value -> value.abs() > 20);
+        masked.forEach((value) -> assertTrue(value.abs() > 20));
+        masked.fill(0);
+        slice.forEach(value -> assertTrue(value.abs() <= 20));
+    }
+
+    @Test
+    void testMaskSliceWithPredicateWithLinearIndices() {
+        ComplexNDArray<Double> masked = slice.maskWithLinearIndices((value, i) -> value.abs() > 20 && i < 10);
+        masked.forEachWithLinearIndices((value, i) -> assertTrue(value.abs() > 20 && i < 10));
+        masked.fill(0);
+        slice.forEachWithLinearIndices((value, i) -> assertTrue(value.abs() <= 20 || i >= 10));
+    }
+
+    @Test
+    void testMaskSliceWithPredicateWithCartesianIndices() {
+        ComplexNDArray<Double> masked = slice.maskWithCartesianIndices((value, idx) -> value.abs() > 20 && idx[0] == 0);
+        masked.forEach(value -> assertTrue(value.abs() > 20));
+        masked.fill(0);
+        slice.forEachWithCartesianIndices((value, idx) -> assertTrue(value.abs() <= 20 || idx[0] != 0));
     }
 
     @Test

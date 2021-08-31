@@ -2,12 +2,12 @@ package io.github.hakkelt.ndarrays;
 
 abstract class AbstractNDArrayReshapeView<T,T2 extends Number> extends AbstractNDArrayView<T,T2> {
 
-    static final String ERROR_LENGTH_MISMATCH = 
-        "Cannot reshape %s array to new shape %s: Number of elements doesn't match!";
-
     @SuppressWarnings("unchecked")
     protected AbstractNDArrayReshapeView(NDArray<T> parent, int ...newShape) {
-        this.parent = (AbstractNDArray<T,T2>)parent;
+        if (parent instanceof AbstractNDArrayReshapeView)
+            this.parent = ((AbstractNDArrayReshapeView<T,T2>)parent).parent;
+        else
+            this.parent = (AbstractNDArray<T,T2>)parent;
         checkNewShape(newShape, parent.dims(), parent.length());
         this.dataLength = parent.length();
         this.dims = newShape;
@@ -40,7 +40,7 @@ abstract class AbstractNDArrayReshapeView<T,T2 extends Number> extends AbstractN
         int actualLength = length(newShape);
         if (actualLength != expectedLength)
             throw new IllegalArgumentException(
-                String.format(ERROR_LENGTH_MISMATCH, Printer.dimsToString(parentShape), Printer.dimsToString(newShape)));
+                String.format(Errors.RESHAPE_LENGTH_MISMATCH, Printer.dimsToString(parentShape), Printer.dimsToString(newShape)));
     }
     
 }

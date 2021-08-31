@@ -1,5 +1,8 @@
 package io.github.hakkelt.ndarrays;
 
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
+
 import org.apache.commons.math3.complex.Complex;
 
 /**
@@ -541,6 +544,63 @@ public interface ComplexNDArray<T extends Number> extends NDArray<Complex> {
      * @return an array view that gives read-write access to a specific multi-dimensional slice of the array
      */
     public ComplexNDArray<T> slice(Object... slicingExpressions);
+    
+    /** 
+     * Returns an array view referencing this NDArray as parent that gives read-write access
+     * to a specific elements of the array selected by the given mask.
+     * 
+     * The mask must have the same shape as this array, and those entries are selected
+     * which has the same indices as the non-zero entries in the mask. In other words: All places where
+     * the mask contains a zero value are skipped, and all other values are copied into a new vector.
+     * 
+     * @param mask mask
+     * @return an array view that gives read-write access to a specific elements of the array selected by the given mask
+     */
+    public ComplexNDArray<T> mask(NDArray<?> mask);
+    
+    /** 
+     * Returns an array view referencing this NDArray as parent that gives read-write access
+     * to a specific elements for which the given function returns true.
+     * 
+     * The mask must have the same shape as this array, and those entries are selected
+     * which has the same indices as the non-zero entries in the mask. In other words: All places where
+     * the mask contains a zero value are skipped, and all other values are copied into a new vector.
+     * 
+     * @param func function that accepts the values of entries as input and returns boolean
+     * @return an array view that gives read-write access to a specific elements of the array selected by the given mask
+     */
+    public ComplexNDArray<T> mask(Predicate<Complex> func);
+    
+    /** 
+     * Returns an array view referencing this NDArray as parent that gives read-write access
+     * to a specific elements for which the given function returns true.
+     * 
+     * @param mask mask
+     * @return an array view that gives read-write access to a specific elements for which the given function returns true
+     */
+    public ComplexNDArray<T> maskWithLinearIndices(BiPredicate<Complex,Integer> func);
+    
+    /** 
+     * Returns an array view referencing this NDArray as parent that gives read-write access
+     * to a specific elements for which the given function returns true.
+     * 
+     * @param mask mask
+     * @return an array view that gives read-write access to a specific elements for which the given function returns true
+     */
+    public ComplexNDArray<T> maskWithCartesianIndices(BiPredicate<Complex,int[]> func);
+    
+    /** 
+     * Returns an array view referencing this NDArray as parent that gives read-write access
+     * to a specific elements of the array selected by the given mask.
+     * 
+     * The mask must have the same shape as this array, and those entries are selected
+     * which has the same indices as the zero entries in the mask. In other words: All places where
+     * the mask contains a non-zero value are skipped, and all other values are copied into a new vector.
+     * 
+     * @param mask mask
+     * @return an array view that gives read-write access to a specific elements of the array selected by the given mask
+     */
+    public ComplexNDArray<T> inverseMask(NDArray<?> mask);
     
     /** 
      * Returns a view that references this NDArray as parent but has a different shape.

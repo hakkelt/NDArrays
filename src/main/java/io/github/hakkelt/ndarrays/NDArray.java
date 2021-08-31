@@ -5,7 +5,9 @@ import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.ObjIntConsumer;
+import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -652,6 +654,63 @@ public interface NDArray<T> extends Collection<T> {
      * @return an array view that gives read-write access to a specific multi-dimensional slice of the array
      */
     public NDArray<T> slice(Object... slicingExpressions);
+    
+    /** 
+     * Returns an array view referencing this NDArray as parent that gives read-write access
+     * to a specific elements of the array selected by the given mask.
+     * 
+     * The mask must have the same shape as this array, and those entries are selected
+     * which has the same indices as the non-zero entries in the mask. In other words: All places where
+     * the mask contains a zero value are skipped, and all other values are copied into a new vector.
+     * 
+     * @param mask mask
+     * @return an array view that gives read-write access to a specific elements of the array selected by the given mask
+     */
+    public NDArray<T> mask(NDArray<?> mask);
+    
+    /** 
+     * Returns an array view referencing this NDArray as parent that gives read-write access
+     * to a specific elements for which the given function returns true.
+     * 
+     * The mask must have the same shape as this array, and those entries are selected
+     * which has the same indices as the non-zero entries in the mask. In other words: All places where
+     * the mask contains a zero value are skipped, and all other values are copied into a new vector.
+     * 
+     * @param func function that accepts the values of entries as input and returns boolean
+     * @return an array view that gives read-write access to a specific elements of the array selected by the given mask
+     */
+    public NDArray<T> mask(Predicate<T> func);
+    
+    /** 
+     * Returns an array view referencing this NDArray as parent that gives read-write access
+     * to a specific elements for which the given function returns true.
+     * 
+     * @param mask mask
+     * @return an array view that gives read-write access to a specific elements for which the given function returns true
+     */
+    public NDArray<T> maskWithLinearIndices(BiPredicate<T,Integer> func);
+    
+    /** 
+     * Returns an array view referencing this NDArray as parent that gives read-write access
+     * to a specific elements for which the given function returns true.
+     * 
+     * @param mask mask
+     * @return an array view that gives read-write access to a specific elements for which the given function returns true
+     */
+    public NDArray<T> maskWithCartesianIndices(BiPredicate<T,int[]> func);
+    
+    /** 
+     * Returns an array view referencing this NDArray as parent that gives read-write access
+     * to a specific elements of the array selected by the given mask.
+     * 
+     * The mask must have the same shape as this array, and those entries are selected
+     * which has the same indices as the zero entries in the mask. In other words: All places where
+     * the mask contains a non-zero value are skipped, and all other values are copied into a new vector.
+     * 
+     * @param mask mask
+     * @return an array view that gives read-write access to a specific elements of the array selected by the given mask
+     */
+    public NDArray<T> inverseMask(NDArray<?> mask);
     
     /** 
      * Returns a view that references this NDArray as parent but has a different shape.

@@ -1,9 +1,15 @@
 package io.github.hakkelt.ndarrays;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import org.apache.commons.math3.complex.Complex;
 
 class ViewOperations<T,T2 extends Number> {
 
@@ -14,28 +20,72 @@ class ViewOperations<T,T2 extends Number> {
     }
 
     public NDArray<T2> slice(InternalRealNDArray<T2> me, Object ...slicingExpressions) {
+        if (Stream.of(slicingExpressions).allMatch(obj -> obj instanceof String && ((String)obj).equals(":"))) return me;
         prepareSlicingExpressions(me, slicingExpressions);
         return new RealNDArraySliceView<>(me, slicingExpressions);
     }
     
     public ComplexNDArray<T2> slice(InternalComplexNDArray<T2> me, Object ...slicingExpressions) {
+        if (Stream.of(slicingExpressions).allMatch(obj -> obj instanceof String && ((String)obj).equals(":"))) return me;
         prepareSlicingExpressions(me, slicingExpressions);
         return new ComplexNDArraySliceView<>(me, slicingExpressions);
     }
 
-    public NDArray<T2> permuteDims(InternalRealNDArray<T2> me, int... permutation) {
-        return new RealNDArrayPermuteDimsView<>(me, permutation);
+    public NDArray<T2> mask(InternalRealNDArray<T2> me, NDArray<?> mask, boolean isInverse) {
+        NDArray<T2> view = new RealNDArrayMaskView<>(me, mask, isInverse);
+        return view.length() == me.length() ? me.reshape(me.length()) : view;
+    }
+    
+    public ComplexNDArray<T2> mask(InternalComplexNDArray<T2> me, NDArray<?> mask, boolean isInverse) {
+        ComplexNDArray<T2> view = new ComplexNDArrayMaskView<>(me, mask, isInverse);
+        return view.length() == me.length() ? me.reshape(me.length()) : view;
     }
 
+    public NDArray<T2> mask(InternalRealNDArray<T2> me, Predicate<T2> func) {
+        NDArray<T2> view = new RealNDArrayMaskView<>(me, func);
+        return view.length() == me.length() ? me.reshape(me.length()) : view;
+    }
+    
+    public ComplexNDArray<T2> mask(InternalComplexNDArray<T2> me, Predicate<Complex> func) {
+        ComplexNDArray<T2> view = new ComplexNDArrayMaskView<>(me, func);
+        return view.length() == me.length() ? me.reshape(me.length()) : view;
+    }
+
+    public NDArray<T2> mask(InternalRealNDArray<T2> me, BiPredicate<T2,?> func, boolean withLinearIndices) {
+        NDArray<T2> view = new RealNDArrayMaskView<>(me, func, withLinearIndices);
+        return view.length() == me.length() ? me.reshape(me.length()) : view;
+    }
+    
+    public ComplexNDArray<T2> mask(InternalComplexNDArray<T2> me, BiPredicate<Complex,?> func, boolean withLinearIndices) {
+        ComplexNDArray<T2> view = new ComplexNDArrayMaskView<>(me, func, withLinearIndices);
+        return view.length() == me.length() ? me.reshape(me.length()) : view;
+    }
+
+    public NDArray<T2> permuteDims(InternalRealNDArray<T2> me, int... permutation) {
+        if (IntStream.range(0, me.ndims()).allMatch(i -> i == permutation[i])) return me;
+        RealNDArrayPermuteDimsView<T2> view = new RealNDArrayPermuteDimsView<>(me, permutation);
+        return IntStream.range(0, me.ndims()).allMatch(i -> i == view.dimsOrder[i]) ? view.parent : view;
+    }
+
+    @SuppressWarnings("unchecked")
     public ComplexNDArray<T2> permuteDims(InternalComplexNDArray<T2> me, int... permutation) {
-        return new ComplexNDArrayPermuteDimsView<>(me, permutation);
+        if (IntStream.range(0, me.ndims()).allMatch(i -> i == permutation[i])) return me;
+        ComplexNDArrayPermuteDimsView<T2> view = new ComplexNDArrayPermuteDimsView<>(me, permutation);
+        return IntStream.range(0, me.ndims()).allMatch(i -> i == view.dimsOrder[i]) ? (ComplexNDArray<T2>)view.parent : view;
     }
 
     public NDArray<T2> reshape(InternalRealNDArray<T2> me, int... newShape) {
+        if (Arrays.equals(newShape, me.dims())) return me;
+        if (me instanceof RealNDArrayReshapeView && Arrays.equals(((RealNDArrayReshapeView<T2>)me).parent.dims(), me.dims()))
+            return ((RealNDArrayReshapeView<T2>)me).parent;
         return new RealNDArrayReshapeView<>(me, newShape);
     }
 
+    @SuppressWarnings("unchecked")
     public ComplexNDArray<T2> reshape(InternalComplexNDArray<T2> me, int... newShape) {
+        if (Arrays.equals(newShape, me.dims())) return me;
+        if (me instanceof ComplexNDArrayReshapeView && Arrays.equals(((ComplexNDArrayReshapeView<T2>)me).parent.dims(), me.dims()))
+            return (ComplexNDArray<T2>)((ComplexNDArrayReshapeView<T2>)me).parent;
         return new ComplexNDArrayReshapeView<>(me, newShape);
     }
 
@@ -75,6 +125,7 @@ class ViewOperations<T,T2 extends Number> {
                 throw new IllegalArgumentException(String.format(Errors.CANNOT_SELECT_DIM_OVERFLOW, i, me.ndims()));
         });
         Set<Integer> set = IntStream.of(selectedDims).boxed().collect(Collectors.toSet());
+        if (set.size() == me.ndims()) return me;
         return me.slice(IntStream.range(0, me.ndims()).mapToObj(i -> {
             if (set.contains(i)) return ":";
             if (me.dims(i) != 1) throw new IllegalArgumentException(String.format(Errors.DROPDIMS_NOT_SINGLETON, i));
@@ -95,6 +146,7 @@ class ViewOperations<T,T2 extends Number> {
                 throw new IllegalArgumentException(String.format(Errors.CANNOT_DROP_DIM_OVERFLOW, i, me.ndims()));
         });
         List<Integer> set = IntStream.of(selectedDims).boxed().collect(Collectors.toList());
+        if (set.isEmpty()) throw new IllegalArgumentException(Errors.ALL_DIMS_DROPPED);
         return me.selectDims(IntStream.range(0, me.ndims()).filter(i -> !set.contains(i)).toArray());
     }
 

@@ -21,6 +21,12 @@ class TestRealInt8NDArrayPermuteDims {
     }
 
     @Test
+    void testPermuteDimsPermuteDims() {
+        NDArray<Byte> ppArray = pArray.permuteDims(0, 2, 1);
+        array.forEachWithCartesianIndices((value, indices) -> assertEquals(value, ppArray.get(indices)));
+    }
+
+    @Test
     void testGetNegativeLinearIndexing() {
         assertEquals((byte)39, pArray.get(-5));
     }
@@ -475,6 +481,39 @@ class TestRealInt8NDArrayPermuteDims {
         pArray.fill(3);
         for (Byte elem : pArray)
             assertEquals((byte)3, elem);
+    }
+
+    @Test
+    void testMaskPermuted() {
+        NDArray<Byte> mask = new RealInt8NDArray(pArray.map(value -> value > 20 ? (byte)1 : (byte)0));
+        NDArray<Byte> masked = pArray.mask(mask);
+        masked.forEach((value) -> assertTrue(value > 20));
+        masked.fill(0);
+        array.forEach(value -> assertTrue(value <= 20));
+    }
+
+    @Test
+    void testMaskPermutedWithPredicate() {
+        NDArray<Byte> masked = pArray.mask(value -> value > 20);
+        masked.forEach((value) -> assertTrue(value > 20));
+        masked.fill(0);
+        array.forEach(value -> assertTrue(value <= 20));
+    }
+
+    @Test
+    void testMaskPermutedWithPredicateWithLinearIndices() {
+        NDArray<Byte> masked = pArray.maskWithLinearIndices((value, i) -> value > 20 && i < 10);
+        masked.forEachWithLinearIndices((value, i) -> assertTrue(value > 20 && i < 10));
+        masked.fill(0);
+        pArray.forEachWithLinearIndices((value, i) -> assertTrue(value <= 20 || i >= 10));
+    }
+
+    @Test
+    void testMaskPermutedWithPredicateWithCartesianIndices() {
+        NDArray<Byte> masked = pArray.maskWithCartesianIndices((value, idx) -> value > 20 && idx[0] == 0);
+        masked.forEach(value -> assertTrue(value > 20));
+        masked.fill(0);
+        pArray.forEachWithCartesianIndices((value, idx) -> assertTrue(value <= 20 || idx[0] != 0));
     }
 
     @Test

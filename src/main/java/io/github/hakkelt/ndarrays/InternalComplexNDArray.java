@@ -1,5 +1,8 @@
 package io.github.hakkelt.ndarrays;
 
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
+
 import org.apache.commons.math3.complex.Complex;
 
 interface InternalComplexNDArray<T extends Number> extends ComplexNDArray<T> {
@@ -58,6 +61,26 @@ interface InternalComplexNDArray<T extends Number> extends ComplexNDArray<T> {
 
     public default ComplexNDArray<T> slice(Object ...slicingExpressions) {
         return new ViewOperations<Complex,T>().slice(this, slicingExpressions);
+    }
+
+    public default ComplexNDArray<T> mask(NDArray<?> mask) {
+        return new ViewOperations<Complex,T>().mask(this, mask, false);
+    }
+
+    public default ComplexNDArray<T> mask(Predicate<Complex> func) {
+        return new ViewOperations<Complex,T>().mask(this, func);
+    }
+
+    public default ComplexNDArray<T> maskWithLinearIndices(BiPredicate<Complex, Integer> func) {
+        return new ViewOperations<Complex,T>().mask(this, func, true);
+    }
+
+    public default ComplexNDArray<T> maskWithCartesianIndices(BiPredicate<Complex, int[]> func) {
+        return new ViewOperations<Complex,T>().mask(this, func, false);
+    }
+
+    public default ComplexNDArray<T> inverseMask(NDArray<?> mask) {
+        return new ViewOperations<Complex,T>().mask(this, mask, true);
     }
 
     public default ComplexNDArray<T> permuteDims(int... permutation) {

@@ -11,8 +11,13 @@ abstract class AbstractNDArrayPermuteDimsView<T,T2 extends Number> extends Abstr
     @SuppressWarnings("unchecked")
     protected AbstractNDArrayPermuteDimsView(NDArray<T> parent, int ...dimsOrder) {
         checkDimsOrder(dimsOrder, parent.dims());
-        this.parent = (AbstractNDArray<T,T2>)parent;
-        this.dimsOrder = dimsOrder;
+        if (parent instanceof AbstractNDArrayPermuteDimsView) {
+            this.parent = ((AbstractNDArrayPermuteDimsView<T,T2>)parent).parent;
+            this.dimsOrder = permuteArray(dimsOrder, ((AbstractNDArrayPermuteDimsView<T,T2>)parent).dimsOrder);
+        } else {
+            this.parent = (AbstractNDArray<T,T2>)parent;
+            this.dimsOrder = dimsOrder;
+        }
         this.dataLength = parent.length();
         this.dims = permuteArray(this.parent.dims, this.dimsOrder);
         this.multipliers = calculateMultipliers(this.dims);

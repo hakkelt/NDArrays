@@ -19,6 +19,12 @@ class TestRealF64NDArrayReshape {
     }
 
     @Test
+    void testReshapeReshaped() {
+        NDArray<Double> reshaped2 = reshaped.reshape(4, 5, 3);
+        array.forEachWithCartesianIndices((value, indices) -> assertEquals(value, reshaped2.get(indices)));
+    }
+
+    @Test
     void testGetNegativeLinearIndexing() {
         assertEquals(55, reshaped.get(-5));
     }
@@ -398,7 +404,7 @@ class TestRealF64NDArrayReshape {
     }
 
     @Test
-    void testFillFloat() {
+    void testFillDouble() {
         reshaped.fill(3);
         for (Double elem : reshaped)
             assertEquals(3, elem);
@@ -439,6 +445,39 @@ class TestRealF64NDArrayReshape {
         assertEquals(
             String.format(Errors.INVALID_PERMUTATOR, "[1, 1]", "20 × 3"),
             exception.getMessage());
+    }
+
+    @Test
+    void testMaskReshaped() {
+        NDArray<Byte> mask = new RealInt8NDArray(reshaped.map(value -> value > 20 ? (double)1 : (double)0));
+        NDArray<Double> masked = reshaped.mask(mask);
+        masked.forEach((value) -> assertTrue(value > 20));
+        masked.fill(0);
+        array.forEach(value -> assertTrue(value <= 20));
+    }
+
+    @Test
+    void testMaskReshapedWithPredicate() {
+        NDArray<Double> masked = reshaped.mask(value -> value > 20);
+        masked.forEach((value) -> assertTrue(value > 20));
+        masked.fill(0);
+        array.forEach(value -> assertTrue(value <= 20));
+    }
+
+    @Test
+    void testMaskReshapedWithPredicateWithLinearIndices() {
+        NDArray<Double> masked = reshaped.maskWithLinearIndices((value, i) -> value > 20 && i < 10);
+        masked.forEachWithLinearIndices((value, i) -> assertTrue(value > 20 && i < 10));
+        masked.fill(0);
+        reshaped.forEachWithLinearIndices((value, i) -> assertTrue(value <= 20 || i >= 10));
+    }
+
+    @Test
+    void testMaskReshapedWithPredicateWithCartesianIndices() {
+        NDArray<Double> masked = reshaped.maskWithCartesianIndices((value, idx) -> value > 20 && idx[0] == 0);
+        masked.forEach(value -> assertTrue(value > 20));
+        masked.fill(0);
+        reshaped.forEachWithCartesianIndices((value, idx) -> assertTrue(value <= 20 || idx[0] != 0));
     }
 
     @Test

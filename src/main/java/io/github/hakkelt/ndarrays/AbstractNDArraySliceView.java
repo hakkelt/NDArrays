@@ -149,19 +149,16 @@ abstract class AbstractNDArraySliceView<T,T2 extends Number> extends AbstractNDA
 
     @SuppressWarnings("unchecked")
     protected AbstractNDArraySliceView(NDArray<T> parent, Object ...slicingExpressions) {
-        this.parent = (AbstractNDArray<T,T2>)parent;
-        this.slicingExpression = new SlicingExpression(parent.dims(), slicingExpressions);
+        if (parent instanceof AbstractNDArraySliceView) {
+            this.parent = ((AbstractNDArraySliceView<T,T2>)parent).parent;
+            this.slicingExpression = new SlicingExpression(((AbstractNDArraySliceView<T,T2>)parent).slicingExpression, slicingExpressions);
+        } else {
+            this.parent = (AbstractNDArray<T,T2>)parent;
+            this.slicingExpression = new SlicingExpression(parent.dims(), slicingExpressions);
+        }
         this.dims = slicingExpression.resolveViewDims();
         this.multipliers = calculateMultipliers(this.dims);
         this.dataLength = length(this.dims);
-    }
-
-    protected AbstractNDArraySliceView(AbstractNDArraySliceView<T,T2> parent, Object ...slicingExpressions) {
-        this.parent = parent.parent;
-        this.slicingExpression = new SlicingExpression(parent.dims(), slicingExpressions);
-        this.dims = slicingExpression.resolveViewDims();
-        this.multipliers = AbstractNDArray.calculateMultipliers(this.dims);
-        this.dataLength = AbstractNDArray.length(this.dims);
     }
 
     @Override

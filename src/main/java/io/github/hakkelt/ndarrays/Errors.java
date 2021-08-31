@@ -74,7 +74,13 @@ class Errors {
         "Dimension mismatch: cannot slice %s array with the following slicing expression: %s";
     public static final String SLICE_OUT_OF_BOUNDS =
         "Bounds error: cannot slice %s array with the following slicing expression: %s";
-    static final String INVALID_RANGE =
+    public static final String INVALID_RANGE =
         "Invalid range: [%d, %d)";
+    public static final String MASK_DIMENSION_MISMATCH =
+        "Mask must have same shape as the array to be masked, but the array has shape of %s and the mask is of the shape %s!";
+    public static final String RESHAPE_LENGTH_MISMATCH = 
+        "Cannot reshape %s array to new shape %s: Number of elements doesn't match!";
+    public static final String ALL_DIMS_DROPPED = 
+        "Cannot drop all dimensions!";
     
 }
