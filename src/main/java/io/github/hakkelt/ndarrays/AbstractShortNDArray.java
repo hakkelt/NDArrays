@@ -1,7 +1,12 @@
 package io.github.hakkelt.ndarrays;
 
+/**
+ * Abstract NDArray class for short (16-bit integer) values.
+ */
 public abstract class AbstractShortNDArray extends AbstractRealNDArray<Short> {
 
+    protected AbstractShortNDArray() {}
+    
     protected Short wrapValue(Number value) {
         return Short.valueOf(value.shortValue());
     }

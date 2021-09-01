@@ -22,13 +22,13 @@ class RealNDArrayMaskView<T extends Number> extends AbstractNDArrayMaskView<T,T>
 
     @Override
     public void set(Number value, int linearIndex) {
-        linearIndex = boundaryCheck(linearIndex, length());
+        linearIndex = IndexingOperations.boundaryCheck(linearIndex, length());
         parent.set(value, indexMapper.get(linearIndex));
     }
 
     @Override
     public void set(Number value, int... indices) {
-        indices = boundaryCheck(indices, dims());
+        indices = IndexingOperations.boundaryCheck(indices, dims());
         parent.set(value, indexMapper.get(indices[0]));
     }
 

@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"io.github.hakkelt.ndarrays"}]
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"io.github.hakkelt.ndarrays"},{"l":"io.github.hakkelt.ndarrays.basic"}]

@@ -704,10 +704,4 @@ class TestLongNDArrayFunctions implements LongNDArrayConstructorTrait, ByteNDArr
                     assertEquals((long)2, array5.get(i, j, k));
     }
 
-    @Test
-    void testAbs() {
-        NDArray<Long> abs = getLongNDArrayClass().cast(array).abs();
-        array.streamLinearIndices()
-            .forEach(i -> assertTrue(Math.abs(array.get(i)) - abs.get(i) < 1e-5));
-    }
 }

@@ -1,6 +1,6 @@
 package io.github.hakkelt.ndarrays;
 
-public class RealNDArrayPermuteDimsView<T extends Number> extends AbstractNDArrayPermuteDimsView<T,T> implements InternalRealNDArray<T> {
+class RealNDArrayPermuteDimsView<T extends Number> extends AbstractNDArrayPermuteDimsView<T,T> implements InternalRealNDArray<T> {
     
     public RealNDArrayPermuteDimsView(NDArray<T> parent, int ...dimsOrder) {
         super(parent, dimsOrder);
@@ -17,7 +17,7 @@ public class RealNDArrayPermuteDimsView<T extends Number> extends AbstractNDArra
 
     @Override
     public void set(Number value, int ...indices) {
-        boundaryCheck(indices, dims);
+        IndexingOperations.boundaryCheck(indices, dims);
         parent.set(value, permuteArray(indices, dimsOrder));
     }
 

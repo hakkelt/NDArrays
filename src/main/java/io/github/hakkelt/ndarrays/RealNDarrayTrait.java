@@ -91,8 +91,6 @@ interface InternalRealNDArray<T extends Number> extends NDArray<T> {
         return new ViewOperations<T,T>().mask(this, mask, true);
     }
 
-    public NDArray<T> abs();
-
     public default NDArray<T> permuteDims(int... permutation) {
         return new ViewOperations<T,T>().permuteDims(this, permutation);
     }

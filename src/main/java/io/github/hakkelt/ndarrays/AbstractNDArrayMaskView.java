@@ -61,7 +61,7 @@ abstract class AbstractNDArrayMaskView<T,T2 extends Number> extends AbstractNDAr
             else
                 parent.streamCartesianIndices()
                     .filter(indices -> ((BiPredicate<T,int[]>)func).test(parent.get(indices), indices))
-                    .mapToInt(indices -> this.parent.resolveIndices(indices))
+                    .mapToInt(indices -> IndexingOperations.cartesianIndicesToLinearIndex(indices, this.parent.dims, this.parent.multipliers))
                     .forEach(i -> indexMapper.add(((AbstractNDArrayMaskView<T,T2>)parent).indexMapper.get(i)));
         } else {
             this.parent = (AbstractNDArray<T,T2>)parent;
@@ -72,7 +72,7 @@ abstract class AbstractNDArrayMaskView<T,T2 extends Number> extends AbstractNDAr
             else
                 parent.streamCartesianIndices()
                     .filter(indices -> ((BiPredicate<T,int[]>)func).test(parent.get(indices), indices))
-                    .mapToInt(indices -> this.parent.resolveIndices(indices))
+                    .mapToInt(indices -> IndexingOperations.cartesianIndicesToLinearIndex(indices, this.parent.dims, this.parent.multipliers))
                     .forEach(i -> indexMapper.add(i));
         }
         this.dataLength = indexMapper.size();
@@ -82,31 +82,31 @@ abstract class AbstractNDArrayMaskView<T,T2 extends Number> extends AbstractNDAr
 
     @Override
     public T get(int linearIndex) {
-        linearIndex = boundaryCheck(linearIndex, length());
+        linearIndex = IndexingOperations.boundaryCheck(linearIndex, length());
         return parent.get(indexMapper.get(linearIndex));
     }
 
     @Override
     public T get(int... indices) {
-        indices = boundaryCheck(indices, dims());
+        indices = IndexingOperations.boundaryCheck(indices, dims());
         return parent.get(indexMapper.get(indices[0]));
     }
 
     @Override
     public void set(T value, int linearIndex) {
-        linearIndex = boundaryCheck(linearIndex, length());
+        linearIndex = IndexingOperations.boundaryCheck(linearIndex, length());
         parent.set(value, indexMapper.get(linearIndex));
     }
 
     @Override
     public void set(T value, int... indices) {
-        indices = boundaryCheck(indices, dims());
+        indices = IndexingOperations.boundaryCheck(indices, dims());
         parent.set(value, indexMapper.get(indices[0]));
     }
 
     @Override
     protected String printItem(int linearIndex, String format) {
-        linearIndex = boundaryCheck(linearIndex, length());
+        linearIndex = IndexingOperations.boundaryCheck(linearIndex, length());
         return parent.printItem(indexMapper.get(linearIndex), format);
     }
 

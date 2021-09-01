@@ -2,8 +2,6 @@ package io.github.hakkelt.ndarrays;
 
 import java.lang.reflect.Array;
 import java.util.AbstractCollection;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -119,7 +117,7 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
     }
 
     public String contentToString() {
-        return Printer.contentToString(this::resolveIndices, this::dataTypeAsString, this::printItem, name(), dims);
+        return Printer.contentToString(this::dataTypeAsString, this::printItem, name(), dims, multipliers);
     }
 
     public int size() {
@@ -142,14 +140,6 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
         if (axis < 0 || axis >= ndims())
             throw new IllegalArgumentException(String.format(Errors.PARAMETER_MUST_BE_BETWEEN, "axis", 0, ndims() - 1, axis));
         return dims[axis];
-    }
-
-    public T get(int ... indices) {
-        return get(resolveIndices(indices));
-    }
-
-    public void set(T value, int... indices) {
-        set(value, resolveIndices(indices));
     }
 
     public boolean equals(Object obj) {
@@ -180,25 +170,6 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
         AbstractNDArray<T,T2> newArray = (AbstractNDArray<T,T2>)createNewNDArrayOfSameTypeAsMe(dims);
         newArray.baseConstuctor(dims);
         return newArray.copyFrom(this);
-    }
-
-    public NDArray<T2> abs() {
-        return streamLinearIndices()
-            .mapToObj(i -> {
-                if (eltype() == Float.class)
-                    return wrapValue(Math.abs(((Number)get(i)).floatValue()));
-                if (eltype() == Double.class)
-                    return wrapValue(Math.abs(((Number)get(i)).doubleValue()));
-                if (eltype() == Byte.class)
-                    return wrapValue(Math.abs(((Number)get(i)).byteValue()));
-                if (eltype() == Short.class)
-                    return wrapValue(Math.abs(((Number)get(i)).shortValue()));
-                if (eltype() == Integer.class)
-                    return wrapValue(Math.abs(((Number)get(i)).intValue()));
-                if (eltype() == Long.class)
-                    return wrapValue(Math.abs(((Number)get(i)).longValue()));
-                throw new IllegalArgumentException();
-            }).collect(getRealCollectorInternal(dims));
     }
 
     public T sum() {
@@ -278,7 +249,8 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
     }
     
     public Stream<int[]> streamCartesianIndices() {
-        return streamLinearIndices().mapToObj(i -> linearIndexToCartesianIndices(i, multipliers, ndims(), length()));
+        return streamLinearIndices().mapToObj(i ->
+            IndexingOperations.linearIndexToCartesianIndices(i, multipliers, ndims(), length()));
     }
 
     protected abstract String name();
@@ -341,66 +313,11 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
         return multipliers;
     }
 
-    protected static int boundaryCheck(int linearIndex, int length) {
-        if (linearIndex < -length || linearIndex >= length)
-            throw new ArrayIndexOutOfBoundsException(
-                String.format(Errors.LINEAR_BOUNDS_ERROR, length, linearIndex));
-        return linearIndex < 0 ? linearIndex + length : linearIndex;
-    }
-
-    protected static int[] boundaryCheck(int[] indices, int[] dims) {
-        indices = indices.clone();
-        if (indices.length != dims.length)
-            throw new IllegalArgumentException(
-                String.format(Errors.DIMENSION_MISMATCH, indices.length, dims.length));
-        for (int i = 0; i < indices.length; i++) {
-            if (indices[i] < -dims[i] || indices[i] >= dims[i])
-                throw new ArrayIndexOutOfBoundsException(
-                    String.format(Errors.CARTESIAN_BOUNDS_ERROR, Printer.dimsToString(dims), Arrays.toString(indices)));
-            if (indices[i] < 0)
-                indices[i] += dims[i];
-        }
-        return indices;
-    }
-
     protected static int length(int[] dims) {
         int len = 1;
         for (int i = 0; i < dims.length; i++)
             len *= dims[i];
         return len;
-    }
-
-    protected static int[] linearIndexToCartesianIndices(int linearIndex, int[] multipliers, int ndims, int length) {
-        linearIndex = boundaryCheck(linearIndex, length);
-        int[] indices = new int[ndims];
-        for (int i = ndims - 1; i >=0; i--) {
-            indices[i] = linearIndex / multipliers[i];
-            linearIndex -= indices[i] * multipliers[i];
-        }
-        return indices;
-    }
-
-    protected static int[] computeDims(Object[] input) {
-        List<Integer> dimsList = new ArrayList<>();
-        return listToArray(computeDimsInternal(dimsList, input));
-    }
-
-    protected static List<Integer> computeDimsInternal(List<Integer> dimsSoFar, Object[] input) {
-        dimsSoFar.add(input.length);
-        if (input[0].getClass().equals(float[].class)) {
-            dimsSoFar.add(((float[])input[0]).length);
-            return dimsSoFar;
-        } else if (input[0].getClass().equals(double[].class)) {
-            dimsSoFar.add(((double[])input[0]).length);
-            return dimsSoFar;
-        } else if (input[0].getClass().isArray())
-            return computeDimsInternal(dimsSoFar, (Object[])input[0]);
-        else
-            throw new IllegalArgumentException(Errors.INPUT_MUST_BE_ARRAY);
-    }
-
-    protected static int[] listToArray(List<Integer> input) {
-        return input.stream().mapToInt(Integer::intValue).toArray();
     }
 
     protected void baseConstuctor(int... dims) {
@@ -455,14 +372,6 @@ abstract class AbstractNDArray<T,T2 extends Number> extends AbstractCollection<T
             else
                 copyToArray(dimension + 1, index, (Object[]) destination[i]);
         }
-    }
-
-    protected int resolveIndices(int... indices) {
-        indices = boundaryCheck(indices, dims);
-        int internalIndex = 0;
-        for (int i = 0; i < indices.length; i++)
-            internalIndex += indices[i] * multipliers[i];
-        return internalIndex;
     }
 
 }

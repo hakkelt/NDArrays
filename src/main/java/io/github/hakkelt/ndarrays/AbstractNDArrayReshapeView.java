@@ -16,8 +16,8 @@ abstract class AbstractNDArrayReshapeView<T,T2 extends Number> extends AbstractN
 
     @Override
     public T get(int ...indices) {
-        boundaryCheck(indices, dims);
-        return parent.get(resolveIndices(indices));
+        IndexingOperations.boundaryCheck(indices, dims);
+        return parent.get(IndexingOperations.cartesianIndicesToLinearIndex(indices, dims, multipliers));
     }
 
     @Override
@@ -27,8 +27,8 @@ abstract class AbstractNDArrayReshapeView<T,T2 extends Number> extends AbstractN
 
     @Override
     public void set(T value, int ...indices) {
-        boundaryCheck(indices, dims);
-        parent.set(value, resolveIndices(indices));
+        IndexingOperations.boundaryCheck(indices, dims);
+        parent.set(value, IndexingOperations.cartesianIndicesToLinearIndex(indices, dims, multipliers));
     }
 
     @Override

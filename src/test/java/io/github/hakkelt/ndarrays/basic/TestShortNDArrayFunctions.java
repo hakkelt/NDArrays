@@ -703,10 +703,4 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
                     assertEquals((short)2, array5.get(i, j, k));
     }
 
-    @Test
-    void testAbs() {
-        NDArray<Short> abs = getShortNDArrayClass().cast(array).abs();
-        array.streamLinearIndices()
-            .forEach(i -> assertTrue(Math.abs(array.get(i)) - abs.get(i) < 1e-5));
-    }
 }

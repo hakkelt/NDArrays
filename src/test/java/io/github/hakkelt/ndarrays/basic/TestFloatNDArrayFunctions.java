@@ -717,10 +717,4 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
                     assertEquals(2, array5.get(i, j, k));
     }
 
-    @Test
-    void testAbs() {
-        NDArray<Float> abs = getFloatNDArrayClass().cast(array).abs();
-        array.streamLinearIndices()
-            .forEach(i -> assertTrue(Math.abs(array.get(i)) - abs.get(i) < 1e-5));
-    }
 }

@@ -1,6 +1,11 @@
 package io.github.hakkelt.ndarrays;
 
+/**
+ * Abstract NDArray class for byte (8-bit integer) values.
+ */
 public abstract class AbstractByteNDArray extends AbstractRealNDArray<Byte> {
+
+    protected AbstractByteNDArray() {}
 
     protected Byte wrapValue(Number value) {
         return Byte.valueOf(value.byteValue());

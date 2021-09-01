@@ -11,6 +11,10 @@ import java.util.stream.Collector;
 
 import org.apache.commons.math3.complex.Complex;
 
+/**
+ * Collector to collect values from a stream of Complex values into the specified ComplexNDArray.
+ * ComplexNDArray interface requires getCollector function to be implemented and to return a ComplexNDArrayCollector.
+ */
 public class ComplexNDArrayCollector<T extends Number> implements Collector<Object, List<Object>, NDArray<Complex>> {
     int[] dims;
     ComplexNDArray<T> destination;

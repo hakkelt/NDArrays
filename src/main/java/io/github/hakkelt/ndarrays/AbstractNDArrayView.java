@@ -231,7 +231,7 @@ abstract class AbstractNDArrayView<T,T2 extends Number> extends AbstractNDArray<
     }
     
     public int[] linearIndexToViewIndices(int linearIndex) {
-        return linearIndexToCartesianIndices(linearIndex, multipliers, ndims(), dataLength);
+        return IndexingOperations.linearIndexToCartesianIndices(linearIndex, multipliers, ndims(), dataLength);
     }
 
     @Override

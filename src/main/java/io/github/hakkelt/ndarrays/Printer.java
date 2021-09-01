@@ -2,7 +2,6 @@ package io.github.hakkelt.ndarrays;
 
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
-import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -17,11 +16,11 @@ class Printer {
     private Printer() {}
 
     public static String contentToString(
-            ToIntFunction<int[]> resolveIndices,
             Supplier<String> dataTypeAsString,
             BiFunction<Integer, String, String> printItem,
             String name,
-            int[] dims) {
+            int[] dims,
+            int[] multipliers) {
         String dataType = dataTypeAsString.get();
         String str = name + " NDArray<" + dataType + ">(" + dimsToString(dims) + ")" + System.lineSeparator();
         String format = dataType.equals("Byte") || dataType.equals("Short") || dataType.equals("Integer") || dataType.equals("Long") ?
@@ -31,7 +30,7 @@ class Printer {
         else if (dims.length == 2)
             str += printMatrix(0, dims[1], dims[0], format, printItem);
         else
-            str += printNDArray(dims.length - 1, new int[dims.length - 2], resolveIndices, printItem, format, dims);
+            str += printNDArray(dims.length - 1, new int[dims.length - 2], printItem, format, dims, multipliers);
         return str;
     }
     
@@ -68,10 +67,10 @@ class Printer {
     static String printNDArray(
             int dimension,
             int[] indices,
-            ToIntFunction<int[]> resolveIndices,
             BiFunction<Integer, String, String> printItem,
             String format,
-            int[] dims) {
+            int[] dims,
+            int[] multipliers) {
         StringBuilder str = new StringBuilder();
         for (indices[dimension - 2] = 0; indices[dimension - 2] < dims[dimension]; indices[dimension - 2]++) {
             if (dimension == 2) {
@@ -80,10 +79,10 @@ class Printer {
                 int[] startIndices = new int[dims.length];
                 for (int j = 2; j < dims.length; j++)
                     startIndices[j] = indices[j - 2];
-                str.append(printMatrix(resolveIndices.applyAsInt(startIndices), dims[1], dims[0], format, printItem));
+                str.append(printMatrix(IndexingOperations.cartesianIndicesToLinearIndex(startIndices, dims, multipliers), dims[1], dims[0], format, printItem));
                 str.append(System.lineSeparator());
             } else {
-                str.append(printNDArray(dimension - 1, indices, resolveIndices, printItem, format, dims));
+                str.append(printNDArray(dimension - 1, indices, printItem, format, dims, multipliers));
             }
         }
         return str.toString();

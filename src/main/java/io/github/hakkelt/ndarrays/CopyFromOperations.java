@@ -1,5 +1,6 @@
 package io.github.hakkelt.ndarrays;
 
+import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import org.apache.commons.math3.complex.Complex;
@@ -7,42 +8,67 @@ import org.apache.commons.math3.complex.Complex;
 class CopyFromOperations<T,T2 extends Number> {
     
     public NDArray<T> copyFrom(AbstractNDArray<T,T2> me, float[] array) {
+        if (me.ndims() > 1 || me.dims[0] != array.length)
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, String.valueOf(array.length), Printer.dimsToString(me.dims)));
         flatten(me, array, 0, 0);
         return me;
     }
 
     public NDArray<T> copyFrom(AbstractNDArray<T,T2> me, double[] array) {
+        if (me.ndims() > 1 || me.dims[0] != array.length)
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, String.valueOf(array.length), Printer.dimsToString(me.dims)));
         flatten(me, array, 0, 0);
         return me;
     }
 
     public NDArray<T> copyFrom(AbstractNDArray<T,T2> me, byte[] array) {
+        if (me.ndims() > 1 || me.dims[0] != array.length)
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, String.valueOf(array.length), Printer.dimsToString(me.dims)));
         flatten(me, array, 0, 0);
         return me;
     }
 
     public NDArray<T> copyFrom(AbstractNDArray<T,T2> me, short[] array) {
+        if (me.ndims() > 1 || me.dims[0] != array.length)
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, String.valueOf(array.length), Printer.dimsToString(me.dims)));
         flatten(me, array, 0, 0);
         return me;
     }
 
     public NDArray<T> copyFrom(AbstractNDArray<T,T2> me, int[] array) {
+        if (me.ndims() > 1 || me.dims[0] != array.length)
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, String.valueOf(array.length), Printer.dimsToString(me.dims)));
         flatten(me, array, 0, 0);
         return me;
     }
 
     public NDArray<T> copyFrom(AbstractNDArray<T,T2> me, long[] array) {
+        if (me.ndims() > 1 || me.dims[0] != array.length)
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, String.valueOf(array.length), Printer.dimsToString(me.dims)));
         flatten(me, array, 0, 0);
         return me;
     }
 
     public NDArray<T> copyFrom(AbstractNDArray<T,T2> me, Object[] array) {
+        int[] arrayDims = IndexingOperations.computeDims(array);
+        if (!Arrays.equals(me.dims(), arrayDims))
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, Printer.dimsToString(arrayDims), Printer.dimsToString(me.dims())));
         flatten(me, array, 0, 0);
         return me;
     }
 
     @SuppressWarnings("unchecked")
     public NDArray<T2> copyFrom(InternalRealNDArray<T2> me, NDArray<? extends Number> array) {
+        if (!Arrays.equals(me.dims(), array.dims()))
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, Printer.dimsToString(array.dims()), Printer.dimsToString(me.dims())));
         me.streamLinearIndices().parallel()
             .forEach(i -> me.set(((AbstractNDArray<T2,T2>)me).wrapValue(array.get(i)), i));
         return me;
@@ -50,41 +76,66 @@ class CopyFromOperations<T,T2 extends Number> {
 
     @SuppressWarnings("unchecked")
     public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, float[] array) {
+        if (me.ndims() > 1 || me.dims(0) != array.length)
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, String.valueOf(array.length), Printer.dimsToString(me.dims())));
         return (ComplexNDArray<T2>)copyFrom((AbstractNDArray<T,T2>)me, array);
     }
 
     @SuppressWarnings("unchecked")
     public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, double[] array) {
+        if (me.ndims() > 1 || me.dims(0) != array.length)
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, String.valueOf(array.length), Printer.dimsToString(me.dims())));
         return (ComplexNDArray<T2>)copyFrom((AbstractNDArray<T,T2>)me, array);
     }
 
     @SuppressWarnings("unchecked")
     public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, byte[] array) {
+        if (me.ndims() > 1 || me.dims(0) != array.length)
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, String.valueOf(array.length), Printer.dimsToString(me.dims())));
         return (ComplexNDArray<T2>)copyFrom((AbstractNDArray<T,T2>)me, array);
     }
 
     @SuppressWarnings("unchecked")
     public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, short[] array) {
+        if (me.ndims() > 1 || me.dims(0) != array.length)
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, String.valueOf(array.length), Printer.dimsToString(me.dims())));
         return (ComplexNDArray<T2>)copyFrom((AbstractNDArray<T,T2>)me, array);
     }
 
     @SuppressWarnings("unchecked")
     public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, int[] array) {
+        if (me.ndims() > 1 || me.dims(0) != array.length)
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, String.valueOf(array.length), Printer.dimsToString(me.dims())));
         return (ComplexNDArray<T2>)copyFrom((AbstractNDArray<T,T2>)me, array);
     }
 
     @SuppressWarnings("unchecked")
     public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, long[] array) {
+        if (me.ndims() > 1 || me.dims(0) != array.length)
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, String.valueOf(array.length), Printer.dimsToString(me.dims())));
         return (ComplexNDArray<T2>)copyFrom((AbstractNDArray<T,T2>)me, array);
     }
 
     @SuppressWarnings("unchecked")
     public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, Object[] array) {
+        int[] arrayDims = IndexingOperations.computeDims(array);
+        if (!Arrays.equals(me.dims(), arrayDims))
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, Printer.dimsToString(arrayDims), Printer.dimsToString(me.dims())));
         return (ComplexNDArray<T2>)copyFrom((AbstractNDArray<T,T2>)me, array);
     }
 
     @SuppressWarnings("unchecked")
     public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, NDArray<?> array) {
+        if (!Arrays.equals(me.dims(), array.dims()))
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, Printer.dimsToString(array.dims()), Printer.dimsToString(me.dims())));
         me.streamLinearIndices().parallel()
             .forEach(i -> {
                 if (array.eltype() == Complex.class)
@@ -96,43 +147,68 @@ class CopyFromOperations<T,T2 extends Number> {
     }
 
     public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, float[] real, float[] imag) {
+        if (me.ndims() > 1 || me.dims(0) != real.length)
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, String.valueOf(real.length), Printer.dimsToString(me.dims())));
         flatten(me, real, imag, 0, 0);
         return me;
     }
 
     public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, double[] real, double[] imag) {
+        if (me.ndims() > 1 || me.dims(0) != real.length)
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, String.valueOf(real.length), Printer.dimsToString(me.dims())));
         flatten(me, real, imag, 0, 0);
         return me;
     }
 
     public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, byte[] real, byte[] imag) {
+        if (me.ndims() > 1 || me.dims(0) != real.length)
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, String.valueOf(real.length), Printer.dimsToString(me.dims())));
         flatten(me, real, imag, 0, 0);
         return me;
     }
 
     public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, short[] real, short[] imag) {
+        if (me.ndims() > 1 || me.dims(0) != real.length)
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, String.valueOf(real.length), Printer.dimsToString(me.dims())));
         flatten(me, real, imag, 0, 0);
         return me;
     }
 
     public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, int[] real, int[] imag) {
+        if (me.ndims() > 1 || me.dims(0) != real.length)
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, String.valueOf(real.length), Printer.dimsToString(me.dims())));
         flatten(me, real, imag, 0, 0);
         return me;
     }
 
     public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, long[] real, long[] imag) {
+        if (me.ndims() > 1 || me.dims(0) != real.length)
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, String.valueOf(real.length), Printer.dimsToString(me.dims())));
         flatten(me, real, imag, 0, 0);
         return me;
     }
 
     public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, Object[] real, Object[] imag) {
+        int[] arrayDims = IndexingOperations.computeDims(real);
+        if (!Arrays.equals(me.dims(), arrayDims))
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, Printer.dimsToString(arrayDims), Printer.dimsToString(me.dims())));
         flatten(me, real, imag, 0, 0);
         return me;
     }
 
     public ComplexNDArray<T2> copyFrom(ComplexNDArrayTrait<T2> me, NDArray<? extends Number> real, NDArray<? extends Number> imag) {
-        if (real.eltype() == Complex.class || imag.eltype() == Complex.class)
-            throw new IllegalArgumentException();
+        if (!Arrays.equals(me.dims(), real.dims()))
+            throw new IllegalArgumentException(String.format(
+                Errors.INCOMPATIBLE_SIZE, Printer.dimsToString(real.dims()), Printer.dimsToString(me.dims())));
+        if (!Arrays.equals(real.dims(), imag.dims()))
+            throw new IllegalArgumentException(Errors.ARRAYS_DIFFER_IN_SIZE);
         me.streamLinearIndices().parallel()
             .forEach(i -> {
                 me.setReal(real.get(i), i);
@@ -176,14 +252,22 @@ class CopyFromOperations<T,T2 extends Number> {
         for (Object obj : realOrComplex) {
             if (obj.getClass().equals(float[].class)) {
                 flatten(me, (float[]) obj, startIndex + i++ * me.multipliers[dimension], dimension + 1);
-            } else if (obj.getClass().equals(double[].class)) {
+            } else if (obj.getClass().equals(long[].class)) {
                 flatten(me, (double[]) obj, startIndex + i++ * me.multipliers[dimension], dimension + 1);
+            } else if (obj.getClass().equals(double[].class)) {
+                flatten(me, (byte[]) obj, startIndex + i++ * me.multipliers[dimension], dimension + 1);
+            } else if (obj.getClass().equals(byte[].class)) {
+                flatten(me, (short[]) obj, startIndex + i++ * me.multipliers[dimension], dimension + 1);
+            } else if (obj.getClass().equals(short[].class)) {
+                flatten(me, (int[]) obj, startIndex + i++ * me.multipliers[dimension], dimension + 1);
+            } else if (obj.getClass().equals(int[].class)) {
+                flatten(me, (long[]) obj, startIndex + i++ * me.multipliers[dimension], dimension + 1);
             } else if (obj.getClass().equals(Complex[].class)) {
                 flatten(me, (Complex[]) obj, startIndex + i++ * me.multipliers[dimension], dimension + 1);
             } else if (obj.getClass().isArray()) {
                 flatten(me, (Object[]) obj, startIndex + i++ * me.multipliers[dimension], dimension + 1);
             } else {
-                throw new IllegalArgumentException(Errors.NOT_FLOAT_ARRAY);
+                throw new IllegalArgumentException(String.format(Errors.COPY_FROM_UNSUPPORTED_TYPE, obj.getClass().getSimpleName()));
             }
         }
     }

@@ -1,7 +1,12 @@
 package io.github.hakkelt.ndarrays;
 
+/**
+ * Abstract NDArray class for int (32-bit integer) values.
+ */
 public abstract class AbstractIntegerNDArray extends AbstractRealNDArray<Integer> {
 
+    protected AbstractIntegerNDArray() {}
+    
     protected Integer wrapValue(Number value) {
         return Integer.valueOf(value.intValue());
     }

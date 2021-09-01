@@ -9,6 +9,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
+/**
+ * Collector to collect values from a stream of Number values into the specified NDArray.
+ * NDArray interface requires getCollector function to be implemented and to return a NDArrayCollector.
+ */
 public class RealNDArrayCollector<T extends Number> implements Collector<Object, List<Object>, NDArray<T>> {
     int[] dims;
     NDArray<T> destination;

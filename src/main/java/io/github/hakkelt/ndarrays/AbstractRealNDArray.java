@@ -5,11 +5,11 @@ import java.util.stream.Collector;
 
 import org.apache.commons.math3.complex.Complex;
 
-public abstract class AbstractRealNDArray<T extends Number> extends AbstractNDArray<T,T> implements InternalRealNDArray<T> {
+abstract class AbstractRealNDArray<T extends Number> extends AbstractNDArray<T,T> implements InternalRealNDArray<T> {
     
     @Override
     public void set(Number value, int... indices) {
-        set(value, resolveIndices(indices));
+        set(value, IndexingOperations.cartesianIndicesToLinearIndex(indices, dims, multipliers));
     }
 
     protected String printItem(int index, String format) {

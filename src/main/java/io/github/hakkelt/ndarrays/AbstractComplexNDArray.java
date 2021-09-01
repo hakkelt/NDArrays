@@ -7,44 +7,15 @@ import java.util.stream.Collector;
 
 import org.apache.commons.math3.complex.Complex;
 
+/**
+ * Abstract NDArray class for Complex values.
+ */
 public abstract class AbstractComplexNDArray<T extends Number> extends AbstractNDArray<Complex,T> implements ComplexNDArrayTrait<T> {
+
+    protected AbstractComplexNDArray() {}
 
     public Object eltype() {
         return Complex.class;
-    }
-
-    public Complex get(int linearIndex) {
-        return new Complex(getReal(linearIndex).doubleValue(), getImag(linearIndex).doubleValue());
-    }
-    
-    public T getReal(int... indices) {
-        return getReal(resolveIndices(indices));
-    }
-
-    public T getImag(int... indices) {
-        return getImag(resolveIndices(indices));
-    }
-
-    public void set(Complex value, int linearIndex) {
-        setReal(value.getReal(), linearIndex);
-        setImag(value.getImaginary(), linearIndex);
-    }
-
-    public void set(Number value, int linearIndex) {
-        setReal(value, linearIndex);
-        setImag(0, linearIndex);
-    }
-    
-    public void set(Number value, int... indices) {
-        set(value, resolveIndices(indices));
-    }
-
-    public void setReal(Number value, int... indices) {
-        setReal(value, resolveIndices(indices));
-    }
-
-    public void setImag(Number value, int... indices) {
-        setImag(value, resolveIndices(indices));
     }
 
     public String dataTypeAsString() {
@@ -88,7 +59,6 @@ public abstract class AbstractComplexNDArray<T extends Number> extends AbstractN
     }
 
     protected abstract ComplexNDArray<T> createNewNDArrayOfSameTypeAsMe(int... dims);
-    protected abstract NDArray<T> createNewRealNDArrayOfSameTypeAsMe(int... dims);
 
     protected Complex accumulateAtIndex(int linearIndex, AccumulateOperators operator, Object ...objects) {
         Complex acc = get(linearIndex);

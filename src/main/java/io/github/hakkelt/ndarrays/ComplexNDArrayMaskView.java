@@ -25,57 +25,61 @@ class ComplexNDArrayMaskView<T extends Number> extends AbstractNDArrayMaskView<C
     @Override
     @SuppressWarnings("unchecked")
     public T getReal(int linearIndex) {
-        linearIndex = boundaryCheck(linearIndex, length());
+        linearIndex = IndexingOperations.boundaryCheck(linearIndex, length());
         return ((ComplexNDArray<T>)parent).getReal(indexMapper.get(linearIndex));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public T getReal(int... indices) {
-        indices = boundaryCheck(indices, dims());
-        return ((ComplexNDArray<T>)parent).getReal(indexMapper.get(parent.resolveIndices(indices)));
+        indices = IndexingOperations.boundaryCheck(indices, dims());
+        return ((ComplexNDArray<T>)parent).getReal(indexMapper.get(
+            IndexingOperations.cartesianIndicesToLinearIndex(indices, parent.dims, parent.multipliers)));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public T getImag(int linearIndex) {
-        linearIndex = boundaryCheck(linearIndex, length());
+        linearIndex = IndexingOperations.boundaryCheck(linearIndex, length());
         return ((ComplexNDArray<T>)parent).getImag(indexMapper.get(linearIndex));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public T getImag(int... indices) {
-        indices = boundaryCheck(indices, dims());
-        return ((ComplexNDArray<T>)parent).getImag(indexMapper.get(parent.resolveIndices(indices)));
+        indices = IndexingOperations.boundaryCheck(indices, dims());
+        return ((ComplexNDArray<T>)parent).getImag(indexMapper.get(
+            IndexingOperations.cartesianIndicesToLinearIndex(indices, parent.dims, parent.multipliers)));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void setReal(Number value, int linearIndex) {
-        linearIndex = boundaryCheck(linearIndex, length());
+        linearIndex = IndexingOperations.boundaryCheck(linearIndex, length());
         ((ComplexNDArray<T>)parent).setReal(value, indexMapper.get(linearIndex));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void setReal(Number value, int... indices) {
-        indices = boundaryCheck(indices, dims());
-        ((ComplexNDArray<T>)parent).setReal(value, indexMapper.get(parent.resolveIndices(indices)));
+        indices = IndexingOperations.boundaryCheck(indices, dims());
+        ((ComplexNDArray<T>)parent).setReal(value, indexMapper.get(
+            IndexingOperations.cartesianIndicesToLinearIndex(indices, parent.dims, parent.multipliers)));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void setImag(Number value, int linearIndex) {
-        linearIndex = boundaryCheck(linearIndex, length());
+        linearIndex = IndexingOperations.boundaryCheck(linearIndex, length());
         ((ComplexNDArray<T>)parent).setImag(value, indexMapper.get(linearIndex));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void setImag(Number value, int... indices) {
-        indices = boundaryCheck(indices, dims());
-        ((ComplexNDArray<T>)parent).setImag(value, indexMapper.get(parent.resolveIndices(indices)));
+        indices = IndexingOperations.boundaryCheck(indices, dims());
+        ((ComplexNDArray<T>)parent).setImag(value, indexMapper.get(
+            IndexingOperations.cartesianIndicesToLinearIndex(indices, parent.dims, parent.multipliers)));
     }
     
     public NDArray<T> real() {

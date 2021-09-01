@@ -17,7 +17,7 @@ class RealNDArrayReshapeView<T extends Number> extends AbstractNDArrayReshapeVie
 
     @Override
     public void set(Number value, int... indices) {
-        set(value, resolveIndices(indices));
+        set(value, IndexingOperations.cartesianIndicesToLinearIndex(indices, dims, multipliers));
     }
 
     public NDArray<T> copyFrom(NDArray<?> array) {

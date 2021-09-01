@@ -30,7 +30,7 @@ abstract class AbstractNDArrayPermuteDimsView<T,T2 extends Number> extends Abstr
 
     @Override
     public T get(int ...indices) {
-        boundaryCheck(indices, dims);
+        IndexingOperations.boundaryCheck(indices, dims);
         return parent.get(permuteArray(indices, dimsOrder));
     }
 
@@ -46,20 +46,20 @@ abstract class AbstractNDArrayPermuteDimsView<T,T2 extends Number> extends Abstr
 
     @Override
     public void set(T value, int ...indices) {
-        boundaryCheck(indices, dims);
+        IndexingOperations.boundaryCheck(indices, dims);
         parent.set(value, permuteArray(indices, dimsOrder));
     }
 
     @Override
     public void set(Number value, int ...indices) {
-        boundaryCheck(indices, dims);
+        IndexingOperations.boundaryCheck(indices, dims);
         parent.set(value, permuteArray(indices, dimsOrder));
     }
 
     @Override
     protected String printItem(int index, String format) {
         int[] viewIndices = linearIndexToViewIndices(index);
-        int parentLinearIndex = parent.resolveIndices(permuteArray(viewIndices, dimsOrder));
+        int parentLinearIndex = IndexingOperations.cartesianIndicesToLinearIndex(permuteArray(viewIndices, dimsOrder), parent.dims, parent.multipliers);
         return parent.printItem(parentLinearIndex, format);
     }
 

@@ -1,7 +1,12 @@
 package io.github.hakkelt.ndarrays;
 
+/**
+ * Abstract NDArray class for double (64-bit floating point) values.
+ */
 public abstract class AbstractFloatNDArray extends AbstractRealNDArray<Float> {
 
+    protected AbstractFloatNDArray() {}
+    
     protected Float wrapValue(Number value) {
         return Float.valueOf(value.floatValue());
     }

@@ -21,15 +21,15 @@ class ComplexNDArrayReshapeView<T extends Number> extends AbstractNDArrayReshape
     @Override
     @SuppressWarnings("unchecked")
     public T getReal(int ...indices) {
-        boundaryCheck(indices, dims);
-        return ((ComplexNDArray<T>)parent).getReal(resolveIndices(indices));
+        IndexingOperations.boundaryCheck(indices, dims);
+        return ((ComplexNDArray<T>)parent).getReal(IndexingOperations.cartesianIndicesToLinearIndex(indices, dims, multipliers));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public T getImag(int ...indices) {
-        boundaryCheck(indices, dims);
-        return ((ComplexNDArray<T>)parent).getImag(resolveIndices(indices));
+        IndexingOperations.boundaryCheck(indices, dims);
+        return ((ComplexNDArray<T>)parent).getImag(IndexingOperations.cartesianIndicesToLinearIndex(indices, dims, multipliers));
     }
 
     @Override
@@ -47,8 +47,8 @@ class ComplexNDArrayReshapeView<T extends Number> extends AbstractNDArrayReshape
     @Override
     @SuppressWarnings("unchecked")
     public void setReal(Number value, int ...indices) {
-        boundaryCheck(indices, dims);
-        ((ComplexNDArray<T>)parent).setReal(value, resolveIndices(indices));
+        IndexingOperations.boundaryCheck(indices, dims);
+        ((ComplexNDArray<T>)parent).setReal(value, IndexingOperations.cartesianIndicesToLinearIndex(indices, dims, multipliers));
     }
 
     @Override
@@ -60,8 +60,8 @@ class ComplexNDArrayReshapeView<T extends Number> extends AbstractNDArrayReshape
     @Override
     @SuppressWarnings("unchecked")
     public void setImag(Number value, int ...indices) {
-        boundaryCheck(indices, dims);
-        ((ComplexNDArray<T>)parent).setImag(value, resolveIndices(indices));
+        IndexingOperations.boundaryCheck(indices, dims);
+        ((ComplexNDArray<T>)parent).setImag(value, IndexingOperations.cartesianIndicesToLinearIndex(indices, dims, multipliers));
     }
 
     @Override

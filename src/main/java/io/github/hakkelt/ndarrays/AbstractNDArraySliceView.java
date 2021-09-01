@@ -116,7 +116,7 @@ abstract class AbstractNDArraySliceView<T,T2 extends Number> extends AbstractNDA
         }
 
         public int[] resolveToParentIndices(int[] viewIndices) {
-            boundaryCheck(viewIndices, viewDims);
+            IndexingOperations.boundaryCheck(viewIndices, viewDims);
             int[] parentIndices = new int[parentDims.length];
             int viewIndicesIndex = 0;
             int parenIndicestIndex = 0;
@@ -181,7 +181,7 @@ abstract class AbstractNDArraySliceView<T,T2 extends Number> extends AbstractNDA
     @Override
     protected String printItem(int linearIndex, String format) {
         int[] parentIndices = slicingExpression.resolveToParentIndices(linearIndexToViewIndices(linearIndex));
-        int parentIndex = parent.resolveIndices(parentIndices);
+        int parentIndex = IndexingOperations.cartesianIndicesToLinearIndex(parentIndices, parent.dims, parent.multipliers);
         return parent.printItem(parentIndex, format);
     }
 

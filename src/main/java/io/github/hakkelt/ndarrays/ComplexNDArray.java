@@ -8,10 +8,10 @@ import java.util.function.UnaryOperator;
 import org.apache.commons.math3.complex.Complex;
 
 /**
- * General N-dimensional arrays holding either complex or real values.
+ * General N-dimensional arrays holding complex values.
  * 
  * The aim of this package to create an general framework to handle multidimensional data.
- * The reference implementation is based on array of primitive values or complex values form apache.math3,
+ * The reference implementation is based on array of complex values form apache.math3,
  * it is, however, super easy to write a wrapper to any array- or collection-implementation making it possible to combine
  * the convenience of this interface with the advantages of the selected collection.
  * 
@@ -373,25 +373,25 @@ public interface ComplexNDArray<T extends Number> extends NDArray<Complex> {
     public NDArray<T> imaginary();
     
     /** 
-     * Returns a new array holding the magnitude / absolute values of elements.
+     * Returns a new array holding the magnitude / absolute values of the elements.
      * 
      * For real arrays, it returns an array filled with zeros.
      * 
-     * @return a new array holding the magnitude / absolute values of elements.
+     * @return a new array holding the magnitude / absolute values of the elements.
      */
     public NDArray<T> abs();
 
     /** 
-     * Returns a new array holding the angle / argument of elements.
+     * Returns a new array holding the angle / argument of the elements.
      * 
      * For real arrays, it returns an array filled with zeros.
      * 
-     * @return a new array holding the angle / argument of elements.
+     * @return a new array holding the angle / argument of the elements.
      */
     public NDArray<T> angle();
 
     /** 
-     * Creates a new NDArray of the same size, and fills it with the element-wise sum of this NDArray and 
+     * Creates a new NDArray of the same size and fills it with the element-wise sum of this NDArray and 
      * the parameter NDArrays and scalars. If list of parameters contains scalar values than these will be
      * added to all elements of the resulting array.
      * 
@@ -417,7 +417,7 @@ public interface ComplexNDArray<T extends Number> extends NDArray<Complex> {
     public ComplexNDArray<T> addInplace(Object ...addends);
     
     /** 
-     * Creates a new NDArray of the same size, and fills it with the result of the element-wise substraction 
+     * Creates a new NDArray of the same size and fills it with the result of the element-wise substraction 
      * the parameter NDArrays and scalars from this NDArray. If list of parameters contains scalar values than these will be
      * substracted from all elements of this NDArray.
      * 
@@ -442,7 +442,7 @@ public interface ComplexNDArray<T extends Number> extends NDArray<Complex> {
     public ComplexNDArray<T> subtractInplace(Object ...subtrahends);
     
     /** 
-     * Creates a new NDArray of the same size, and fills it with the element-wise product of this NDArray and 
+     * Creates a new NDArray of the same size and fills it with the element-wise product of this NDArray and 
      * the parameter NDArrays and scalars. If list of parameters contains scalar values than these will be
      * multiplied to all elements of the resulting array.
      * 
@@ -467,7 +467,7 @@ public interface ComplexNDArray<T extends Number> extends NDArray<Complex> {
     public ComplexNDArray<T> multiplyInplace(Object ...multiplicands);
     
     /** 
-     * Creates a new NDArray of the same size, and fills it with the result of the element-wise division 
+     * Creates a new NDArray of the same size and fills it with the result of the element-wise division 
      * of this NDArray by the parameter NDArrays and scalars. If list of parameters contains scalar values than
      * all elements of this NDArray will be divided by them.
      * 
@@ -645,7 +645,7 @@ public interface ComplexNDArray<T extends Number> extends NDArray<Complex> {
      * Returns an array view referencing this NDArray as parent that gives read-write access
      * to a specific elements for which the given function returns true.
      * 
-     * @param mask mask
+     * @param func function that accepts the values of entries and their linear indices as input and returns boolean
      * @return an array view that gives read-write access to a specific elements for which the given function returns true
      */
     public ComplexNDArray<T> maskWithLinearIndices(BiPredicate<Complex,Integer> func);
@@ -654,7 +654,7 @@ public interface ComplexNDArray<T extends Number> extends NDArray<Complex> {
      * Returns an array view referencing this NDArray as parent that gives read-write access
      * to a specific elements for which the given function returns true.
      * 
-     * @param mask mask
+     * @param func function that accepts the values of entries and their Cartesian indices as input and returns boolean
      * @return an array view that gives read-write access to a specific elements for which the given function returns true
      */
     public ComplexNDArray<T> maskWithCartesianIndices(BiPredicate<Complex,int[]> func);

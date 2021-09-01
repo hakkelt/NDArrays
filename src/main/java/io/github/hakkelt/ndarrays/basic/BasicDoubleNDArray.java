@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.stream.Collector;
 
 import io.github.hakkelt.ndarrays.AbstractDoubleNDArray;
+import io.github.hakkelt.ndarrays.IndexingOperations;
 import io.github.hakkelt.ndarrays.NDArray;
 import io.github.hakkelt.ndarrays.RealNDArrayCollector;
 
 /**
- * N-dimensional arrays holding double-precision (64bit) doubleing point values.
- * 
+ * Reference implementation for the NDArray of double (double-precision, 64 bit floating point) values.
  */
 public class BasicDoubleNDArray extends AbstractDoubleNDArray {
     protected double[] data;
@@ -37,32 +37,74 @@ public class BasicDoubleNDArray extends AbstractDoubleNDArray {
         copyFrom(array);
     }
 
-    public static NDArray<Double> of(float[] array) {
+    /**
+     * Factory method that creates an NDArray from a list or 1D array of float values.
+     * 
+     * @param array a list or 1D array of float values from which a BasicDoubleNDArray is created.
+     * @return an NDArray created from a list or 1D array of float values
+     */
+    public static NDArray<Double> of(float... array) {
         return new BasicDoubleNDArray(array.length).copyFrom(array);
     }
     
-    public static NDArray<Double> of(double[] array) {
+    /**
+     * Factory method that creates an NDArray from a list or 1D array of double values.
+     * 
+     * @param array a list or 1D array of double values from which a BasicDoubleNDArray is created.
+     * @return an NDArray created from a list or 1D array of double values
+     */
+    public static NDArray<Double> of(double... array) {
         return new BasicDoubleNDArray(array.length).copyFrom(array);
     }
     
-    public static NDArray<Double> of(byte[] array) {
+    /**
+     * Factory method that creates an NDArray from a list or 1D array of byte values.
+     * 
+     * @param array a list or 1D array of byte values from which a BasicDoubleNDArray is created.
+     * @return an NDArray created from a list or 1D array of byte values
+     */
+    public static NDArray<Double> of(byte... array) {
         return new BasicDoubleNDArray(array.length).copyFrom(array);
     }
     
-    public static NDArray<Double> of(short[] array) {
+    /**
+     * Factory method that creates an NDArray from a list or 1D array of short values.
+     * 
+     * @param array a list or 1D array of short values from which a BasicDoubleNDArray is created.
+     * @return an NDArray created from a list or 1D array of short values
+     */
+    public static NDArray<Double> of(short... array) {
         return new BasicDoubleNDArray(array.length).copyFrom(array);
     }
     
-    public static NDArray<Double> of(int[] array) {
+    /**
+     * Factory method that creates an NDArray from a list or 1D array of int values.
+     * 
+     * @param array a list or 1D array of int values from which a BasicDoubleNDArray is created.
+     * @return an NDArray created from a list or 1D array of int values
+     */
+    public static NDArray<Double> of(int... array) {
         return new BasicDoubleNDArray(array.length).copyFrom(array);
     }
     
-    public static NDArray<Double> of(long[] array) {
+    /**
+     * Factory method that creates an NDArray from a list or 1D array of long values.
+     * 
+     * @param array a list or 1D array of long values from which a BasicDoubleNDArray is created.
+     * @return an NDArray created from a list or 1D array of long values
+     */
+    public static NDArray<Double> of(long... array) {
         return new BasicDoubleNDArray(array.length).copyFrom(array);
     }
     
-    public static NDArray<Double> of(Object[] realOrComplex) {
-        return new BasicDoubleNDArray(computeDims(realOrComplex)).copyFrom(realOrComplex);
+    /**
+     * Factory method that creates an NDArray from a multi-dimensional array of numeric values.
+     * 
+     * @param array a multi-dimensional array of numeric values from which a BasicDoubleNDArray is created.
+     * @return an NDArray created from a multi-dimensional array of numeric values
+     */
+    public static NDArray<Double> of(Object[] array) {
+        return new BasicDoubleNDArray(IndexingOperations.computeDims(array)).copyFrom(array);
     }
 
     public NDArray<Double> copyFrom(BasicDoubleNDArray array) {
@@ -71,13 +113,21 @@ public class BasicDoubleNDArray extends AbstractDoubleNDArray {
     }
 
     public Double get(int linearIndex) {
-        linearIndex = boundaryCheck(linearIndex, length());
+        linearIndex = IndexingOperations.boundaryCheck(linearIndex, length());
         return data[linearIndex];
     }
 
     public void set(Number real, int linearIndex) {
-        linearIndex = boundaryCheck(linearIndex, length());
+        linearIndex = IndexingOperations.boundaryCheck(linearIndex, length());
         data[linearIndex] = real.doubleValue();
+    }
+
+    public Double get(int... indices) {
+        return get(IndexingOperations.cartesianIndicesToLinearIndex(indices, dims, multipliers));
+    }
+
+    public void set(Double value, int... indices) {
+        set(value, IndexingOperations.cartesianIndicesToLinearIndex(indices, dims, multipliers));
     }
 
     public static Collector<Object, List<Object>, NDArray<Double>> getCollector(int[] dims) {

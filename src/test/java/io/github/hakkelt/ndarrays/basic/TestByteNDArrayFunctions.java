@@ -703,10 +703,4 @@ class TestByteNDArrayFunctions implements ByteNDArrayConstructorTrait, Construct
                     assertEquals((byte)2, array5.get(i, j, k));
     }
 
-    @Test
-    void testAbs() {
-        NDArray<Byte> abs = getByteNDArrayClass().cast(array).abs();
-        array.streamLinearIndices()
-            .forEach(i -> assertTrue(Math.abs(array.get(i)) - abs.get(i) < 1e-5));
-    }
 }

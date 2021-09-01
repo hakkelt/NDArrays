@@ -704,10 +704,4 @@ class TestIntegerNDArrayFunctions implements IntegerNDArrayConstructorTrait, Byt
                     assertEquals((int)2, array5.get(i, j, k));
     }
 
-    @Test
-    void testAbs() {
-        NDArray<Integer> abs = getIntegerNDArrayClass().cast(array).abs();
-        array.streamLinearIndices()
-            .forEach(i -> assertTrue(Math.abs(array.get(i)) - abs.get(i) < 1e-5));
-    }
 }

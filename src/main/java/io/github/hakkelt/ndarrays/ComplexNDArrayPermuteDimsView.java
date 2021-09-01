@@ -2,7 +2,7 @@ package io.github.hakkelt.ndarrays;
 
 import org.apache.commons.math3.complex.Complex;
 
-public class ComplexNDArrayPermuteDimsView<T extends Number> extends AbstractNDArrayPermuteDimsView<Complex,T> implements ComplexNDArrayTrait<T> {
+class ComplexNDArrayPermuteDimsView<T extends Number> extends AbstractNDArrayPermuteDimsView<Complex,T> implements ComplexNDArrayTrait<T> {
 
     public ComplexNDArrayPermuteDimsView(NDArray<Complex> parent, int ...dimsOrder) {
         super(parent, dimsOrder);
@@ -20,7 +20,7 @@ public class ComplexNDArrayPermuteDimsView<T extends Number> extends AbstractNDA
     @Override
     @SuppressWarnings("unchecked")
     public T getReal(int ...indices) {
-        boundaryCheck(indices, dims);
+        IndexingOperations.boundaryCheck(indices, dims);
         return ((ComplexNDArray<T>)parent).getReal(permuteArray(indices, dimsOrder));
     }
 
@@ -32,7 +32,7 @@ public class ComplexNDArrayPermuteDimsView<T extends Number> extends AbstractNDA
     @Override
     @SuppressWarnings("unchecked")
     public T getImag(int ...indices) {
-        boundaryCheck(indices, dims);
+        IndexingOperations.boundaryCheck(indices, dims);
         return ((ComplexNDArray<T>)parent).getImag(permuteArray(indices, dimsOrder));
     }
 
@@ -44,7 +44,7 @@ public class ComplexNDArrayPermuteDimsView<T extends Number> extends AbstractNDA
     @Override
     @SuppressWarnings("unchecked")
     public void setReal(Number value, int ...indices) {
-        boundaryCheck(indices, dims);
+        IndexingOperations.boundaryCheck(indices, dims);
         ((ComplexNDArray<T>)parent).setReal(value, permuteArray(indices, dimsOrder));
     }
 
@@ -56,7 +56,7 @@ public class ComplexNDArrayPermuteDimsView<T extends Number> extends AbstractNDA
     @Override
     @SuppressWarnings("unchecked")
     public void setImag(Number value, int ...indices) {
-        boundaryCheck(indices, dims);
+        IndexingOperations.boundaryCheck(indices, dims);
         ((ComplexNDArray<T>)parent).setImag(value, permuteArray(indices, dimsOrder));
     }
     

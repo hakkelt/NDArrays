@@ -1,7 +1,12 @@
 package io.github.hakkelt.ndarrays;
 
+/**
+ * Abstract NDArray class for long (64-bit integer) values.
+ */
 public abstract class AbstractLongNDArray extends AbstractRealNDArray<Long> {
 
+    protected AbstractLongNDArray() {}
+    
     protected Long wrapValue(Number value) {
         return Long.valueOf(value.longValue());
     }
