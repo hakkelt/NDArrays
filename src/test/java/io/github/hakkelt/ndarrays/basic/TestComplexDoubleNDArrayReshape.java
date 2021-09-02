@@ -11,18 +11,16 @@ import org.apache.commons.math3.complex.Complex;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
-import io.github.hakkelt.ndarrays.ComplexDoubleNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.ComplexNDArray;
 import io.github.hakkelt.ndarrays.Errors;
 import io.github.hakkelt.ndarrays.NDArray;
 
-class TestComplexDoubleNDArrayReshape implements ComplexDoubleNDArrayConstructorTrait, ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestComplexDoubleNDArrayReshape implements NameTrait {
     ComplexNDArray<Double> array, reshaped;
 
     @BeforeEach
     void setup() {
-        array = createComplexDoubleNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicComplexDoubleNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> new Complex(index, -index));
         reshaped = array.reshape(20, 3);
     }
@@ -189,7 +187,7 @@ class TestComplexDoubleNDArrayReshape implements ComplexDoubleNDArrayConstructor
 
     @Test
     void testEqual() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(reshaped);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(reshaped);
         assertEquals(reshaped, array2);
         array2.set(new Complex(0,0), 10);
         assertNotEquals(reshaped, array2);
@@ -231,7 +229,7 @@ class TestComplexDoubleNDArrayReshape implements ComplexDoubleNDArrayConstructor
         final Complex one = new Complex(1,-1);
         NDArray<?> increased = reshaped.stream()
             .map((value) -> value.add(one))
-            .collect(getComplexDoubleNDArrayCollector(reshaped.dims()));
+            .collect(BasicComplexDoubleNDArray.getCollector(reshaped.dims()));
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals(reshaped.get(i).add(one), increased.get(i));
     }
@@ -241,7 +239,7 @@ class TestComplexDoubleNDArrayReshape implements ComplexDoubleNDArrayConstructor
         final Complex one = new Complex(1,-1);
         NDArray<?> increased = reshaped.stream().parallel()
             .map((value) -> value.add(one))
-            .collect(getComplexDoubleNDArrayCollector(reshaped.dims()));
+            .collect(BasicComplexDoubleNDArray.getCollector(reshaped.dims()));
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals(reshaped.get(i).add(one), increased.get(i));
     }
@@ -284,7 +282,7 @@ class TestComplexDoubleNDArrayReshape implements ComplexDoubleNDArrayConstructor
 
     @Test
     void testApply() {
-        NDArray<Complex> reshaped2 = createComplexDoubleNDArray(array).reshape(20, 3).apply(value -> value.atan());
+        NDArray<Complex> reshaped2 = new BasicComplexDoubleNDArray(array).reshape(20, 3).apply(value -> value.atan());
         for (int i = 1; i < array.length(); i++) {
             assertTrue(Math.abs(reshaped.get(i).atan().getReal() - reshaped2.get(i).getReal()) / reshaped2.get(i).getReal() < 1e-6);
             assertTrue(Math.abs(reshaped.get(i).atan().getImaginary() - reshaped2.get(i).getImaginary()) / reshaped2.get(i).getImaginary() < 1e-6);
@@ -293,7 +291,7 @@ class TestComplexDoubleNDArrayReshape implements ComplexDoubleNDArrayConstructor
 
     @Test
     void testApplyWithLinearIndices() {
-        NDArray<Complex> reshaped2 = createComplexDoubleNDArray(array).reshape(20, 3).applyWithLinearIndices((value, index) -> value.atan().add(index));
+        NDArray<Complex> reshaped2 = new BasicComplexDoubleNDArray(array).reshape(20, 3).applyWithLinearIndices((value, index) -> value.atan().add(index));
         for (int i = 1; i < reshaped.length(); i++) {
             assertTrue(Math.abs(reshaped.get(i).atan().add(i).getReal() - reshaped2.get(i).getReal()) / reshaped2.get(i).getReal() < 1e-6);
             assertTrue(Math.abs(reshaped.get(i).atan().add(i).getImaginary() - reshaped2.get(i).getImaginary()) / reshaped2.get(i).getImaginary() < 1e-6);
@@ -302,7 +300,7 @@ class TestComplexDoubleNDArrayReshape implements ComplexDoubleNDArrayConstructor
 
     @Test
     void testApplyWithCartesianIndex() {
-        NDArray<Complex> reshaped2 = createComplexDoubleNDArray(array).reshape(20, 3).applyWithCartesianIndices((value, indices) -> value.atan().add(indices[0]));
+        NDArray<Complex> reshaped2 = new BasicComplexDoubleNDArray(array).reshape(20, 3).applyWithCartesianIndices((value, indices) -> value.atan().add(indices[0]));
         for (int i = 0; i < reshaped.dims(0); i++)
             for (int j = 0; j < reshaped.dims(1); j++) {
                 if (i == 0 && j == 0) continue;
@@ -358,7 +356,7 @@ class TestComplexDoubleNDArrayReshape implements ComplexDoubleNDArrayConstructor
 
     @Test
     void testAdd() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(reshaped);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(reshaped);
         ComplexNDArray<Double> array3 = reshaped.add(array2);
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals(reshaped.get(i).multiply(2), array3.get(i));
@@ -373,7 +371,7 @@ class TestComplexDoubleNDArrayReshape implements ComplexDoubleNDArrayConstructor
 
     @Test
     void testAddMultiple() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(reshaped);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(reshaped);
         ComplexNDArray<Double> array3 = reshaped.add(array2, 5.3, array2, new Complex(3,1));
         for (int i = 0; i < reshaped.length(); i++) {
             Complex expected = reshaped.get(i).multiply(3).add(new Complex(5.3 + 3,1));
@@ -383,7 +381,7 @@ class TestComplexDoubleNDArrayReshape implements ComplexDoubleNDArrayConstructor
 
     @Test
     void testAddInplace() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(reshaped);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(reshaped);
         array2.addInplace(reshaped);
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals(reshaped.get(i).multiply(2), array2.get(i));
@@ -391,7 +389,7 @@ class TestComplexDoubleNDArrayReshape implements ComplexDoubleNDArrayConstructor
 
     @Test
     void testAddInplaceScalar() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(reshaped);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(reshaped);
         array2.addInplace(5);
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals(reshaped.get(i).add(5), array2.get(i));
@@ -399,7 +397,7 @@ class TestComplexDoubleNDArrayReshape implements ComplexDoubleNDArrayConstructor
 
     @Test
     void testAddInplaceMultiple() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(reshaped);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(reshaped);
         array2.addInplace(reshaped, 5.3, array2, new Complex(3,1));
         for (int i = 0; i < reshaped.length(); i++) {
             Complex expected = reshaped.get(i).multiply(3).add(new Complex(5.3 + 3,1));
@@ -540,7 +538,7 @@ class TestComplexDoubleNDArrayReshape implements ComplexDoubleNDArrayConstructor
 
     @Test
     void testMaskReshaped() {
-        NDArray<Byte> mask = createByteNDArray(reshaped.abs().map(value -> value > 20 ? 1. : 0.));
+        NDArray<Byte> mask = new BasicByteNDArray(reshaped.abs().map(value -> value > 20 ? 1. : 0.));
         ComplexNDArray<Double> masked = reshaped.mask(mask);
         masked.forEach((value) -> assertTrue(value.abs() > 20));
         masked.fill(0);
@@ -573,7 +571,7 @@ class TestComplexDoubleNDArrayReshape implements ComplexDoubleNDArrayConstructor
 
     @Test
     void testConcatenate() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(new int[]{5, 3}).fill(1);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(new int[]{5, 3}).fill(1);
         ComplexNDArray<Double> array3 = reshaped.concatenate(0, array2);
         for (int i = 0; i < reshaped.dims(0); i++)
             for (int j = 0; j < reshaped.dims(1); j++)
@@ -586,8 +584,8 @@ class TestComplexDoubleNDArrayReshape implements ComplexDoubleNDArrayConstructor
     @Test
     void testConcatenateMultiple() {
         ComplexNDArray<Double> array2 = reshaped.copy().fill(1).slice("1:5", ":");
-        ComplexNDArray<Double> array3 = createComplexDoubleNDArray(new int[]{3, 2}).permuteDims(1, 0);
-        ComplexNDArray<Double> array4 = createComplexDoubleNDArray(new int[]{9}).fill(new Complex(2, -2)).reshape(3, 3);
+        ComplexNDArray<Double> array3 = new BasicComplexDoubleNDArray(new int[]{3, 2}).permuteDims(1, 0);
+        ComplexNDArray<Double> array4 = new BasicComplexDoubleNDArray(new int[]{9}).fill(new Complex(2, -2)).reshape(3, 3);
         ComplexNDArray<Double> array5 = reshaped.concatenate(0, array2, array3, array4);
         int start = 0;
         int end = reshaped.dims(0);

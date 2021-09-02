@@ -10,17 +10,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.Errors;
 import io.github.hakkelt.ndarrays.NDArray;
-import io.github.hakkelt.ndarrays.ShortNDArrayConstructorTrait;
 
-class TestShortNDArrayReshape implements ShortNDArrayConstructorTrait, ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestShortNDArrayReshape implements NameTrait {
     NDArray<Short> array, reshaped;
 
     @BeforeEach
     void setup() {
-        array = createShortNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicShortNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> index.shortValue());
         reshaped = array.reshape(20, 3);
     }
@@ -181,7 +179,7 @@ class TestShortNDArrayReshape implements ShortNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testEqual() {
-        NDArray<Short> array2 = createShortNDArray(reshaped);
+        NDArray<Short> array2 = new BasicShortNDArray(reshaped);
         assertEquals(reshaped, array2);
         array2.set(0, 10);
         assertNotEquals(reshaped, array2);
@@ -222,7 +220,7 @@ class TestShortNDArrayReshape implements ShortNDArrayConstructorTrait, ByteNDArr
     void testCollector() {
         NDArray<?> increased = reshaped.stream()
             .map((value) -> value + 1)
-            .collect(getShortNDArrayCollector(reshaped.dims()));
+            .collect(BasicShortNDArray.getCollector(reshaped.dims()));
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals((short)(reshaped.get(i) + 1), increased.get(i));
     }
@@ -231,7 +229,7 @@ class TestShortNDArrayReshape implements ShortNDArrayConstructorTrait, ByteNDArr
     void testParallelCollector() {
         NDArray<?> increased = reshaped.stream().parallel()
             .map((value) -> value + 1)
-            .collect(getShortNDArrayCollector(reshaped.dims()));
+            .collect(BasicShortNDArray.getCollector(reshaped.dims()));
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals((short)(reshaped.get(i) + 1), increased.get(i));
     }
@@ -274,7 +272,7 @@ class TestShortNDArrayReshape implements ShortNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testApply() {
-        NDArray<Short> reshaped2 = createShortNDArray(array).reshape(20, 3);
+        NDArray<Short> reshaped2 = new BasicShortNDArray(array).reshape(20, 3);
         reshaped2.apply(value -> (short)Math.sqrt(value));
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals((short)Math.sqrt(reshaped.get(i)), reshaped2.get(i));
@@ -282,7 +280,7 @@ class TestShortNDArrayReshape implements ShortNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testApplyWithLinearIndices() {
-        NDArray<Short> reshaped2 = createShortNDArray(array).reshape(20, 3);
+        NDArray<Short> reshaped2 = new BasicShortNDArray(array).reshape(20, 3);
         reshaped2.applyWithLinearIndices((value, index) -> (short)(Math.sqrt(value) + index));
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals((short)(Math.sqrt(reshaped.get(i)) + i), reshaped2.get(i));
@@ -290,7 +288,7 @@ class TestShortNDArrayReshape implements ShortNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testApplyWithCartesianIndex() {
-        NDArray<Short> reshaped2 = createShortNDArray(array).reshape(20, 3);
+        NDArray<Short> reshaped2 = new BasicShortNDArray(array).reshape(20, 3);
         reshaped2.applyWithCartesianIndices((value, indices) -> (short)(Math.sqrt(value) + indices[0]));
         for (int i = 0; i < reshaped.dims(0); i++)
             for (int j = 0; j < reshaped.dims(1); j++)
@@ -337,7 +335,7 @@ class TestShortNDArrayReshape implements ShortNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testAdd() {
-        NDArray<Short> array2 = createShortNDArray(reshaped);
+        NDArray<Short> array2 = new BasicShortNDArray(reshaped);
         NDArray<Short> array3 = reshaped.add(array2);
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals((short)(reshaped.get(i) * 2), array3.get(i));
@@ -352,7 +350,7 @@ class TestShortNDArrayReshape implements ShortNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testAddMultiple() {
-        NDArray<Short> array2 = createShortNDArray(reshaped);
+        NDArray<Short> array2 = new BasicShortNDArray(reshaped);
         NDArray<Short> array3 = reshaped.add(array2, 5.3, array2, 3);
         for (int i = 0; i < reshaped.length(); i++) {
             float expected = reshaped.get(i) * 3.f + 5.3f + 3.f;
@@ -362,7 +360,7 @@ class TestShortNDArrayReshape implements ShortNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testAddInplace() {
-        NDArray<Short> array2 = createShortNDArray(reshaped);
+        NDArray<Short> array2 = new BasicShortNDArray(reshaped);
         array2.addInplace(reshaped);
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals((short)(reshaped.get(i) * 2), array2.get(i));
@@ -370,7 +368,7 @@ class TestShortNDArrayReshape implements ShortNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Short> array2 = createShortNDArray(reshaped);
+        NDArray<Short> array2 = new BasicShortNDArray(reshaped);
         array2.addInplace(5);
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals((short)(reshaped.get(i) + 5), array2.get(i));
@@ -378,7 +376,7 @@ class TestShortNDArrayReshape implements ShortNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Short> array2 = createShortNDArray(reshaped);
+        NDArray<Short> array2 = new BasicShortNDArray(reshaped);
         array2.addInplace(reshaped, 5.3, array2, 3);
         for (int i = 0; i < reshaped.length(); i++) {
             float expected = reshaped.get(i) * 3.f + 5.3f + 3.f;
@@ -519,7 +517,7 @@ class TestShortNDArrayReshape implements ShortNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testMaskReshaped() {
-        NDArray<Byte> mask = createByteNDArray(reshaped.map(value -> value > 20 ? (short)1 : (short)0));
+        NDArray<Byte> mask = new BasicByteNDArray(reshaped.map(value -> value > 20 ? (short)1 : (short)0));
         NDArray<Short> masked = reshaped.mask(mask);
         masked.forEach((value) -> assertTrue(value > 20));
         masked.fill(0);
@@ -552,7 +550,7 @@ class TestShortNDArrayReshape implements ShortNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testConcatenate() {
-        NDArray<Short> array2 = createShortNDArray(new int[]{5, 3}).fill(1);
+        NDArray<Short> array2 = new BasicShortNDArray(new int[]{5, 3}).fill(1);
         NDArray<Short> array3 = reshaped.concatenate(0, array2);
         for (int i = 0; i < reshaped.dims(0); i++)
             for (int j = 0; j < reshaped.dims(1); j++)
@@ -565,8 +563,8 @@ class TestShortNDArrayReshape implements ShortNDArrayConstructorTrait, ByteNDArr
     @Test
     void testConcatenateMultiple() {
         NDArray<Short> array2 = reshaped.copy().fill(1).slice("1:5", ":");
-        NDArray<Short> array3 = createShortNDArray(new int[]{3, 2}).permuteDims(1, 0);
-        NDArray<Short> array4 = createShortNDArray(new int[]{9}).fill(2).reshape(3, 3);
+        NDArray<Short> array3 = new BasicShortNDArray(new int[]{3, 2}).permuteDims(1, 0);
+        NDArray<Short> array4 = new BasicShortNDArray(new int[]{9}).fill(2).reshape(3, 3);
         NDArray<Short> array5 = reshaped.concatenate(0, array2, array3, array4);
         int start = 0;
         int end = reshaped.dims(0);

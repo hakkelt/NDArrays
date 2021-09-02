@@ -11,21 +11,19 @@ import org.apache.commons.math3.complex.Complex;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
-import io.github.hakkelt.ndarrays.ComplexDoubleNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.ComplexNDArray;
 import io.github.hakkelt.ndarrays.Errors;
 import io.github.hakkelt.ndarrays.NDArray;
 
-class TestComplexDoubleNDArrayMask implements ComplexDoubleNDArrayConstructorTrait, ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestComplexDoubleNDArrayMask implements NameTrait {
     ComplexNDArray<Double> array, masked;
     NDArray<Byte> mask;
 
     @BeforeEach
     void setup() {
-        array = createComplexDoubleNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicComplexDoubleNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> new Complex(index, -index));
-        mask = createByteNDArray(array.abs().mapWithLinearIndices((value, index) -> (double)index % 2));
+        mask = new BasicByteNDArray(array.abs().mapWithLinearIndices((value, index) -> (double)index % 2));
         masked = array.mask(mask);
     }
 
@@ -62,14 +60,14 @@ class TestComplexDoubleNDArrayMask implements ComplexDoubleNDArrayConstructorTra
 
     @Test
     void testMaskMask() {
-        NDArray<Byte> mask2 = createByteNDArray(masked.abs().map(value -> value > 20 ? 1. : 0.));
+        NDArray<Byte> mask2 = new BasicByteNDArray(masked.abs().map(value -> value > 20 ? 1. : 0.));
         ComplexNDArray<Double> masked2 = masked.mask(mask2);
         masked2.forEach((value) -> assertTrue(value.abs() > 20));
     }
 
     @Test
     void testMaskInverseMask() {
-        NDArray<Byte> mask2 = createByteNDArray(masked.abs().map(value -> value > 20 ? (double)1 : (double)0));
+        NDArray<Byte> mask2 = new BasicByteNDArray(masked.abs().map(value -> value > 20 ? (double)1 : (double)0));
         ComplexNDArray<Double> masked2 = masked.inverseMask(mask2);
         masked2.forEach((value) -> assertTrue(value.abs() <= 20));
     }
@@ -147,7 +145,7 @@ class TestComplexDoubleNDArrayMask implements ComplexDoubleNDArrayConstructorTra
 
     @Test
     void testEqual() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(masked);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(masked);
         assertEquals(masked, array2);
         array2.set(new Complex(0,0), 5);
         assertNotEquals(masked, array2);
@@ -188,7 +186,7 @@ class TestComplexDoubleNDArrayMask implements ComplexDoubleNDArrayConstructorTra
         final Complex one = new Complex(1,-1);
         NDArray<Complex> increased = masked.stream()
             .map((value) -> value.add(one))
-            .collect(getComplexDoubleNDArrayCollector(masked.dims()));
+            .collect(BasicComplexDoubleNDArray.getCollector(masked.dims()));
         for (int i = 0; i < masked.length(); i++)
             assertEquals(masked.get(i).add(one), increased.get(i));
     }
@@ -198,7 +196,7 @@ class TestComplexDoubleNDArrayMask implements ComplexDoubleNDArrayConstructorTra
         final Complex one = new Complex(1,-1);
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value.add(one))
-            .collect(getComplexDoubleNDArrayCollector(array.dims()));
+            .collect(BasicComplexDoubleNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).add(one), increased.get(i));
     }
@@ -226,7 +224,7 @@ class TestComplexDoubleNDArrayMask implements ComplexDoubleNDArrayConstructorTra
 
     @Test
     void testApply() {
-        NDArray<Complex> masked2 = createComplexDoubleNDArray(array).mask(mask).apply(value -> value.atan());
+        NDArray<Complex> masked2 = new BasicComplexDoubleNDArray(array).mask(mask).apply(value -> value.atan());
         for (int i = 1; i < masked.length(); i++) {
             assertTrue(Math.abs(masked.get(i).atan().getReal() - masked2.get(i).getReal()) / masked2.get(i).getReal() < 1e-6);
             assertTrue(Math.abs(masked.get(i).atan().getImaginary() - masked2.get(i).getImaginary()) / masked2.get(i).getImaginary() < 1e-6);
@@ -235,7 +233,7 @@ class TestComplexDoubleNDArrayMask implements ComplexDoubleNDArrayConstructorTra
 
     @Test
     void testApplyWithLinearIndices() {
-        NDArray<Complex> masked2 = createComplexDoubleNDArray(array).mask(mask).applyWithLinearIndices((value, index) -> value.atan().add(index));
+        NDArray<Complex> masked2 = new BasicComplexDoubleNDArray(array).mask(mask).applyWithLinearIndices((value, index) -> value.atan().add(index));
         for (int i = 1; i < masked.length(); i++) {
             assertTrue(Math.abs(masked.get(i).atan().add(i).getReal() - masked2.get(i).getReal()) / masked2.get(i).getReal() < 1e-6);
             assertTrue(Math.abs(masked.get(i).atan().add(i).getImaginary() - masked2.get(i).getImaginary()) / masked2.get(i).getImaginary() < 1e-6);
@@ -278,7 +276,7 @@ class TestComplexDoubleNDArrayMask implements ComplexDoubleNDArrayConstructorTra
 
     @Test
     void testAdd() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(masked);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(masked);
         ComplexNDArray<Double> array3 = masked.add(array2);
         for (int i = 0; i < masked.length(); i++)
             assertEquals(masked.get(i).multiply(2), array3.get(i));
@@ -286,7 +284,7 @@ class TestComplexDoubleNDArrayMask implements ComplexDoubleNDArrayConstructorTra
 
     @Test
     void testAddArrayToMasked() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(masked);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(masked);
         ComplexNDArray<Double> array3 = masked.add(array2);
         for (int i = 0; i < masked.length(); i++)
             assertEquals(masked.get(i).multiply(2), array3.get(i));
@@ -294,7 +292,7 @@ class TestComplexDoubleNDArrayMask implements ComplexDoubleNDArrayConstructorTra
 
     @Test
     void testAddMaskedToArray() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(masked);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(masked);
         ComplexNDArray<Double> array3 = array2.add(masked);
         for (int i = 0; i < masked.length(); i++)
             assertEquals(masked.get(i).multiply(2), array3.get(i));
@@ -317,7 +315,7 @@ class TestComplexDoubleNDArrayMask implements ComplexDoubleNDArrayConstructorTra
 
     @Test
     void testAddMultiple() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> masked2 = array2.mask(mask);
         ComplexNDArray<Double> array3 = masked2.add(masked, 5.3, masked2, new Complex(3,1));
         for (int i = 0; i < masked.length(); i++) {
@@ -328,7 +326,7 @@ class TestComplexDoubleNDArrayMask implements ComplexDoubleNDArrayConstructorTra
 
     @Test
     void testAddInplace() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> masked2 = array2.mask(mask);
         masked2.addInplace(masked);
         for (int i = 0; i < masked.length(); i++)
@@ -337,7 +335,7 @@ class TestComplexDoubleNDArrayMask implements ComplexDoubleNDArrayConstructorTra
 
     @Test
     void testAddInplaceScalar() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> masked2 = array2.mask(mask);
         masked2.addInplace(5);
         for (int i = 0; i < masked.length(); i++)
@@ -346,7 +344,7 @@ class TestComplexDoubleNDArrayMask implements ComplexDoubleNDArrayConstructorTra
 
     @Test
     void testAddInplaceMultiple() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> masked2 = array2.mask(mask);
         masked2.addInplace(masked, 5.3, masked2, new Complex(3,1));
         for (int i = 0; i < masked.length(); i++) {
@@ -448,7 +446,7 @@ class TestComplexDoubleNDArrayMask implements ComplexDoubleNDArrayConstructorTra
 
     @Test
     void testConcatenate() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(5).fill(1);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(5).fill(1);
         ComplexNDArray<Double> array3 = masked.concatenate(0, array2);
         for (int i = 0; i < masked.dims(0); i++)
             assertEquals(masked.get(i), array3.get(i));
@@ -459,8 +457,8 @@ class TestComplexDoubleNDArrayMask implements ComplexDoubleNDArrayConstructorTra
     @Test
     void testConcatenateMultiple() {
         ComplexNDArray<Double> array2 = masked.copy().fill(1).slice("1:1");
-        ComplexNDArray<Double> array3 = createComplexDoubleNDArray(3).permuteDims(0);
-        ComplexNDArray<Double> array4 = createComplexDoubleNDArray(3,3).fill(new Complex(2, -2)).reshape(9);
+        ComplexNDArray<Double> array3 = new BasicComplexDoubleNDArray(3).permuteDims(0);
+        ComplexNDArray<Double> array4 = new BasicComplexDoubleNDArray(3,3).fill(new Complex(2, -2)).reshape(9);
         ComplexNDArray<Double> array5 = masked.concatenate(0, array2, array3, array4);
         int start = 0;
         int end = masked.dims(0);

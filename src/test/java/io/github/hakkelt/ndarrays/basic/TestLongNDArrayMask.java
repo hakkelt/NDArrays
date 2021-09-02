@@ -8,20 +8,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.Errors;
-import io.github.hakkelt.ndarrays.LongNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.NDArray;
 
-class TestLongNDArrayMask implements LongNDArrayConstructorTrait, ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestLongNDArrayMask implements NameTrait {
     NDArray<Long> array, masked;
     NDArray<Byte> mask;
 
     @BeforeEach
     void setup() {
-        array = createLongNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicLongNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> index.longValue());
-        mask = createByteNDArray(array.mapWithLinearIndices((value, index) -> (long)(index.intValue() % 2)));
+        mask = new BasicByteNDArray(array.mapWithLinearIndices((value, index) -> (long)(index.intValue() % 2)));
         masked = array.mask(mask);
     }
 
@@ -58,14 +56,14 @@ class TestLongNDArrayMask implements LongNDArrayConstructorTrait, ByteNDArrayCon
 
     @Test
     void testMaskMask() {
-        NDArray<Byte> mask2 = createByteNDArray(masked.map(value -> value > 20 ? (long)1 : (long)0));
+        NDArray<Byte> mask2 = new BasicByteNDArray(masked.map(value -> value > 20 ? (long)1 : (long)0));
         NDArray<Long> masked2 = masked.mask(mask2);
         masked2.forEach((value) -> assertTrue(value > 20));
     }
 
     @Test
     void testMaskInverseMask() {
-        NDArray<Byte> mask2 = createByteNDArray(masked.map(value -> value > 20 ? (long)1 : (long)0));
+        NDArray<Byte> mask2 = new BasicByteNDArray(masked.map(value -> value > 20 ? (long)1 : (long)0));
         NDArray<Long> masked2 = masked.inverseMask(mask2);
         masked2.forEach((value) -> assertTrue(value <= 20));
     }
@@ -140,7 +138,7 @@ class TestLongNDArrayMask implements LongNDArrayConstructorTrait, ByteNDArrayCon
 
     @Test
     void testEqual() {
-        NDArray<Long> array2 = createLongNDArray(masked);
+        NDArray<Long> array2 = new BasicLongNDArray(masked);
         assertEquals(masked, array2);
         array2.set(0, 5);
         assertNotEquals(masked, array2);
@@ -180,7 +178,7 @@ class TestLongNDArrayMask implements LongNDArrayConstructorTrait, ByteNDArrayCon
     void testCollector() {
         NDArray<Long> increased = masked.stream()
             .map((value) -> value + 1)
-            .collect(getLongNDArrayCollector(masked.dims()));
+            .collect(BasicLongNDArray.getCollector(masked.dims()));
         for (int i = 0; i < masked.length(); i++)
             assertEquals((long)(masked.get(i) + 1), increased.get(i));
     }
@@ -189,7 +187,7 @@ class TestLongNDArrayMask implements LongNDArrayConstructorTrait, ByteNDArrayCon
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(getLongNDArrayCollector(array.dims()));
+            .collect(BasicLongNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) + 1, increased.get(i));
     }
@@ -217,7 +215,7 @@ class TestLongNDArrayMask implements LongNDArrayConstructorTrait, ByteNDArrayCon
 
     @Test
     void testAddArrayToMasked() {
-        NDArray<Long> array2 = createLongNDArray(masked);
+        NDArray<Long> array2 = new BasicLongNDArray(masked);
         NDArray<Long> array3 = masked.add(array2);
         for (int i = 0; i < masked.length(); i++)
             assertEquals((long)(masked.get(i) * 2), array3.get(i));
@@ -225,7 +223,7 @@ class TestLongNDArrayMask implements LongNDArrayConstructorTrait, ByteNDArrayCon
 
     @Test
     void testAddMaskedToArray() {
-        NDArray<Long> array2 = createLongNDArray(masked);
+        NDArray<Long> array2 = new BasicLongNDArray(masked);
         NDArray<Long> array3 = array2.add(masked);
         for (int i = 0; i < masked.length(); i++)
             assertEquals((long)(masked.get(i) * 2), array3.get(i));
@@ -248,7 +246,7 @@ class TestLongNDArrayMask implements LongNDArrayConstructorTrait, ByteNDArrayCon
 
     @Test
     void testAddMultiple() {
-        NDArray<Long> array2 = createLongNDArray(array);
+        NDArray<Long> array2 = new BasicLongNDArray(array);
         NDArray<Long> masked2 = array2.mask(mask);
         NDArray<Long> array3 = masked2.add(masked, 5, masked2, 3);
         for (int i = 0; i < masked.length(); i++) {
@@ -259,7 +257,7 @@ class TestLongNDArrayMask implements LongNDArrayConstructorTrait, ByteNDArrayCon
 
     @Test
     void testAddInplace() {
-        NDArray<Long> array2 = createLongNDArray(array);
+        NDArray<Long> array2 = new BasicLongNDArray(array);
         NDArray<Long> masked2 = array2.mask(mask);
         masked2.addInplace(masked);
         for (int i = 0; i < masked.length(); i++)
@@ -268,7 +266,7 @@ class TestLongNDArrayMask implements LongNDArrayConstructorTrait, ByteNDArrayCon
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Long> array2 = createLongNDArray(array);
+        NDArray<Long> array2 = new BasicLongNDArray(array);
         NDArray<Long> masked2 = array2.mask(mask);
         masked2.addInplace(5);
         for (int i = 0; i < masked.length(); i++)
@@ -277,7 +275,7 @@ class TestLongNDArrayMask implements LongNDArrayConstructorTrait, ByteNDArrayCon
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Long> array2 = createLongNDArray(array);
+        NDArray<Long> array2 = new BasicLongNDArray(array);
         NDArray<Long> masked2 = array2.mask(mask);
         masked2.addInplace(masked, 5.3, masked2, 3);
         for (int i = 0; i < masked.length(); i++) {
@@ -366,7 +364,7 @@ class TestLongNDArrayMask implements LongNDArrayConstructorTrait, ByteNDArrayCon
 
     @Test
     void testConcatenate() {
-        NDArray<Long> array2 = createLongNDArray(5).fill(1);
+        NDArray<Long> array2 = new BasicLongNDArray(5).fill(1);
         NDArray<Long> array3 = masked.concatenate(0, array2);
         for (int i = 0; i < masked.dims(0); i++)
             assertEquals(masked.get(i), array3.get(i));
@@ -377,8 +375,8 @@ class TestLongNDArrayMask implements LongNDArrayConstructorTrait, ByteNDArrayCon
     @Test
     void testConcatenateMultiple() {
         NDArray<Long> array2 = masked.copy().fill(1).slice("1:1");
-        NDArray<Long> array3 = createLongNDArray(5).permuteDims(0);
-        NDArray<Long> array4 = createLongNDArray(3, 3).fill(2).reshape(9);
+        NDArray<Long> array3 = new BasicLongNDArray(5).permuteDims(0);
+        NDArray<Long> array4 = new BasicLongNDArray(3, 3).fill(2).reshape(9);
         NDArray<Long> array5 = masked.concatenate(0, array2, array3, array4);
         int start = 0;
         int end = masked.dims(0);

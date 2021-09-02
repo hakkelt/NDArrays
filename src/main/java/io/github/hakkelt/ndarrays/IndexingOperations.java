@@ -65,6 +65,18 @@ public class IndexingOperations {
         } else if (input[0].getClass().equals(double[].class)) {
             dimsSoFar.add(((double[])input[0]).length);
             return dimsSoFar;
+        } else if (input[0].getClass().equals(byte[].class)) {
+            dimsSoFar.add(((byte[])input[0]).length);
+            return dimsSoFar;
+        } else if (input[0].getClass().equals(short[].class)) {
+            dimsSoFar.add(((short[])input[0]).length);
+            return dimsSoFar;
+        } else if (input[0].getClass().equals(int[].class)) {
+            dimsSoFar.add(((int[])input[0]).length);
+            return dimsSoFar;
+        } else if (input[0].getClass().equals(long[].class)) {
+            dimsSoFar.add(((long[])input[0]).length);
+            return dimsSoFar;
         } else if (input[0].getClass().isArray())
             return computeDimsInternal(dimsSoFar, (Object[])input[0]);
         else

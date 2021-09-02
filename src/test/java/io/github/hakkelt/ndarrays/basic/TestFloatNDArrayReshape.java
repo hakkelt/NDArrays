@@ -8,17 +8,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.Errors;
-import io.github.hakkelt.ndarrays.FloatNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.NDArray;
 
-class TestFloatNDArrayReshape implements FloatNDArrayConstructorTrait, ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestFloatNDArrayReshape implements NameTrait {
     NDArray<Float> array, reshaped;
 
     @BeforeEach
     void setup() {
-        array = createFloatNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicFloatNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> (float)index);
         reshaped = array.reshape(20, 3);
     }
@@ -179,7 +177,7 @@ class TestFloatNDArrayReshape implements FloatNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testEqual() {
-        NDArray<Float> array2 = createFloatNDArray(reshaped);
+        NDArray<Float> array2 = new BasicFloatNDArray(reshaped);
         assertEquals(reshaped, array2);
         array2.set(0, 10);
         assertNotEquals(reshaped, array2);
@@ -220,7 +218,7 @@ class TestFloatNDArrayReshape implements FloatNDArrayConstructorTrait, ByteNDArr
     void testCollector() {
         NDArray<?> increased = reshaped.stream()
             .map((value) -> value + 1)
-            .collect(getFloatNDArrayCollector(reshaped.dims()));
+            .collect(BasicFloatNDArray.getCollector(reshaped.dims()));
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals(reshaped.get(i) + 1, increased.get(i));
     }
@@ -229,7 +227,7 @@ class TestFloatNDArrayReshape implements FloatNDArrayConstructorTrait, ByteNDArr
     void testParallelCollector() {
         NDArray<?> increased = reshaped.stream().parallel()
             .map((value) -> value + 1)
-            .collect(getFloatNDArrayCollector(reshaped.dims()));
+            .collect(BasicFloatNDArray.getCollector(reshaped.dims()));
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals(reshaped.get(i) + 1, increased.get(i));
     }
@@ -272,7 +270,7 @@ class TestFloatNDArrayReshape implements FloatNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testAdd() {
-        NDArray<Float> array2 = createFloatNDArray(reshaped);
+        NDArray<Float> array2 = new BasicFloatNDArray(reshaped);
         NDArray<Float> array3 = reshaped.add(array2);
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals(reshaped.get(i) * 2, array3.get(i));
@@ -287,7 +285,7 @@ class TestFloatNDArrayReshape implements FloatNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testAddMultiple() {
-        NDArray<Float> array2 = createFloatNDArray(reshaped);
+        NDArray<Float> array2 = new BasicFloatNDArray(reshaped);
         NDArray<Float> array3 = reshaped.add(array2, 5.3, array2, 3);
         for (int i = 0; i < reshaped.length(); i++) {
             float expected = reshaped.get(i) * 3.f + 5.3f + 3.f;
@@ -297,7 +295,7 @@ class TestFloatNDArrayReshape implements FloatNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testAddInplace() {
-        NDArray<Float> array2 = createFloatNDArray(reshaped);
+        NDArray<Float> array2 = new BasicFloatNDArray(reshaped);
         array2.addInplace(reshaped);
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals(reshaped.get(i) * 2, array2.get(i));
@@ -305,7 +303,7 @@ class TestFloatNDArrayReshape implements FloatNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Float> array2 = createFloatNDArray(reshaped);
+        NDArray<Float> array2 = new BasicFloatNDArray(reshaped);
         array2.addInplace(5);
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals(reshaped.get(i) + 5, array2.get(i));
@@ -313,7 +311,7 @@ class TestFloatNDArrayReshape implements FloatNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Float> array2 = createFloatNDArray(reshaped);
+        NDArray<Float> array2 = new BasicFloatNDArray(reshaped);
         array2.addInplace(reshaped, 5.3, array2, 3);
         for (int i = 0; i < reshaped.length(); i++) {
             float expected = reshaped.get(i) * 3.f + 5.3f + 3.f;
@@ -454,7 +452,7 @@ class TestFloatNDArrayReshape implements FloatNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testMaskReshaped() {
-        NDArray<Byte> mask = createByteNDArray(reshaped.map(value -> value > 20 ? (float)1 : (float)0));
+        NDArray<Byte> mask = new BasicByteNDArray(reshaped.map(value -> value > 20 ? (float)1 : (float)0));
         NDArray<Float> masked = reshaped.mask(mask);
         masked.forEach((value) -> assertTrue(value > 20));
         masked.fill(0);
@@ -487,7 +485,7 @@ class TestFloatNDArrayReshape implements FloatNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testConcatenate() {
-        NDArray<Float> array2 = createFloatNDArray(new int[]{5, 3}).fill(1);
+        NDArray<Float> array2 = new BasicFloatNDArray(new int[]{5, 3}).fill(1);
         NDArray<Float> array3 = reshaped.concatenate(0, array2);
         for (int i = 0; i < reshaped.dims(0); i++)
             for (int j = 0; j < reshaped.dims(1); j++)
@@ -500,8 +498,8 @@ class TestFloatNDArrayReshape implements FloatNDArrayConstructorTrait, ByteNDArr
     @Test
     void testConcatenateMultiple() {
         NDArray<Float> array2 = reshaped.copy().fill(1).slice("1:5", ":");
-        NDArray<Float> array3 = createFloatNDArray(new int[]{3, 2}).permuteDims(1, 0);
-        NDArray<Float> array4 = createFloatNDArray(new int[]{9}).fill(2).reshape(3, 3);
+        NDArray<Float> array3 = new BasicFloatNDArray(new int[]{3, 2}).permuteDims(1, 0);
+        NDArray<Float> array4 = new BasicFloatNDArray(new int[]{9}).fill(2).reshape(3, 3);
         NDArray<Float> array5 = reshaped.concatenate(0, array2, array3, array4);
         int start = 0;
         int end = reshaped.dims(0);

@@ -9,16 +9,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.github.hakkelt.ndarrays.Errors;
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
-import io.github.hakkelt.ndarrays.DoubleNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.NDArray;
 
-class TestDoubleNDArrayPermuteDims implements DoubleNDArrayConstructorTrait, ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestDoubleNDArrayPermuteDims implements NameTrait {
     NDArray<Double> array, pArray;
 
     @BeforeEach
     void setup() {
-        array = createDoubleNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicDoubleNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> (double)index);
         pArray = array.permuteDims(0, 2, 1);
     }
@@ -176,7 +174,7 @@ class TestDoubleNDArrayPermuteDims implements DoubleNDArrayConstructorTrait, Byt
 
     @Test
     void testEqual() {
-        NDArray<Double> array2 = createDoubleNDArray(pArray);
+        NDArray<Double> array2 = new BasicDoubleNDArray(pArray);
         assertEquals(pArray, array2);
         array2.set(0., 5);
         assertNotEquals(pArray, array2);
@@ -218,7 +216,7 @@ class TestDoubleNDArrayPermuteDims implements DoubleNDArrayConstructorTrait, Byt
     void testCollector() {
         NDArray<Double> increased = pArray.stream()
             .map((value) -> value + 1)
-            .collect(getDoubleNDArrayCollector(pArray.dims()));
+            .collect(BasicDoubleNDArray.getCollector(pArray.dims()));
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i) + 1, increased.get(i));
     }
@@ -227,7 +225,7 @@ class TestDoubleNDArrayPermuteDims implements DoubleNDArrayConstructorTrait, Byt
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(getDoubleNDArrayCollector(array.dims()));
+            .collect(BasicDoubleNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) + 1, increased.get(i));
     }
@@ -280,7 +278,7 @@ class TestDoubleNDArrayPermuteDims implements DoubleNDArrayConstructorTrait, Byt
 
     @Test
     void testAddArrayTopArray() {
-        NDArray<Double> array2 = createDoubleNDArray(pArray);
+        NDArray<Double> array2 = new BasicDoubleNDArray(pArray);
         NDArray<Double> array3 = pArray.add(array2);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i) * 2, array3.get(i));
@@ -288,7 +286,7 @@ class TestDoubleNDArrayPermuteDims implements DoubleNDArrayConstructorTrait, Byt
 
     @Test
     void testAddpArrayToArray() {
-        NDArray<Double> array2 = createDoubleNDArray(pArray);
+        NDArray<Double> array2 = new BasicDoubleNDArray(pArray);
         NDArray<Double> array3 = array2.add(pArray);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i) * 2, array3.get(i));
@@ -311,7 +309,7 @@ class TestDoubleNDArrayPermuteDims implements DoubleNDArrayConstructorTrait, Byt
 
     @Test
     void testAddMultiple() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         NDArray<Double> pArray2 = array2.permuteDims(0, 2, 1);
         NDArray<Double> array3 = pArray2.add(pArray, 5.3, pArray2, 3.);
         for (int i = 0; i < pArray.length(); i++) {
@@ -322,7 +320,7 @@ class TestDoubleNDArrayPermuteDims implements DoubleNDArrayConstructorTrait, Byt
 
     @Test
     void testAddInplace() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         NDArray<Double> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(pArray);
         for (int i = 0; i < pArray.length(); i++)
@@ -331,7 +329,7 @@ class TestDoubleNDArrayPermuteDims implements DoubleNDArrayConstructorTrait, Byt
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         NDArray<Double> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(5);
         for (int i = 0; i < pArray.length(); i++)
@@ -340,7 +338,7 @@ class TestDoubleNDArrayPermuteDims implements DoubleNDArrayConstructorTrait, Byt
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         NDArray<Double> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(pArray, 5.3, pArray2, 3.);
         for (int i = 0; i < pArray.length(); i++) {
@@ -423,7 +421,7 @@ class TestDoubleNDArrayPermuteDims implements DoubleNDArrayConstructorTrait, Byt
 
     @Test
     void testMaskPermuted() {
-        NDArray<Byte> mask = createByteNDArray(pArray.map(value -> value > 20 ? 1. : 0.));
+        NDArray<Byte> mask = new BasicByteNDArray(pArray.map(value -> value > 20 ? 1. : 0.));
         NDArray<Double> masked = pArray.mask(mask);
         masked.forEach((value) -> assertTrue(value > 20));
         masked.fill(0);
@@ -465,7 +463,7 @@ class TestDoubleNDArrayPermuteDims implements DoubleNDArrayConstructorTrait, Byt
 
     @Test
     void testConcatenate() {
-        NDArray<Double> array2 = createDoubleNDArray(new int[]{4, 3, 2}).fill(1);
+        NDArray<Double> array2 = new BasicDoubleNDArray(new int[]{4, 3, 2}).fill(1);
         NDArray<Double> array3 = pArray.concatenate(2, array2);
         for (int i = 0; i < pArray.dims(0); i++)
             for (int j = 0; j < pArray.dims(1); j++)
@@ -480,8 +478,8 @@ class TestDoubleNDArrayPermuteDims implements DoubleNDArrayConstructorTrait, Byt
     @Test
     void testConcatenateMultiple() {
         NDArray<Double> array2 = pArray.copy().fill(1).slice(":", ":", "1:3");
-        NDArray<Double> array3 = createDoubleNDArray(new int[]{5, 3, 4}).permuteDims(2, 1, 0);
-        NDArray<Double> array4 = createDoubleNDArray(new int[]{36}).fill(2.).reshape(4, 3, 3);
+        NDArray<Double> array3 = new BasicDoubleNDArray(new int[]{5, 3, 4}).permuteDims(2, 1, 0);
+        NDArray<Double> array4 = new BasicDoubleNDArray(new int[]{36}).fill(2.).reshape(4, 3, 3);
         NDArray<Double> array5 = pArray.concatenate(2, array2, array3, array4);
         int start = 0;
         int end = pArray.dims(2);

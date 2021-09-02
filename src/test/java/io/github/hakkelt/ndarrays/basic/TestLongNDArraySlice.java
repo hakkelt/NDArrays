@@ -10,17 +10,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.Errors;
-import io.github.hakkelt.ndarrays.LongNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.NDArray;
 
-class TestLongNDArraySlice implements LongNDArrayConstructorTrait, ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestLongNDArraySlice implements NameTrait {
     NDArray<Long> array, slice;
 
     @BeforeEach
     void setup() {
-        array = createLongNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicLongNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> index.longValue());
         slice = array.slice(1, "1:4", ":");
     }
@@ -181,7 +179,7 @@ class TestLongNDArraySlice implements LongNDArrayConstructorTrait, ByteNDArrayCo
 
     @Test
     void testEqual() {
-        NDArray<Long> array2 = createLongNDArray(slice);
+        NDArray<Long> array2 = new BasicLongNDArray(slice);
         assertEquals(slice, array2);
         array2.set(0, 5);
         assertNotEquals(slice, array2);
@@ -222,7 +220,7 @@ class TestLongNDArraySlice implements LongNDArrayConstructorTrait, ByteNDArrayCo
     void testCollector() {
         NDArray<Long> increased = slice.stream()
             .map((value) -> value + 1)
-            .collect(getLongNDArrayCollector(slice.dims()));
+            .collect(BasicLongNDArray.getCollector(slice.dims()));
         for (int i = 0; i < slice.length(); i++)
             assertEquals((long)(slice.get(i) + 1), increased.get(i));
     }
@@ -231,7 +229,7 @@ class TestLongNDArraySlice implements LongNDArrayConstructorTrait, ByteNDArrayCo
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(getLongNDArrayCollector(array.dims()));
+            .collect(BasicLongNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals((long)(array.get(i) + 1), increased.get(i));
     }
@@ -257,7 +255,7 @@ class TestLongNDArraySlice implements LongNDArrayConstructorTrait, ByteNDArrayCo
 
     @Test
     void testApply() {
-        NDArray<Long> slice2 = createLongNDArray(array).slice(1, "1:4", ":");
+        NDArray<Long> slice2 = new BasicLongNDArray(array).slice(1, "1:4", ":");
         slice2.apply(value -> (long)Math.sqrt(value));
         for (int i = 0; i < slice.length(); i++)
             assertEquals((long)Math.sqrt(slice.get(i)), slice2.get(i));
@@ -265,7 +263,7 @@ class TestLongNDArraySlice implements LongNDArrayConstructorTrait, ByteNDArrayCo
 
     @Test
     void testApplyWithLinearIndices() {
-        NDArray<Long> slice2 = createLongNDArray(array).slice(1, "1:4", ":");
+        NDArray<Long> slice2 = new BasicLongNDArray(array).slice(1, "1:4", ":");
         slice2.applyWithLinearIndices((value, index) -> (long)(Math.sqrt(value) + index));
         for (int i = 0; i < slice.length(); i++)
             assertEquals((long)(Math.sqrt(slice.get(i)) + i), slice2.get(i));
@@ -273,7 +271,7 @@ class TestLongNDArraySlice implements LongNDArrayConstructorTrait, ByteNDArrayCo
 
     @Test
     void testApplyWithCartesianIndex() {
-        NDArray<Long> slice2 = createLongNDArray(array).slice(1, "1:4", ":");
+        NDArray<Long> slice2 = new BasicLongNDArray(array).slice(1, "1:4", ":");
         slice2.applyWithCartesianIndices((value, indices) -> (long)(Math.sqrt(value) + indices[0]));
         for (int i = 0; i < slice.dims(0); i++)
             for (int j = 0; j < slice.dims(1); j++)
@@ -320,7 +318,7 @@ class TestLongNDArraySlice implements LongNDArrayConstructorTrait, ByteNDArrayCo
 
     @Test
     void testAddArrayToSlice() {
-        NDArray<Long> array2 = createLongNDArray(slice);
+        NDArray<Long> array2 = new BasicLongNDArray(slice);
         NDArray<Long> array3 = slice.add(array2);
         for (int i = 0; i < slice.length(); i++)
             assertEquals((long)(slice.get(i) * 2), array3.get(i));
@@ -328,7 +326,7 @@ class TestLongNDArraySlice implements LongNDArrayConstructorTrait, ByteNDArrayCo
 
     @Test
     void testAddSliceToArray() {
-        NDArray<Long> array2 = createLongNDArray(slice);
+        NDArray<Long> array2 = new BasicLongNDArray(slice);
         NDArray<Long> array3 = array2.add(slice);
         for (int i = 0; i < slice.length(); i++)
             assertEquals((long)(slice.get(i) * 2), array3.get(i));
@@ -351,7 +349,7 @@ class TestLongNDArraySlice implements LongNDArrayConstructorTrait, ByteNDArrayCo
 
     @Test
     void testAddMultiple() {
-        NDArray<Long> array2 = createLongNDArray(array);
+        NDArray<Long> array2 = new BasicLongNDArray(array);
         NDArray<Long> slice2 = array2.slice(1, "1:4", ":");
         NDArray<Long> array3 = slice2.add(slice, 5.3, slice2, 3);
         for (int i = 0; i < slice.length(); i++) {
@@ -362,7 +360,7 @@ class TestLongNDArraySlice implements LongNDArrayConstructorTrait, ByteNDArrayCo
 
     @Test
     void testAddInplace() {
-        NDArray<Long> array2 = createLongNDArray(array);
+        NDArray<Long> array2 = new BasicLongNDArray(array);
         NDArray<Long> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(slice);
         for (int i = 0; i < slice.length(); i++)
@@ -371,7 +369,7 @@ class TestLongNDArraySlice implements LongNDArrayConstructorTrait, ByteNDArrayCo
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Long> array2 = createLongNDArray(array);
+        NDArray<Long> array2 = new BasicLongNDArray(array);
         NDArray<Long> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(5);
         for (int i = 0; i < slice.length(); i++)
@@ -380,7 +378,7 @@ class TestLongNDArraySlice implements LongNDArrayConstructorTrait, ByteNDArrayCo
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Long> array2 = createLongNDArray(array);
+        NDArray<Long> array2 = new BasicLongNDArray(array);
         NDArray<Long> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(slice, 5.3, slice2, 3);
         for (int i = 0; i < slice.length(); i++) {
@@ -478,7 +476,7 @@ class TestLongNDArraySlice implements LongNDArrayConstructorTrait, ByteNDArrayCo
 
     @Test
     void testMaskSlice() {
-        NDArray<Byte> mask = createByteNDArray(slice.map(value -> value > 20 ? (long)1 : (long)0));
+        NDArray<Byte> mask = new BasicByteNDArray(slice.map(value -> value > 20 ? (long)1 : (long)0));
         NDArray<Long> masked = slice.mask(mask);
         masked.forEach((value) -> assertTrue(value > 20));
         masked.fill(0);
@@ -511,7 +509,7 @@ class TestLongNDArraySlice implements LongNDArrayConstructorTrait, ByteNDArrayCo
 
     @Test
     void testConcatenate() {
-        NDArray<Long> array2 = createLongNDArray(new int[]{5, 3}).fill(1);
+        NDArray<Long> array2 = new BasicLongNDArray(new int[]{5, 3}).fill(1);
         NDArray<Long> array3 = slice.concatenate(0, array2);
         for (int i = 0; i < slice.dims(0); i++)
             for (int j = 0; j < slice.dims(1); j++)
@@ -524,8 +522,8 @@ class TestLongNDArraySlice implements LongNDArrayConstructorTrait, ByteNDArrayCo
     @Test
     void testConcatenateMultiple() {
         NDArray<Long> array2 = slice.copy().fill(1).slice("1:1", ":");
-        NDArray<Long> array3 = createLongNDArray(new int[]{3, 2}).permuteDims(1, 0);
-        NDArray<Long> array4 = createLongNDArray(new int[]{9}).fill(2).reshape(3, 3);
+        NDArray<Long> array3 = new BasicLongNDArray(new int[]{3, 2}).permuteDims(1, 0);
+        NDArray<Long> array4 = new BasicLongNDArray(new int[]{9}).fill(2).reshape(3, 3);
         NDArray<Long> array5 = slice.concatenate(0, array2, array3, array4);
         int start = 0;
         int end = slice.dims(0);

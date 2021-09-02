@@ -10,17 +10,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.Errors;
-import io.github.hakkelt.ndarrays.IntegerNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.NDArray;
 
-class TestIntegerNDArrayPermuteDims implements IntegerNDArrayConstructorTrait, ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestIntegerNDArrayPermuteDims implements NameTrait {
     NDArray<Integer> array, pArray;
 
     @BeforeEach
     void setup() {
-        array = createIntegerNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicIntegerNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> index.intValue());
         pArray = array.permuteDims(0, 2, 1);
     }
@@ -178,7 +176,7 @@ class TestIntegerNDArrayPermuteDims implements IntegerNDArrayConstructorTrait, B
 
     @Test
     void testEqual() {
-        NDArray<Integer> array2 = createIntegerNDArray(pArray);
+        NDArray<Integer> array2 = new BasicIntegerNDArray(pArray);
         assertEquals(pArray, array2);
         array2.set(0.f, 5);
         assertNotEquals(pArray, array2);
@@ -220,7 +218,7 @@ class TestIntegerNDArrayPermuteDims implements IntegerNDArrayConstructorTrait, B
     void testCollector() {
         NDArray<Integer> increased = pArray.stream()
             .map((value) -> value + 1)
-            .collect(getIntegerNDArrayCollector(pArray.dims()));
+            .collect(BasicIntegerNDArray.getCollector(pArray.dims()));
         for (int i = 0; i < pArray.length(); i++)
             assertEquals((int)(pArray.get(i) + 1), increased.get(i));
     }
@@ -229,7 +227,7 @@ class TestIntegerNDArrayPermuteDims implements IntegerNDArrayConstructorTrait, B
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(getIntegerNDArrayCollector(array.dims()));
+            .collect(BasicIntegerNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals((int)(array.get(i) + 1), increased.get(i));
     }
@@ -282,7 +280,7 @@ class TestIntegerNDArrayPermuteDims implements IntegerNDArrayConstructorTrait, B
 
     @Test
     void testApply() {
-        NDArray<Integer> pArray2 = createIntegerNDArray(array).permuteDims(0, 2, 1);
+        NDArray<Integer> pArray2 = new BasicIntegerNDArray(array).permuteDims(0, 2, 1);
         pArray2.apply(value -> (int)Math.sqrt(value));
         for (int i = 0; i < pArray.length(); i++)
             assertEquals((int)Math.sqrt(pArray.get(i)), pArray2.get(i));
@@ -290,7 +288,7 @@ class TestIntegerNDArrayPermuteDims implements IntegerNDArrayConstructorTrait, B
 
     @Test
     void testApplyWithLinearIndices() {
-        NDArray<Integer> pArray2 = createIntegerNDArray(array).permuteDims(0, 2, 1);
+        NDArray<Integer> pArray2 = new BasicIntegerNDArray(array).permuteDims(0, 2, 1);
         pArray2.applyWithLinearIndices((value, index) -> (int)(Math.sqrt(value) + index));
         for (int i = 0; i < pArray.length(); i++)
             assertEquals((int)(Math.sqrt(pArray.get(i)) + i), pArray2.get(i));
@@ -298,7 +296,7 @@ class TestIntegerNDArrayPermuteDims implements IntegerNDArrayConstructorTrait, B
 
     @Test
     void testApplyWithCartesianIndex() {
-        NDArray<Integer> pArray2 = createIntegerNDArray(array).permuteDims(0, 2, 1);
+        NDArray<Integer> pArray2 = new BasicIntegerNDArray(array).permuteDims(0, 2, 1);
         pArray2.applyWithCartesianIndices((value, indices) -> (int)(Math.sqrt(value) + indices[0]));
         for (int i = 0; i < pArray.dims(0); i++)
             for (int j = 0; j < pArray.dims(1); j++)
@@ -347,7 +345,7 @@ class TestIntegerNDArrayPermuteDims implements IntegerNDArrayConstructorTrait, B
 
     @Test
     void testAddArrayTopArray() {
-        NDArray<Integer> array2 = createIntegerNDArray(pArray);
+        NDArray<Integer> array2 = new BasicIntegerNDArray(pArray);
         NDArray<Integer> array3 = pArray.add(array2);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals((int)(pArray.get(i) * 2), array3.get(i));
@@ -355,7 +353,7 @@ class TestIntegerNDArrayPermuteDims implements IntegerNDArrayConstructorTrait, B
 
     @Test
     void testAddpArrayToArray() {
-        NDArray<Integer> array2 = createIntegerNDArray(pArray);
+        NDArray<Integer> array2 = new BasicIntegerNDArray(pArray);
         NDArray<Integer> array3 = array2.add(pArray);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals((int)(pArray.get(i) * 2), array3.get(i));
@@ -378,7 +376,7 @@ class TestIntegerNDArrayPermuteDims implements IntegerNDArrayConstructorTrait, B
 
     @Test
     void testAddMultiple() {
-        NDArray<Integer> array2 = createIntegerNDArray(array);
+        NDArray<Integer> array2 = new BasicIntegerNDArray(array);
         NDArray<Integer> pArray2 = array2.permuteDims(0, 2, 1);
         NDArray<Integer> array3 = pArray2.add(pArray, 5, pArray2, 3);
         for (int i = 0; i < pArray.length(); i++) {
@@ -389,7 +387,7 @@ class TestIntegerNDArrayPermuteDims implements IntegerNDArrayConstructorTrait, B
 
     @Test
     void testAddInplace() {
-        NDArray<Integer> array2 = createIntegerNDArray(array);
+        NDArray<Integer> array2 = new BasicIntegerNDArray(array);
         NDArray<Integer> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(pArray);
         for (int i = 0; i < pArray.length(); i++)
@@ -398,7 +396,7 @@ class TestIntegerNDArrayPermuteDims implements IntegerNDArrayConstructorTrait, B
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Integer> array2 = createIntegerNDArray(array);
+        NDArray<Integer> array2 = new BasicIntegerNDArray(array);
         NDArray<Integer> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(5);
         for (int i = 0; i < pArray.length(); i++)
@@ -407,7 +405,7 @@ class TestIntegerNDArrayPermuteDims implements IntegerNDArrayConstructorTrait, B
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Integer> array2 = createIntegerNDArray(array);
+        NDArray<Integer> array2 = new BasicIntegerNDArray(array);
         NDArray<Integer> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(pArray, 5, pArray2, 3);
         for (int i = 0; i < pArray.length(); i++) {
@@ -490,7 +488,7 @@ class TestIntegerNDArrayPermuteDims implements IntegerNDArrayConstructorTrait, B
 
     @Test
     void testMaskPermuted() {
-        NDArray<Byte> mask = createByteNDArray(pArray.map(value -> value > 20 ? 1 : 0));
+        NDArray<Byte> mask = new BasicByteNDArray(pArray.map(value -> value > 20 ? 1 : 0));
         NDArray<Integer> masked = pArray.mask(mask);
         masked.forEach((value) -> assertTrue(value > 20));
         masked.fill(0);
@@ -532,7 +530,7 @@ class TestIntegerNDArrayPermuteDims implements IntegerNDArrayConstructorTrait, B
 
     @Test
     void testConcatenate() {
-        NDArray<Integer> array2 = createIntegerNDArray(new int[]{4, 3, 2}).fill(1);
+        NDArray<Integer> array2 = new BasicIntegerNDArray(new int[]{4, 3, 2}).fill(1);
         NDArray<Integer> array3 = pArray.concatenate(2, array2);
         for (int i = 0; i < pArray.dims(0); i++)
             for (int j = 0; j < pArray.dims(1); j++)
@@ -547,8 +545,8 @@ class TestIntegerNDArrayPermuteDims implements IntegerNDArrayConstructorTrait, B
     @Test
     void testConcatenateMultiple() {
         NDArray<Integer> array2 = pArray.copy().fill(1).slice(":", ":", "1:3");
-        NDArray<Integer> array3 = createIntegerNDArray(new int[]{5, 3, 4}).permuteDims(2, 1, 0);
-        NDArray<Integer> array4 = createIntegerNDArray(new int[]{36}).fill(2.f).reshape(4, 3, 3);
+        NDArray<Integer> array3 = new BasicIntegerNDArray(new int[]{5, 3, 4}).permuteDims(2, 1, 0);
+        NDArray<Integer> array4 = new BasicIntegerNDArray(new int[]{36}).fill(2.f).reshape(4, 3, 3);
         NDArray<Integer> array5 = pArray.concatenate(2, array2, array3, array4);
         int start = 0;
         int end = pArray.dims(2);

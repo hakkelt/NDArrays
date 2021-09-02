@@ -8,20 +8,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.Errors;
 import io.github.hakkelt.ndarrays.NDArray;
-import io.github.hakkelt.ndarrays.ShortNDArrayConstructorTrait;
 
-class TestShortNDArrayMask implements ShortNDArrayConstructorTrait, ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestShortNDArrayMask implements NameTrait {
     NDArray<Short> array, masked;
     NDArray<Byte> mask;
 
     @BeforeEach
     void setup() {
-        array = createShortNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicShortNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> index.shortValue());
-        mask = createByteNDArray(array.mapWithLinearIndices((value, index) -> (short)(index.intValue() % 2)));
+        mask = new BasicByteNDArray(array.mapWithLinearIndices((value, index) -> (short)(index.intValue() % 2)));
         masked = array.mask(mask);
     }
 
@@ -58,14 +56,14 @@ class TestShortNDArrayMask implements ShortNDArrayConstructorTrait, ByteNDArrayC
 
     @Test
     void testMaskMask() {
-        NDArray<Byte> mask2 = createByteNDArray(masked.map(value -> value > 20 ? (short)1 : (short)0));
+        NDArray<Byte> mask2 = new BasicByteNDArray(masked.map(value -> value > 20 ? (short)1 : (short)0));
         NDArray<Short> masked2 = masked.mask(mask2);
         masked2.forEach((value) -> assertTrue(value > 20));
     }
 
     @Test
     void testMaskInverseMask() {
-        NDArray<Byte> mask2 = createByteNDArray(masked.map(value -> value > 20 ? (short)1 : (short)0));
+        NDArray<Byte> mask2 = new BasicByteNDArray(masked.map(value -> value > 20 ? (short)1 : (short)0));
         NDArray<Short> masked2 = masked.inverseMask(mask2);
         masked2.forEach((value) -> assertTrue(value <= 20));
     }
@@ -140,7 +138,7 @@ class TestShortNDArrayMask implements ShortNDArrayConstructorTrait, ByteNDArrayC
 
     @Test
     void testEqual() {
-        NDArray<Short> array2 = createShortNDArray(masked);
+        NDArray<Short> array2 = new BasicShortNDArray(masked);
         assertEquals(masked, array2);
         array2.set(0, 5);
         assertNotEquals(masked, array2);
@@ -180,7 +178,7 @@ class TestShortNDArrayMask implements ShortNDArrayConstructorTrait, ByteNDArrayC
     void testCollector() {
         NDArray<Short> increased = masked.stream()
             .map((value) -> value + 1)
-            .collect(getShortNDArrayCollector(masked.dims()));
+            .collect(BasicShortNDArray.getCollector(masked.dims()));
         for (int i = 0; i < masked.length(); i++)
             assertEquals((short)(masked.get(i) + 1), increased.get(i));
     }
@@ -189,7 +187,7 @@ class TestShortNDArrayMask implements ShortNDArrayConstructorTrait, ByteNDArrayC
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(getShortNDArrayCollector(array.dims()));
+            .collect(BasicShortNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals((short)(array.get(i) + 1), increased.get(i));
     }
@@ -217,7 +215,7 @@ class TestShortNDArrayMask implements ShortNDArrayConstructorTrait, ByteNDArrayC
 
     @Test
     void testAddArrayToMasked() {
-        NDArray<Short> array2 = createShortNDArray(masked);
+        NDArray<Short> array2 = new BasicShortNDArray(masked);
         NDArray<Short> array3 = masked.add(array2);
         for (int i = 0; i < masked.length(); i++)
             assertEquals((short)(masked.get(i) * 2), array3.get(i));
@@ -225,7 +223,7 @@ class TestShortNDArrayMask implements ShortNDArrayConstructorTrait, ByteNDArrayC
 
     @Test
     void testAddMaskedToArray() {
-        NDArray<Short> array2 = createShortNDArray(masked);
+        NDArray<Short> array2 = new BasicShortNDArray(masked);
         NDArray<Short> array3 = array2.add(masked);
         for (int i = 0; i < masked.length(); i++)
             assertEquals((short)(masked.get(i) * 2), array3.get(i));
@@ -248,7 +246,7 @@ class TestShortNDArrayMask implements ShortNDArrayConstructorTrait, ByteNDArrayC
 
     @Test
     void testAddMultiple() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         NDArray<Short> masked2 = array2.mask(mask);
         NDArray<Short> array3 = masked2.add(masked, 5, masked2, 3);
         for (int i = 0; i < masked.length(); i++) {
@@ -259,7 +257,7 @@ class TestShortNDArrayMask implements ShortNDArrayConstructorTrait, ByteNDArrayC
 
     @Test
     void testAddInplace() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         NDArray<Short> masked2 = array2.mask(mask);
         masked2.addInplace(masked);
         for (int i = 0; i < masked.length(); i++)
@@ -268,7 +266,7 @@ class TestShortNDArrayMask implements ShortNDArrayConstructorTrait, ByteNDArrayC
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         NDArray<Short> masked2 = array2.mask(mask);
         masked2.addInplace(5);
         for (int i = 0; i < masked.length(); i++)
@@ -277,7 +275,7 @@ class TestShortNDArrayMask implements ShortNDArrayConstructorTrait, ByteNDArrayC
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         NDArray<Short> masked2 = array2.mask(mask);
         masked2.addInplace(masked, 5.3, masked2, 3);
         for (int i = 0; i < masked.length(); i++) {
@@ -366,7 +364,7 @@ class TestShortNDArrayMask implements ShortNDArrayConstructorTrait, ByteNDArrayC
 
     @Test
     void testConcatenate() {
-        NDArray<Short> array2 = createShortNDArray(5).fill(1);
+        NDArray<Short> array2 = new BasicShortNDArray(5).fill(1);
         NDArray<Short> array3 = masked.concatenate(0, array2);
         for (int i = 0; i < masked.dims(0); i++)
             assertEquals(masked.get(i), array3.get(i));
@@ -377,8 +375,8 @@ class TestShortNDArrayMask implements ShortNDArrayConstructorTrait, ByteNDArrayC
     @Test
     void testConcatenateMultiple() {
         NDArray<Short> array2 = masked.copy().fill(1).slice("1:1");
-        NDArray<Short> array3 = createShortNDArray(5).permuteDims(0);
-        NDArray<Short> array4 = createShortNDArray(3, 3).fill(2).reshape(9);
+        NDArray<Short> array3 = new BasicShortNDArray(5).permuteDims(0);
+        NDArray<Short> array4 = new BasicShortNDArray(3, 3).fill(2).reshape(9);
         NDArray<Short> array5 = masked.concatenate(0, array2, array3, array4);
         int start = 0;
         int end = masked.dims(0);

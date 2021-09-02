@@ -8,20 +8,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.Errors;
-import io.github.hakkelt.ndarrays.FloatNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.NDArray;
 
-class TestFloatNDArrayMask implements FloatNDArrayConstructorTrait, ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestFloatNDArrayMask implements NameTrait {
     NDArray<Float> array, masked;
     NDArray<Byte> mask;
 
     @BeforeEach
     void setup() {
-        array = createFloatNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicFloatNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> (float)index);
-        mask = createByteNDArray(array.mapWithLinearIndices((value, index) -> (float)index % 2));
+        mask = new BasicByteNDArray(array.mapWithLinearIndices((value, index) -> (float)index % 2));
         masked = array.mask(mask);
     }
 
@@ -58,14 +56,14 @@ class TestFloatNDArrayMask implements FloatNDArrayConstructorTrait, ByteNDArrayC
 
     @Test
     void testMaskMask() {
-        NDArray<Byte> mask2 = createByteNDArray(masked.map(value -> value > 20 ? (float)1 : (float)0));
+        NDArray<Byte> mask2 = new BasicByteNDArray(masked.map(value -> value > 20 ? (float)1 : (float)0));
         NDArray<Float> masked2 = masked.mask(mask2);
         masked2.forEach((value) -> assertTrue(value > 20));
     }
 
     @Test
     void testMaskInverseMask() {
-        NDArray<Byte> mask2 = createByteNDArray(masked.map(value -> value > 20 ? (float)1 : (float)0));
+        NDArray<Byte> mask2 = new BasicByteNDArray(masked.map(value -> value > 20 ? (float)1 : (float)0));
         NDArray<Float> masked2 = masked.inverseMask(mask2);
         masked2.forEach((value) -> assertTrue(value <= 20));
     }
@@ -140,7 +138,7 @@ class TestFloatNDArrayMask implements FloatNDArrayConstructorTrait, ByteNDArrayC
 
     @Test
     void testEqual() {
-        NDArray<Float> array2 = createFloatNDArray(masked);
+        NDArray<Float> array2 = new BasicFloatNDArray(masked);
         assertEquals(masked, array2);
         array2.set(0, 5);
         assertNotEquals(masked, array2);
@@ -180,7 +178,7 @@ class TestFloatNDArrayMask implements FloatNDArrayConstructorTrait, ByteNDArrayC
     void testCollector() {
         NDArray<Float> increased = masked.stream()
             .map((value) -> value + 1)
-            .collect(getFloatNDArrayCollector(masked.dims()));
+            .collect(BasicFloatNDArray.getCollector(masked.dims()));
         for (int i = 0; i < masked.length(); i++)
             assertEquals(masked.get(i) + 1, increased.get(i));
     }
@@ -189,7 +187,7 @@ class TestFloatNDArrayMask implements FloatNDArrayConstructorTrait, ByteNDArrayC
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(getFloatNDArrayCollector(array.dims()));
+            .collect(BasicFloatNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) + 1, increased.get(i));
     }
@@ -217,7 +215,7 @@ class TestFloatNDArrayMask implements FloatNDArrayConstructorTrait, ByteNDArrayC
 
     @Test
     void testAddArrayToMasked() {
-        NDArray<Float> array2 = createFloatNDArray(masked);
+        NDArray<Float> array2 = new BasicFloatNDArray(masked);
         NDArray<Float> array3 = masked.add(array2);
         for (int i = 0; i < masked.length(); i++)
             assertEquals(masked.get(i) * 2, array3.get(i));
@@ -225,7 +223,7 @@ class TestFloatNDArrayMask implements FloatNDArrayConstructorTrait, ByteNDArrayC
 
     @Test
     void testAddMaskedToArray() {
-        NDArray<Float> array2 = createFloatNDArray(masked);
+        NDArray<Float> array2 = new BasicFloatNDArray(masked);
         NDArray<Float> array3 = array2.add(masked);
         for (int i = 0; i < masked.length(); i++)
             assertEquals(masked.get(i) * 2, array3.get(i));
@@ -248,7 +246,7 @@ class TestFloatNDArrayMask implements FloatNDArrayConstructorTrait, ByteNDArrayC
 
     @Test
     void testAddMultiple() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         NDArray<Float> masked2 = array2.mask(mask);
         NDArray<Float> array3 = masked2.add(masked, 5.3, masked2, 3);
         for (int i = 0; i < masked.length(); i++) {
@@ -259,7 +257,7 @@ class TestFloatNDArrayMask implements FloatNDArrayConstructorTrait, ByteNDArrayC
 
     @Test
     void testAddInplace() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         NDArray<Float> masked2 = array2.mask(mask);
         masked2.addInplace(masked);
         for (int i = 0; i < masked.length(); i++)
@@ -268,7 +266,7 @@ class TestFloatNDArrayMask implements FloatNDArrayConstructorTrait, ByteNDArrayC
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         NDArray<Float> masked2 = array2.mask(mask);
         masked2.addInplace(5);
         for (int i = 0; i < masked.length(); i++)
@@ -277,7 +275,7 @@ class TestFloatNDArrayMask implements FloatNDArrayConstructorTrait, ByteNDArrayC
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         NDArray<Float> masked2 = array2.mask(mask);
         masked2.addInplace(masked, 5.3, masked2, 3);
         for (int i = 0; i < masked.length(); i++) {
@@ -366,7 +364,7 @@ class TestFloatNDArrayMask implements FloatNDArrayConstructorTrait, ByteNDArrayC
 
     @Test
     void testConcatenate() {
-        NDArray<Float> array2 = createFloatNDArray(5).fill(1);
+        NDArray<Float> array2 = new BasicFloatNDArray(5).fill(1);
         NDArray<Float> array3 = masked.concatenate(0, array2);
         for (int i = 0; i < masked.dims(0); i++)
             assertEquals(masked.get(i), array3.get(i));
@@ -377,8 +375,8 @@ class TestFloatNDArrayMask implements FloatNDArrayConstructorTrait, ByteNDArrayC
     @Test
     void testConcatenateMultiple() {
         NDArray<Float> array2 = masked.copy().fill(1).slice("1:1");
-        NDArray<Float> array3 = createFloatNDArray(5).permuteDims(0);
-        NDArray<Float> array4 = createFloatNDArray(3, 3).fill(2).reshape(9);
+        NDArray<Float> array3 = new BasicFloatNDArray(5).permuteDims(0);
+        NDArray<Float> array4 = new BasicFloatNDArray(3, 3).fill(2).reshape(9);
         NDArray<Float> array5 = masked.concatenate(0, array2, array3, array4);
         int start = 0;
         int end = masked.dims(0);

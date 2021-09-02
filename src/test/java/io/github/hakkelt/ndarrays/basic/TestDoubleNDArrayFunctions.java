@@ -11,15 +11,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.github.hakkelt.ndarrays.Errors;
-import io.github.hakkelt.ndarrays.DoubleNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.NDArray;
 
-class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, ConstructorTrait {
+class TestDoubleNDArrayFunctions implements NameTrait {
     NDArray<Double> array;
 
     @BeforeEach
     void setup() {
-        array = createDoubleNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicDoubleNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> (double)index);
     }
 
@@ -170,7 +169,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testEqual() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         assertEquals(array, array2);
         array2.set(0, 10);
         assertNotEquals(array, array2);
@@ -211,7 +210,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
     void testCollector() {
         NDArray<?> increased = array.stream()
             .map((value) -> value + 1)
-            .collect(getDoubleNDArrayCollector(array.dims()));
+            .collect(BasicDoubleNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) + 1, increased.get(i));
     }
@@ -220,7 +219,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(getDoubleNDArrayCollector(array.dims()));
+            .collect(BasicDoubleNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) + 1, increased.get(i));
     }
@@ -261,7 +260,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testApply() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         array2.apply(value -> Math.sqrt(value));
         for (int i = 0; i < array.length(); i++)
             assertEquals(Math.sqrt(array.get(i)), array2.get(i));
@@ -269,7 +268,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testApplyWithLinearIndices() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         array2.applyWithLinearIndices((value, index) -> Math.sqrt(value) + index);
         for (int i = 0; i < array.length(); i++)
             assertEquals((Math.sqrt(array.get(i)) + i), array2.get(i));
@@ -277,7 +276,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testApplyWithCartesianIndex() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         array2.applyWithCartesianIndices((value, indices) -> Math.sqrt(value) + indices[0]);
         for (int i = 0; i < array.dims(0); i++)
             for (int j = 0; j < array.dims(1); j++)
@@ -326,7 +325,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testAdd() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         NDArray<Double> array3 = array.add(array2);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) * 2, array3.get(i));
@@ -341,7 +340,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testAddMultiple() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         NDArray<Double> array3 = array.add(array2, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             double expected = array.get(i) * 3 + 5.3 + 3;
@@ -351,7 +350,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testAddInplace() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         array2.addInplace(array);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) * 2, array2.get(i));
@@ -359,7 +358,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         array2.addInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) + 5, array2.get(i));
@@ -367,7 +366,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         array2.addInplace(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             double expected = array.get(i) * 3 + 5.3 + 3;
@@ -377,7 +376,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testSubtract() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         NDArray<Double> array3 = array.subtract(array2);
         for (int i = 0; i < array.length(); i++)
             assertEquals(0, array3.get(i));
@@ -392,7 +391,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testSubtractMultiple() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         NDArray<Double> array3 = array.subtract(array2, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             double expected = array.get(i) * -1. - 5.3f - 3.;
@@ -402,7 +401,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testSubtractInplace() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         array2.subtractInplace(array);
         for (int i = 0; i < array.length(); i++)
             assertEquals(0, array2.get(i));
@@ -410,7 +409,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testSubtractInplaceScalar() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         array2.subtractInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) - 5., array2.get(i));
@@ -418,7 +417,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testSubtractInplaceMultiple() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         array2.subtractInplace(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             double expected = array.get(i) * -1. - 5.3f - 3.;
@@ -428,7 +427,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testMultiply() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         NDArray<Double> array3 = array.multiply(array2);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) * array.get(i), array3.get(i));
@@ -443,7 +442,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testMultiplyMultiple() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         NDArray<Double> array3 = array.multiply(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             double expected = array.get(i) * array.get(i) * 5.3f * array2.get(i) * 3.;
@@ -453,7 +452,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testMultiplyInplace() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         array2.multiplyInplace(array);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) * array.get(i), array2.get(i));
@@ -461,7 +460,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testMultiplyInplaceScalar() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         array2.multiplyInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) * 5., array2.get(i));
@@ -469,7 +468,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testMultiplyInplaceMultiple() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         array2.multiplyInplace(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             double expected = array.get(i) * array.get(i) * 5.3f * array2.get(i) * 3.;
@@ -482,7 +481,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testDivide() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         NDArray<Double> array3 = array.divide(array2);
         for (int i = 0; i < array.length(); i++) {
             if (array.get(i) == 0)
@@ -501,7 +500,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testDivideMultiple() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         NDArray<Double> array3 = array.divide(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             Double expected = array.get(i) / array.get(i) / 5.3f
@@ -515,7 +514,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testDivideInplace() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         array2.divideInplace(array);
         for (int i = 0; i < array.length(); i++)
         if (array.get(i) == 0)
@@ -526,7 +525,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testDivideInplaceScalar() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         array2.divideInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertTrue(Math.abs(array.get(i) / 5. - array2.get(i)) < 1e-5);
@@ -534,7 +533,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testDivideInplaceMultiple() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         array2.divideInplace(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             Double expected = array.get(i) / array.get(i) / 5.3f
@@ -671,7 +670,7 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
 
     @Test
     void testConcatenate() {
-        NDArray<Double> array2 = createDoubleNDArray(new int[]{4, 2, 3}).fill(1);
+        NDArray<Double> array2 = new BasicDoubleNDArray(new int[]{4, 2, 3}).fill(1);
         NDArray<Double> array3 = array.concatenate(1, array2);
         for (int i = 0; i < array.dims(0); i++)
             for (int j = 0; j < array.dims(1); j++)
@@ -686,8 +685,8 @@ class TestDoubleNDArrayFunctions implements DoubleNDArrayConstructorTrait, Const
     @Test
     void testConcatenateMultiple() {
         NDArray<Double> array2 = array.copy().fill(1).slice(":", "1:3", ":");
-        NDArray<Double> array3 = createDoubleNDArray(new int[]{3, 4, 4}).permuteDims(2, 1, 0);
-        NDArray<Double> array4 = createDoubleNDArray(new int[]{12}).fill(2).reshape(4, 1, 3);
+        NDArray<Double> array3 = new BasicDoubleNDArray(new int[]{3, 4, 4}).permuteDims(2, 1, 0);
+        NDArray<Double> array4 = new BasicDoubleNDArray(new int[]{12}).fill(2).reshape(4, 1, 3);
         NDArray<Double> array5 = array.concatenate(1, array2, array3, array4);
         int start = 0;
         int end = array.dims(1);

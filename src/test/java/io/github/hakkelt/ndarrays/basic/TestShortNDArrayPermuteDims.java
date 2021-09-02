@@ -10,17 +10,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.Errors;
 import io.github.hakkelt.ndarrays.NDArray;
-import io.github.hakkelt.ndarrays.ShortNDArrayConstructorTrait;
 
-class TestShortNDArrayPermuteDims implements ShortNDArrayConstructorTrait, ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestShortNDArrayPermuteDims implements NameTrait {
     NDArray<Short> array, pArray;
 
     @BeforeEach
     void setup() {
-        array = createShortNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicShortNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> index.shortValue());
         pArray = array.permuteDims(0, 2, 1);
     }
@@ -178,7 +176,7 @@ class TestShortNDArrayPermuteDims implements ShortNDArrayConstructorTrait, ByteN
 
     @Test
     void testEqual() {
-        NDArray<Short> array2 = createShortNDArray(pArray);
+        NDArray<Short> array2 = new BasicShortNDArray(pArray);
         assertEquals(pArray, array2);
         array2.set(0.f, 5);
         assertNotEquals(pArray, array2);
@@ -220,7 +218,7 @@ class TestShortNDArrayPermuteDims implements ShortNDArrayConstructorTrait, ByteN
     void testCollector() {
         NDArray<Short> increased = pArray.stream()
             .map((value) -> value + 1)
-            .collect(getShortNDArrayCollector(pArray.dims()));
+            .collect(BasicShortNDArray.getCollector(pArray.dims()));
         for (int i = 0; i < pArray.length(); i++)
             assertEquals((short)(pArray.get(i) + 1), increased.get(i));
     }
@@ -229,7 +227,7 @@ class TestShortNDArrayPermuteDims implements ShortNDArrayConstructorTrait, ByteN
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(getShortNDArrayCollector(array.dims()));
+            .collect(BasicShortNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals((short)(array.get(i) + 1), increased.get(i));
     }
@@ -282,7 +280,7 @@ class TestShortNDArrayPermuteDims implements ShortNDArrayConstructorTrait, ByteN
 
     @Test
     void testApply() {
-        NDArray<Short> pArray2 = createShortNDArray(array).permuteDims(0, 2, 1);
+        NDArray<Short> pArray2 = new BasicShortNDArray(array).permuteDims(0, 2, 1);
         pArray2.apply(value -> (short)Math.sqrt(value));
         for (int i = 0; i < pArray.length(); i++)
             assertEquals((short)Math.sqrt(pArray.get(i)), pArray2.get(i));
@@ -290,7 +288,7 @@ class TestShortNDArrayPermuteDims implements ShortNDArrayConstructorTrait, ByteN
 
     @Test
     void testApplyWithLinearIndices() {
-        NDArray<Short> pArray2 = createShortNDArray(array).permuteDims(0, 2, 1);
+        NDArray<Short> pArray2 = new BasicShortNDArray(array).permuteDims(0, 2, 1);
         pArray2.applyWithLinearIndices((value, index) -> (short)(Math.sqrt(value) + index));
         for (int i = 0; i < pArray.length(); i++)
             assertEquals((short)(Math.sqrt(pArray.get(i)) + i), pArray2.get(i));
@@ -298,7 +296,7 @@ class TestShortNDArrayPermuteDims implements ShortNDArrayConstructorTrait, ByteN
 
     @Test
     void testApplyWithCartesianIndex() {
-        NDArray<Short> pArray2 = createShortNDArray(array).permuteDims(0, 2, 1);
+        NDArray<Short> pArray2 = new BasicShortNDArray(array).permuteDims(0, 2, 1);
         pArray2.applyWithCartesianIndices((value, indices) -> (short)(Math.sqrt(value) + indices[0]));
         for (int i = 0; i < pArray.dims(0); i++)
             for (int j = 0; j < pArray.dims(1); j++)
@@ -347,7 +345,7 @@ class TestShortNDArrayPermuteDims implements ShortNDArrayConstructorTrait, ByteN
 
     @Test
     void testAddArrayTopArray() {
-        NDArray<Short> array2 = createShortNDArray(pArray);
+        NDArray<Short> array2 = new BasicShortNDArray(pArray);
         NDArray<Short> array3 = pArray.add(array2);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals((short)(pArray.get(i) * 2), array3.get(i));
@@ -355,7 +353,7 @@ class TestShortNDArrayPermuteDims implements ShortNDArrayConstructorTrait, ByteN
 
     @Test
     void testAddpArrayToArray() {
-        NDArray<Short> array2 = createShortNDArray(pArray);
+        NDArray<Short> array2 = new BasicShortNDArray(pArray);
         NDArray<Short> array3 = array2.add(pArray);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals((short)(pArray.get(i) * 2), array3.get(i));
@@ -378,7 +376,7 @@ class TestShortNDArrayPermuteDims implements ShortNDArrayConstructorTrait, ByteN
 
     @Test
     void testAddMultiple() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         NDArray<Short> pArray2 = array2.permuteDims(0, 2, 1);
         NDArray<Short> array3 = pArray2.add(pArray, 5, pArray2, 3);
         for (int i = 0; i < pArray.length(); i++) {
@@ -389,7 +387,7 @@ class TestShortNDArrayPermuteDims implements ShortNDArrayConstructorTrait, ByteN
 
     @Test
     void testAddInplace() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         NDArray<Short> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(pArray);
         for (int i = 0; i < pArray.length(); i++)
@@ -398,7 +396,7 @@ class TestShortNDArrayPermuteDims implements ShortNDArrayConstructorTrait, ByteN
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         NDArray<Short> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(5);
         for (int i = 0; i < pArray.length(); i++)
@@ -407,7 +405,7 @@ class TestShortNDArrayPermuteDims implements ShortNDArrayConstructorTrait, ByteN
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         NDArray<Short> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(pArray, 5, pArray2, 3);
         for (int i = 0; i < pArray.length(); i++) {
@@ -490,7 +488,7 @@ class TestShortNDArrayPermuteDims implements ShortNDArrayConstructorTrait, ByteN
 
     @Test
     void testMaskPermuted() {
-        NDArray<Byte> mask = createByteNDArray(pArray.map(value -> value > 20 ? (short)1 : (short)0));
+        NDArray<Byte> mask = new BasicByteNDArray(pArray.map(value -> value > 20 ? (short)1 : (short)0));
         NDArray<Short> masked = pArray.mask(mask);
         masked.forEach((value) -> assertTrue(value > 20));
         masked.fill(0);
@@ -532,7 +530,7 @@ class TestShortNDArrayPermuteDims implements ShortNDArrayConstructorTrait, ByteN
 
     @Test
     void testConcatenate() {
-        NDArray<Short> array2 = createShortNDArray(new int[]{4, 3, 2}).fill(1);
+        NDArray<Short> array2 = new BasicShortNDArray(new int[]{4, 3, 2}).fill(1);
         NDArray<Short> array3 = pArray.concatenate(2, array2);
         for (int i = 0; i < pArray.dims(0); i++)
             for (int j = 0; j < pArray.dims(1); j++)
@@ -547,8 +545,8 @@ class TestShortNDArrayPermuteDims implements ShortNDArrayConstructorTrait, ByteN
     @Test
     void testConcatenateMultiple() {
         NDArray<Short> array2 = pArray.copy().fill(1).slice(":", ":", "1:3");
-        NDArray<Short> array3 = createShortNDArray(new int[]{5, 3, 4}).permuteDims(2, 1, 0);
-        NDArray<Short> array4 = createShortNDArray(new int[]{36}).fill(2.f).reshape(4, 3, 3);
+        NDArray<Short> array3 = new BasicShortNDArray(new int[]{5, 3, 4}).permuteDims(2, 1, 0);
+        NDArray<Short> array4 = new BasicShortNDArray(new int[]{36}).fill(2.f).reshape(4, 3, 3);
         NDArray<Short> array5 = pArray.concatenate(2, array2, array3, array4);
         int start = 0;
         int end = pArray.dims(2);

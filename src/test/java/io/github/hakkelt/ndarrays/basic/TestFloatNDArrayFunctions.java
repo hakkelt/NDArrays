@@ -11,15 +11,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.github.hakkelt.ndarrays.Errors;
-import io.github.hakkelt.ndarrays.FloatNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.NDArray;
 
-class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, ConstructorTrait {
+class TestFloatNDArrayFunctions implements NameTrait {
     NDArray<Float> array;
 
     @BeforeEach
     void setup() {
-        array = createFloatNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicFloatNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> (float)index);
     }
 
@@ -170,7 +169,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testEqual() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         assertEquals(array, array2);
         array2.set(0, 10);
         assertNotEquals(array, array2);
@@ -211,7 +210,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
     void testCollector() {
         NDArray<?> increased = array.stream()
             .map((value) -> value + 1)
-            .collect(getFloatNDArrayCollector(array.dims()));
+            .collect(BasicFloatNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) + 1, increased.get(i));
     }
@@ -220,7 +219,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(getFloatNDArrayCollector(array.dims()));
+            .collect(BasicFloatNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) + 1, increased.get(i));
     }
@@ -261,7 +260,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testApply() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         array2.apply(value -> (float)Math.sqrt(value));
         for (int i = 0; i < array.length(); i++)
             assertEquals((float)Math.sqrt(array.get(i)), array2.get(i));
@@ -269,7 +268,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testApplyWithLinearIndices() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         array2.applyWithLinearIndices((value, index) -> (float)(Math.sqrt(value) + index));
         for (int i = 0; i < array.length(); i++)
             assertEquals((float)(Math.sqrt(array.get(i)) + i), array2.get(i));
@@ -277,7 +276,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testApplyWithCartesianIndex() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         array2.applyWithCartesianIndices((value, indices) -> (float)(Math.sqrt(value) + indices[0]));
         for (int i = 0; i < array.dims(0); i++)
             for (int j = 0; j < array.dims(1); j++)
@@ -326,7 +325,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testAdd() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         NDArray<Float> array3 = array.add(array2);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) * 2, array3.get(i));
@@ -341,7 +340,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testAddMultiple() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         NDArray<Float> array3 = array.add(array2, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             double expected = array.get(i) * 3 + 5.3 + 3;
@@ -351,7 +350,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testAddInplace() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         array2.addInplace(array);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) * 2, array2.get(i));
@@ -359,7 +358,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         array2.addInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) + 5, array2.get(i));
@@ -367,7 +366,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         array2.addInplace(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             double expected = array.get(i) * 3 + 5.3 + 3;
@@ -377,7 +376,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testSubtract() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         NDArray<Float> array3 = array.subtract(array2);
         for (int i = 0; i < array.length(); i++)
             assertEquals(0, array3.get(i));
@@ -392,7 +391,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testSubtractMultiple() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         NDArray<Float> array3 = array.subtract(array2, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             float expected = array.get(i) * -1.f - 5.3f - 3.f;
@@ -402,7 +401,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testSubtractInplace() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         array2.subtractInplace(array);
         for (int i = 0; i < array.length(); i++)
             assertEquals(0, array2.get(i));
@@ -410,7 +409,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testSubtractInplaceScalar() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         array2.subtractInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) - 5.f, array2.get(i));
@@ -418,7 +417,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testSubtractInplaceMultiple() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         array2.subtractInplace(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             float expected = array.get(i) * -1.f - 5.3f - 3.f;
@@ -428,7 +427,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testMultiply() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         NDArray<Float> array3 = array.multiply(array2);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) * array.get(i), array3.get(i));
@@ -443,7 +442,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testMultiplyMultiple() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         NDArray<Float> array3 = array.multiply(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             float expected = array.get(i) * array.get(i) * 5.3f *
@@ -454,7 +453,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testMultiplyInplace() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         array2.multiplyInplace(array);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) * array.get(i), array2.get(i));
@@ -462,7 +461,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testMultiplyInplaceScalar() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         array2.multiplyInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) * 5.f, array2.get(i));
@@ -470,7 +469,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testMultiplyInplaceMultiple() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         array2.multiplyInplace(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             float expected = array.get(i) * array.get(i) * 5.3f *
@@ -484,7 +483,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testDivide() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         NDArray<Float> array3 = array.divide(array2);
         for (int i = 0; i < array.length(); i++) {
             if (array.get(i) == 0)
@@ -503,7 +502,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testDivideMultiple() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         NDArray<Float> array3 = array.divide(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             Float expected = array.get(i) / array.get(i) / 5.3f
@@ -517,7 +516,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testDivideInplace() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         array2.divideInplace(array);
         for (int i = 0; i < array.length(); i++)
         if (array.get(i) == 0)
@@ -528,7 +527,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testDivideInplaceScalar() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         array2.divideInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertTrue(Math.abs(array.get(i) / 5.f - array2.get(i)) < 1e-5);
@@ -536,7 +535,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testDivideInplaceMultiple() {
-        NDArray<Float> array2 = createFloatNDArray(array);
+        NDArray<Float> array2 = new BasicFloatNDArray(array);
         array2.divideInplace(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             Float expected = array.get(i) / array.get(i) / 5.3f
@@ -673,7 +672,7 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
 
     @Test
     void testConcatenate() {
-        NDArray<Float> array2 = createFloatNDArray(new int[]{4, 2, 3}).fill(1);
+        NDArray<Float> array2 = new BasicFloatNDArray(new int[]{4, 2, 3}).fill(1);
         NDArray<Float> array3 = array.concatenate(1, array2);
         for (int i = 0; i < array.dims(0); i++)
             for (int j = 0; j < array.dims(1); j++)
@@ -688,8 +687,8 @@ class TestFloatNDArrayFunctions implements FloatNDArrayConstructorTrait, Constru
     @Test
     void testConcatenateMultiple() {
         NDArray<Float> array2 = array.copy().fill(1).slice(":", "1:3", ":");
-        NDArray<Float> array3 = createFloatNDArray(new int[]{3, 4, 4}).permuteDims(2, 1, 0);
-        NDArray<Float> array4 = createFloatNDArray(new int[]{12}).fill(2).reshape(4, 1, 3);
+        NDArray<Float> array3 = new BasicFloatNDArray(new int[]{3, 4, 4}).permuteDims(2, 1, 0);
+        NDArray<Float> array4 = new BasicFloatNDArray(new int[]{12}).fill(2).reshape(4, 1, 3);
         NDArray<Float> array5 = array.concatenate(1, array2, array3, array4);
         int start = 0;
         int end = array.dims(1);

@@ -10,17 +10,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.Errors;
 import io.github.hakkelt.ndarrays.NDArray;
-import io.github.hakkelt.ndarrays.ShortNDArrayConstructorTrait;
 
-class TestShortNDArraySlice implements ShortNDArrayConstructorTrait, ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestShortNDArraySlice implements NameTrait {
     NDArray<Short> array, slice;
 
     @BeforeEach
     void setup() {
-        array = createShortNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicShortNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> index.shortValue());
         slice = array.slice(1, "1:4", ":");
     }
@@ -181,7 +179,7 @@ class TestShortNDArraySlice implements ShortNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testEqual() {
-        NDArray<Short> array2 = createShortNDArray(slice);
+        NDArray<Short> array2 = new BasicShortNDArray(slice);
         assertEquals(slice, array2);
         array2.set(0, 5);
         assertNotEquals(slice, array2);
@@ -222,7 +220,7 @@ class TestShortNDArraySlice implements ShortNDArrayConstructorTrait, ByteNDArray
     void testCollector() {
         NDArray<Short> increased = slice.stream()
             .map((value) -> value + 1)
-            .collect(getShortNDArrayCollector(slice.dims()));
+            .collect(BasicShortNDArray.getCollector(slice.dims()));
         for (int i = 0; i < slice.length(); i++)
             assertEquals((short)(slice.get(i) + 1), increased.get(i));
     }
@@ -231,7 +229,7 @@ class TestShortNDArraySlice implements ShortNDArrayConstructorTrait, ByteNDArray
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(getShortNDArrayCollector(array.dims()));
+            .collect(BasicShortNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals((short)(array.get(i) + 1), increased.get(i));
     }
@@ -257,7 +255,7 @@ class TestShortNDArraySlice implements ShortNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testApply() {
-        NDArray<Short> slice2 = createShortNDArray(array).slice(1, "1:4", ":");
+        NDArray<Short> slice2 = new BasicShortNDArray(array).slice(1, "1:4", ":");
         slice2.apply(value -> (short)Math.sqrt(value));
         for (int i = 0; i < slice.length(); i++)
             assertEquals((short)Math.sqrt(slice.get(i)), slice2.get(i));
@@ -265,7 +263,7 @@ class TestShortNDArraySlice implements ShortNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testApplyWithLinearIndices() {
-        NDArray<Short> slice2 = createShortNDArray(array).slice(1, "1:4", ":");
+        NDArray<Short> slice2 = new BasicShortNDArray(array).slice(1, "1:4", ":");
         slice2.applyWithLinearIndices((value, index) -> (short)(Math.sqrt(value) + index));
         for (int i = 0; i < slice.length(); i++)
             assertEquals((short)(Math.sqrt(slice.get(i)) + i), slice2.get(i));
@@ -273,7 +271,7 @@ class TestShortNDArraySlice implements ShortNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testApplyWithCartesianIndex() {
-        NDArray<Short> slice2 = createShortNDArray(array).slice(1, "1:4", ":");
+        NDArray<Short> slice2 = new BasicShortNDArray(array).slice(1, "1:4", ":");
         slice2.applyWithCartesianIndices((value, indices) -> (short)(Math.sqrt(value) + indices[0]));
         for (int i = 0; i < slice.dims(0); i++)
             for (int j = 0; j < slice.dims(1); j++)
@@ -320,7 +318,7 @@ class TestShortNDArraySlice implements ShortNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testAddArrayToSlice() {
-        NDArray<Short> array2 = createShortNDArray(slice);
+        NDArray<Short> array2 = new BasicShortNDArray(slice);
         NDArray<Short> array3 = slice.add(array2);
         for (int i = 0; i < slice.length(); i++)
             assertEquals((short)(slice.get(i) * 2), array3.get(i));
@@ -328,7 +326,7 @@ class TestShortNDArraySlice implements ShortNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testAddSliceToArray() {
-        NDArray<Short> array2 = createShortNDArray(slice);
+        NDArray<Short> array2 = new BasicShortNDArray(slice);
         NDArray<Short> array3 = array2.add(slice);
         for (int i = 0; i < slice.length(); i++)
             assertEquals((short)(slice.get(i) * 2), array3.get(i));
@@ -351,7 +349,7 @@ class TestShortNDArraySlice implements ShortNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testAddMultiple() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         NDArray<Short> slice2 = array2.slice(1, "1:4", ":");
         NDArray<Short> array3 = slice2.add(slice, 5.3, slice2, 3);
         for (int i = 0; i < slice.length(); i++) {
@@ -362,7 +360,7 @@ class TestShortNDArraySlice implements ShortNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testAddInplace() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         NDArray<Short> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(slice);
         for (int i = 0; i < slice.length(); i++)
@@ -371,7 +369,7 @@ class TestShortNDArraySlice implements ShortNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         NDArray<Short> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(5);
         for (int i = 0; i < slice.length(); i++)
@@ -380,7 +378,7 @@ class TestShortNDArraySlice implements ShortNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         NDArray<Short> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(slice, 5.3, slice2, 3);
         for (int i = 0; i < slice.length(); i++) {
@@ -478,7 +476,7 @@ class TestShortNDArraySlice implements ShortNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testMaskSlice() {
-        NDArray<Byte> mask = createByteNDArray(slice.map(value -> value > 20 ? (short)1 : (short)0));
+        NDArray<Byte> mask = new BasicByteNDArray(slice.map(value -> value > 20 ? (short)1 : (short)0));
         NDArray<Short> masked = slice.mask(mask);
         masked.forEach((value) -> assertTrue(value > 20));
         masked.fill(0);
@@ -511,7 +509,7 @@ class TestShortNDArraySlice implements ShortNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testConcatenate() {
-        NDArray<Short> array2 = createShortNDArray(new int[]{5, 3}).fill(1);
+        NDArray<Short> array2 = new BasicShortNDArray(new int[]{5, 3}).fill(1);
         NDArray<Short> array3 = slice.concatenate(0, array2);
         for (int i = 0; i < slice.dims(0); i++)
             for (int j = 0; j < slice.dims(1); j++)
@@ -524,8 +522,8 @@ class TestShortNDArraySlice implements ShortNDArrayConstructorTrait, ByteNDArray
     @Test
     void testConcatenateMultiple() {
         NDArray<Short> array2 = slice.copy().fill(1).slice("1:1", ":");
-        NDArray<Short> array3 = createShortNDArray(new int[]{3, 2}).permuteDims(1, 0);
-        NDArray<Short> array4 = createShortNDArray(new int[]{9}).fill(2).reshape(3, 3);
+        NDArray<Short> array3 = new BasicShortNDArray(new int[]{3, 2}).permuteDims(1, 0);
+        NDArray<Short> array4 = new BasicShortNDArray(new int[]{9}).fill(2).reshape(3, 3);
         NDArray<Short> array5 = slice.concatenate(0, array2, array3, array4);
         int start = 0;
         int end = slice.dims(0);

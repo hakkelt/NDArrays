@@ -11,18 +11,16 @@ import org.apache.commons.math3.complex.Complex;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
-import io.github.hakkelt.ndarrays.ComplexDoubleNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.ComplexNDArray;
 import io.github.hakkelt.ndarrays.Errors;
 import io.github.hakkelt.ndarrays.NDArray;
 
-class TestComplexDoubleNDArrayPermuteDims implements ComplexDoubleNDArrayConstructorTrait, ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestComplexDoubleNDArrayPermuteDims implements NameTrait {
     ComplexNDArray<Double> array, pArray;
 
     @BeforeEach
     void setup() {
-        array = createComplexDoubleNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicComplexDoubleNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> new Complex(index, -index));
         pArray = array.permuteDims(0, 2, 1);
     }
@@ -186,7 +184,7 @@ class TestComplexDoubleNDArrayPermuteDims implements ComplexDoubleNDArrayConstru
 
     @Test
     void testEqual() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(pArray);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(pArray);
         assertEquals(pArray, array2);
         array2.set(new Complex(0,0), 5);
         assertNotEquals(pArray, array2);
@@ -229,7 +227,7 @@ class TestComplexDoubleNDArrayPermuteDims implements ComplexDoubleNDArrayConstru
         final Complex one = new Complex(1,-1);
         NDArray<Complex> increased = pArray.stream()
             .map((value) -> value.add(one))
-            .collect(getComplexDoubleNDArrayCollector(pArray.dims()));
+            .collect(BasicComplexDoubleNDArray.getCollector(pArray.dims()));
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i).add(one), increased.get(i));
     }
@@ -239,7 +237,7 @@ class TestComplexDoubleNDArrayPermuteDims implements ComplexDoubleNDArrayConstru
         final Complex one = new Complex(1,-1);
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value.add(one))
-            .collect(getComplexDoubleNDArrayCollector(array.dims()));
+            .collect(BasicComplexDoubleNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).add(one), increased.get(i));
     }
@@ -292,7 +290,7 @@ class TestComplexDoubleNDArrayPermuteDims implements ComplexDoubleNDArrayConstru
 
     @Test
     void testApply() {
-        NDArray<Complex> pArray2 = createComplexDoubleNDArray(array).permuteDims(0,2,1).apply(value -> value.atan());
+        NDArray<Complex> pArray2 = new BasicComplexDoubleNDArray(array).permuteDims(0,2,1).apply(value -> value.atan());
         for (int i = 1; i < array.length(); i++) {
             assertTrue(Math.abs(pArray.get(i).atan().getReal() - pArray2.get(i).getReal()) / pArray2.get(i).getReal() < 1e-6);
             assertTrue(Math.abs(pArray.get(i).atan().getImaginary() - pArray2.get(i).getImaginary()) / pArray2.get(i).getImaginary() < 1e-6);
@@ -301,7 +299,7 @@ class TestComplexDoubleNDArrayPermuteDims implements ComplexDoubleNDArrayConstru
 
     @Test
     void testApplyWithLinearIndices() {
-        NDArray<Complex> pArray2 = createComplexDoubleNDArray(array).permuteDims(0,2,1).applyWithLinearIndices((value, index) -> value.atan().add(index));
+        NDArray<Complex> pArray2 = new BasicComplexDoubleNDArray(array).permuteDims(0,2,1).applyWithLinearIndices((value, index) -> value.atan().add(index));
         for (int i = 1; i < pArray.length(); i++) {
             assertTrue(Math.abs(pArray.get(i).atan().add(i).getReal() - pArray2.get(i).getReal()) / pArray2.get(i).getReal() < 1e-6);
             assertTrue(Math.abs(pArray.get(i).atan().add(i).getImaginary() - pArray2.get(i).getImaginary()) / pArray2.get(i).getImaginary() < 1e-6);
@@ -310,7 +308,7 @@ class TestComplexDoubleNDArrayPermuteDims implements ComplexDoubleNDArrayConstru
 
     @Test
     void testApplyWithCartesianIndex() {
-        NDArray<Complex> pArray2 = createComplexDoubleNDArray(array).permuteDims(0,2,1).applyWithCartesianIndices((value, indices) -> value.atan().add(indices[0]));
+        NDArray<Complex> pArray2 = new BasicComplexDoubleNDArray(array).permuteDims(0,2,1).applyWithCartesianIndices((value, indices) -> value.atan().add(indices[0]));
         for (int i = 0; i < pArray.dims(0); i++)
             for (int j = 0; j < pArray.dims(1); j++)
                 for (int k = 0; k < pArray.dims(2); k++) {
@@ -368,7 +366,7 @@ class TestComplexDoubleNDArrayPermuteDims implements ComplexDoubleNDArrayConstru
 
     @Test
     void testAddArrayTopArray() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(pArray);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(pArray);
         ComplexNDArray<Double> array3 = pArray.add(array2);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i).multiply(2), array3.get(i));
@@ -376,7 +374,7 @@ class TestComplexDoubleNDArrayPermuteDims implements ComplexDoubleNDArrayConstru
 
     @Test
     void testAddpArrayToArray() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(pArray);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(pArray);
         ComplexNDArray<Double> array3 = array2.add(pArray);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals(pArray.get(i).multiply(2), array3.get(i));
@@ -399,7 +397,7 @@ class TestComplexDoubleNDArrayPermuteDims implements ComplexDoubleNDArrayConstru
 
     @Test
     void testAddMultiple() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> pArray2 = array2.permuteDims(0, 2, 1);
         ComplexNDArray<Double> array3 = pArray2.add(pArray, 5.3, pArray2, new Complex(3,1));
         for (int i = 0; i < pArray.length(); i++) {
@@ -410,7 +408,7 @@ class TestComplexDoubleNDArrayPermuteDims implements ComplexDoubleNDArrayConstru
 
     @Test
     void testAddInplace() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(pArray);
         for (int i = 0; i < pArray.length(); i++)
@@ -419,7 +417,7 @@ class TestComplexDoubleNDArrayPermuteDims implements ComplexDoubleNDArrayConstru
 
     @Test
     void testAddInplaceScalar() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(5);
         for (int i = 0; i < pArray.length(); i++)
@@ -428,7 +426,7 @@ class TestComplexDoubleNDArrayPermuteDims implements ComplexDoubleNDArrayConstru
 
     @Test
     void testAddInplaceMultiple() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(pArray, 5.3, pArray2, new Complex(3,1));
         for (int i = 0; i < pArray.length(); i++) {
@@ -511,7 +509,7 @@ class TestComplexDoubleNDArrayPermuteDims implements ComplexDoubleNDArrayConstru
 
     @Test
     void testMaskPermuted() {
-        NDArray<Byte> mask = createByteNDArray(pArray.abs().map(value -> value > 20 ? 1. : 0.));
+        NDArray<Byte> mask = new BasicByteNDArray(pArray.abs().map(value -> value > 20 ? 1. : 0.));
         ComplexNDArray<Double> masked = pArray.mask(mask);
         masked.forEach((value) -> assertTrue(value.abs() > 20));
         masked.fill(0);
@@ -553,7 +551,7 @@ class TestComplexDoubleNDArrayPermuteDims implements ComplexDoubleNDArrayConstru
 
     @Test
     void testConcatenate() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(new int[]{4, 3, 2}).fill(1);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(new int[]{4, 3, 2}).fill(1);
         ComplexNDArray<Double> array3 = pArray.concatenate(2, array2);
         for (int i = 0; i < pArray.dims(0); i++)
             for (int j = 0; j < pArray.dims(1); j++)
@@ -568,8 +566,8 @@ class TestComplexDoubleNDArrayPermuteDims implements ComplexDoubleNDArrayConstru
     @Test
     void testConcatenateMultiple() {
         ComplexNDArray<Double> array2 = pArray.copy().fill(1).slice(":", ":", "1:3");
-        ComplexNDArray<Double> array3 = createComplexDoubleNDArray(new int[]{5, 3, 4}).permuteDims(2, 1, 0);
-        ComplexNDArray<Double> array4 = createComplexDoubleNDArray(new int[]{36}).fill(new Complex(2, -2)).reshape(4, 3, 3);
+        ComplexNDArray<Double> array3 = new BasicComplexDoubleNDArray(new int[]{5, 3, 4}).permuteDims(2, 1, 0);
+        ComplexNDArray<Double> array4 = new BasicComplexDoubleNDArray(new int[]{36}).fill(new Complex(2, -2)).reshape(4, 3, 3);
         ComplexNDArray<Double> array5 = pArray.concatenate(2, array2, array3, array4);
         int start = 0;
         int end = pArray.dims(2);

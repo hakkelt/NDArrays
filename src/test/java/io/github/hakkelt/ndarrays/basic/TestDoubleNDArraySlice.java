@@ -9,16 +9,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.github.hakkelt.ndarrays.Errors;
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
-import io.github.hakkelt.ndarrays.DoubleNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.NDArray;
 
-class TestDoubleNDArraySlice implements DoubleNDArrayConstructorTrait, ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestDoubleNDArraySlice implements NameTrait {
     NDArray<Double> array, slice;
 
     @BeforeEach
     void setup() {
-        array = createDoubleNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicDoubleNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> (double)index);
         slice = array.slice(1, "1:4", ":");
     }
@@ -179,7 +177,7 @@ class TestDoubleNDArraySlice implements DoubleNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testEqual() {
-        NDArray<Double> array2 = createDoubleNDArray(slice);
+        NDArray<Double> array2 = new BasicDoubleNDArray(slice);
         assertEquals(slice, array2);
         array2.set(0, 5);
         assertNotEquals(slice, array2);
@@ -220,7 +218,7 @@ class TestDoubleNDArraySlice implements DoubleNDArrayConstructorTrait, ByteNDArr
     void testCollector() {
         NDArray<Double> increased = slice.stream()
             .map((value) -> value + 1)
-            .collect(getDoubleNDArrayCollector(slice.dims()));
+            .collect(BasicDoubleNDArray.getCollector(slice.dims()));
         for (int i = 0; i < slice.length(); i++)
             assertEquals(slice.get(i) + 1, increased.get(i));
     }
@@ -229,7 +227,7 @@ class TestDoubleNDArraySlice implements DoubleNDArrayConstructorTrait, ByteNDArr
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(getDoubleNDArrayCollector(array.dims()));
+            .collect(BasicDoubleNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) + 1, increased.get(i));
     }
@@ -255,7 +253,7 @@ class TestDoubleNDArraySlice implements DoubleNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testAddArrayToSlice() {
-        NDArray<Double> array2 = createDoubleNDArray(slice);
+        NDArray<Double> array2 = new BasicDoubleNDArray(slice);
         NDArray<Double> array3 = slice.add(array2);
         for (int i = 0; i < slice.length(); i++)
             assertEquals(slice.get(i) * 2, array3.get(i));
@@ -263,7 +261,7 @@ class TestDoubleNDArraySlice implements DoubleNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testAddSliceToArray() {
-        NDArray<Double> array2 = createDoubleNDArray(slice);
+        NDArray<Double> array2 = new BasicDoubleNDArray(slice);
         NDArray<Double> array3 = array2.add(slice);
         for (int i = 0; i < slice.length(); i++)
             assertEquals(slice.get(i) * 2, array3.get(i));
@@ -286,7 +284,7 @@ class TestDoubleNDArraySlice implements DoubleNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testAddMultiple() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         NDArray<Double> slice2 = array2.slice(1, "1:4", ":");
         NDArray<Double> array3 = slice2.add(slice, 5.3, slice2, 3);
         for (int i = 0; i < slice.length(); i++) {
@@ -297,7 +295,7 @@ class TestDoubleNDArraySlice implements DoubleNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testAddInplace() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         NDArray<Double> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(slice);
         for (int i = 0; i < slice.length(); i++)
@@ -306,7 +304,7 @@ class TestDoubleNDArraySlice implements DoubleNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         NDArray<Double> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(5);
         for (int i = 0; i < slice.length(); i++)
@@ -315,7 +313,7 @@ class TestDoubleNDArraySlice implements DoubleNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Double> array2 = createDoubleNDArray(array);
+        NDArray<Double> array2 = new BasicDoubleNDArray(array);
         NDArray<Double> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(slice, 5.3, slice2, 3);
         for (int i = 0; i < slice.length(); i++) {
@@ -413,7 +411,7 @@ class TestDoubleNDArraySlice implements DoubleNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testMaskSlice() {
-        NDArray<Byte> mask = createByteNDArray(slice.map(value -> value > 20 ? 1. : 0.));
+        NDArray<Byte> mask = new BasicByteNDArray(slice.map(value -> value > 20 ? 1. : 0.));
         NDArray<Double> masked = slice.mask(mask);
         masked.forEach((value) -> assertTrue(value > 20));
         masked.fill(0);
@@ -446,7 +444,7 @@ class TestDoubleNDArraySlice implements DoubleNDArrayConstructorTrait, ByteNDArr
 
     @Test
     void testConcatenate() {
-        NDArray<Double> array2 = createDoubleNDArray(new int[]{5, 3}).fill(1);
+        NDArray<Double> array2 = new BasicDoubleNDArray(new int[]{5, 3}).fill(1);
         NDArray<Double> array3 = slice.concatenate(0, array2);
         for (int i = 0; i < slice.dims(0); i++)
             for (int j = 0; j < slice.dims(1); j++)
@@ -459,8 +457,8 @@ class TestDoubleNDArraySlice implements DoubleNDArrayConstructorTrait, ByteNDArr
     @Test
     void testConcatenateMultiple() {
         NDArray<Double> array2 = slice.copy().fill(1).slice("1:1", ":");
-        NDArray<Double> array3 = createDoubleNDArray(new int[]{3, 2}).permuteDims(1, 0);
-        NDArray<Double> array4 = createDoubleNDArray(new int[]{9}).fill(2).reshape(3, 3);
+        NDArray<Double> array3 = new BasicDoubleNDArray(new int[]{3, 2}).permuteDims(1, 0);
+        NDArray<Double> array4 = new BasicDoubleNDArray(new int[]{9}).fill(2).reshape(3, 3);
         NDArray<Double> array5 = slice.concatenate(0, array2, array3, array4);
         int start = 0;
         int end = slice.dims(0);

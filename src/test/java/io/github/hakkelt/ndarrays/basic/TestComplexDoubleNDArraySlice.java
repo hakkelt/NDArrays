@@ -11,18 +11,16 @@ import org.apache.commons.math3.complex.Complex;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
-import io.github.hakkelt.ndarrays.ComplexDoubleNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.ComplexNDArray;
 import io.github.hakkelt.ndarrays.Errors;
 import io.github.hakkelt.ndarrays.NDArray;
 
-class TestComplexDoubleNDArraySlice implements ComplexDoubleNDArrayConstructorTrait, ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestComplexDoubleNDArraySlice implements NameTrait {
     ComplexNDArray<Double> array, slice;
 
     @BeforeEach
     void setup() {
-        array = createComplexDoubleNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicComplexDoubleNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> new Complex(index, -index));
         slice = array.slice(1, "1:4", ":");
     }
@@ -189,7 +187,7 @@ class TestComplexDoubleNDArraySlice implements ComplexDoubleNDArrayConstructorTr
 
     @Test
     void testEqual() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(slice);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(slice);
         assertEquals(slice, array2);
         array2.set(new Complex(0,0), 5);
         assertNotEquals(slice, array2);
@@ -231,7 +229,7 @@ class TestComplexDoubleNDArraySlice implements ComplexDoubleNDArrayConstructorTr
         final Complex one = new Complex(1,-1);
         NDArray<Complex> increased = slice.stream()
             .map((value) -> value.add(one))
-            .collect(getComplexDoubleNDArrayCollector(slice.dims()));
+            .collect(BasicComplexDoubleNDArray.getCollector(slice.dims()));
         for (int i = 0; i < slice.length(); i++)
             assertEquals(slice.get(i).add(one), increased.get(i));
     }
@@ -241,7 +239,7 @@ class TestComplexDoubleNDArraySlice implements ComplexDoubleNDArrayConstructorTr
         final Complex one = new Complex(1,-1);
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value.add(one))
-            .collect(getComplexDoubleNDArrayCollector(array.dims()));
+            .collect(BasicComplexDoubleNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).add(one), increased.get(i));
     }
@@ -267,7 +265,7 @@ class TestComplexDoubleNDArraySlice implements ComplexDoubleNDArrayConstructorTr
 
     @Test
     void testApply() {
-        NDArray<Complex> slice2 = createComplexDoubleNDArray(array).slice(1, "1:4", ":").apply(value -> value.atan());
+        NDArray<Complex> slice2 = new BasicComplexDoubleNDArray(array).slice(1, "1:4", ":").apply(value -> value.atan());
         for (int i = 1; i < slice.length(); i++) {
             assertTrue(Math.abs(slice.get(i).atan().getReal() - slice2.get(i).getReal()) / slice2.get(i).getReal() < 1e-6);
             assertTrue(Math.abs(slice.get(i).atan().getImaginary() - slice2.get(i).getImaginary()) / slice2.get(i).getImaginary() < 1e-6);
@@ -276,7 +274,7 @@ class TestComplexDoubleNDArraySlice implements ComplexDoubleNDArrayConstructorTr
 
     @Test
     void testApplyWithLinearIndices() {
-        NDArray<Complex> slice2 = createComplexDoubleNDArray(array).slice(1, "1:4", ":").applyWithLinearIndices((value, index) -> value.atan().add(index));
+        NDArray<Complex> slice2 = new BasicComplexDoubleNDArray(array).slice(1, "1:4", ":").applyWithLinearIndices((value, index) -> value.atan().add(index));
         for (int i = 1; i < slice.length(); i++) {
             assertTrue(Math.abs(slice.get(i).atan().add(i).getReal() - slice2.get(i).getReal()) / slice2.get(i).getReal() < 1e-6);
             assertTrue(Math.abs(slice.get(i).atan().add(i).getImaginary() - slice2.get(i).getImaginary()) / slice2.get(i).getImaginary() < 1e-6);
@@ -285,7 +283,7 @@ class TestComplexDoubleNDArraySlice implements ComplexDoubleNDArrayConstructorTr
 
     @Test
     void testApplyWithCartesianIndex() {
-        NDArray<Complex> slice2 = createComplexDoubleNDArray(array).slice(1, "1:4", ":").applyWithCartesianIndices((value, indices) -> value.atan().add(indices[0]));
+        NDArray<Complex> slice2 = new BasicComplexDoubleNDArray(array).slice(1, "1:4", ":").applyWithCartesianIndices((value, indices) -> value.atan().add(indices[0]));
         for (int i = 0; i < slice.dims(0); i++)
             for (int j = 0; j < slice.dims(1); j++) {
                 if (i == 0 && j == 0) continue;
@@ -341,7 +339,7 @@ class TestComplexDoubleNDArraySlice implements ComplexDoubleNDArrayConstructorTr
 
     @Test
     void testAddArrayToSlice() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(slice);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(slice);
         ComplexNDArray<Double> array3 = slice.add(array2);
         for (int i = 0; i < slice.length(); i++)
             assertEquals(slice.get(i).multiply(2), array3.get(i));
@@ -349,7 +347,7 @@ class TestComplexDoubleNDArraySlice implements ComplexDoubleNDArrayConstructorTr
 
     @Test
     void testAddSliceToArray() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(slice);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(slice);
         ComplexNDArray<Double> array3 = array2.add(slice);
         for (int i = 0; i < slice.length(); i++)
             assertEquals(slice.get(i).multiply(2), array3.get(i));
@@ -372,7 +370,7 @@ class TestComplexDoubleNDArraySlice implements ComplexDoubleNDArrayConstructorTr
 
     @Test
     void testAddMultiple() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> slice2 = array2.slice(1, "1:4", ":");
         ComplexNDArray<Double> array3 = slice2.add(slice, 5.3, slice2, new Complex(3,1));
         for (int i = 0; i < slice.length(); i++) {
@@ -383,7 +381,7 @@ class TestComplexDoubleNDArraySlice implements ComplexDoubleNDArrayConstructorTr
 
     @Test
     void testAddInplace() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(slice);
         for (int i = 0; i < slice.length(); i++)
@@ -392,7 +390,7 @@ class TestComplexDoubleNDArraySlice implements ComplexDoubleNDArrayConstructorTr
 
     @Test
     void testAddInplaceScalar() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(5);
         for (int i = 0; i < slice.length(); i++)
@@ -401,7 +399,7 @@ class TestComplexDoubleNDArraySlice implements ComplexDoubleNDArrayConstructorTr
 
     @Test
     void testAddInplaceMultiple() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(slice, 5.3, slice2, new Complex(3,1));
         for (int i = 0; i < slice.length(); i++) {
@@ -499,7 +497,7 @@ class TestComplexDoubleNDArraySlice implements ComplexDoubleNDArrayConstructorTr
 
     @Test
     void testMaskSlice() {
-        NDArray<Byte> mask = createByteNDArray(slice.abs().map(value -> value > 20 ? 1. : 0.));
+        NDArray<Byte> mask = new BasicByteNDArray(slice.abs().map(value -> value > 20 ? 1. : 0.));
         ComplexNDArray<Double> masked = slice.mask(mask);
         masked.forEach((value) -> assertTrue(value.abs() > 20));
         masked.fill(0);
@@ -532,7 +530,7 @@ class TestComplexDoubleNDArraySlice implements ComplexDoubleNDArrayConstructorTr
 
     @Test
     void testConcatenate() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(new int[]{5, 3}).fill(1);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(new int[]{5, 3}).fill(1);
         ComplexNDArray<Double> array3 = slice.concatenate(0, array2);
         for (int i = 0; i < slice.dims(0); i++)
             for (int j = 0; j < slice.dims(1); j++)
@@ -545,8 +543,8 @@ class TestComplexDoubleNDArraySlice implements ComplexDoubleNDArrayConstructorTr
     @Test
     void testConcatenateMultiple() {
         ComplexNDArray<Double> array2 = slice.copy().fill(1).slice("1:1", ":");
-        ComplexNDArray<Double> array3 = createComplexDoubleNDArray(new int[]{3, 2}).permuteDims(1, 0);
-        ComplexNDArray<Double> array4 = createComplexDoubleNDArray(new int[]{9}).fill(new Complex(2, -2)).reshape(3, 3);
+        ComplexNDArray<Double> array3 = new BasicComplexDoubleNDArray(new int[]{3, 2}).permuteDims(1, 0);
+        ComplexNDArray<Double> array4 = new BasicComplexDoubleNDArray(new int[]{9}).fill(new Complex(2, -2)).reshape(3, 3);
         ComplexNDArray<Double> array5 = slice.concatenate(0, array2, array3, array4);
         int start = 0;
         int end = slice.dims(0);

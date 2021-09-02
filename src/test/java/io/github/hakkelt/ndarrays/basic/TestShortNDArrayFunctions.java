@@ -12,14 +12,13 @@ import org.junit.jupiter.api.Test;
 
 import io.github.hakkelt.ndarrays.Errors;
 import io.github.hakkelt.ndarrays.NDArray;
-import io.github.hakkelt.ndarrays.ShortNDArrayConstructorTrait;
 
-class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, ConstructorTrait {
+class TestShortNDArrayFunctions implements NameTrait {
     NDArray<Short> array;
 
     @BeforeEach
     void setup() {
-        array = createShortNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicShortNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> index.shortValue());
     }
 
@@ -170,7 +169,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testEqual() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         assertEquals(array, array2);
         array2.set(0, 10);
         assertNotEquals(array, array2);
@@ -211,7 +210,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
     void testCollector() {
         NDArray<?> increased = array.stream()
             .map((value) -> value + 1)
-            .collect(getShortNDArrayCollector(array.dims()));
+            .collect(BasicShortNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals((short)(array.get(i) + 1), increased.get(i));
     }
@@ -220,7 +219,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(getShortNDArrayCollector(array.dims()));
+            .collect(BasicShortNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals((short)(array.get(i) + 1), increased.get(i));
     }
@@ -261,7 +260,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testApply() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         array2.apply(value -> (short)Math.sqrt(value));
         for (int i = 0; i < array.length(); i++)
             assertEquals((short)Math.sqrt(array.get(i)), array2.get(i));
@@ -269,7 +268,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testApplyWithLinearIndices() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         array2.applyWithLinearIndices((value, index) -> (short)(Math.sqrt(value) + index));
         for (int i = 0; i < array.length(); i++)
             assertEquals((short)(Math.sqrt(array.get(i)) + i), array2.get(i));
@@ -277,7 +276,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testApplyWithCartesianIndex() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         array2.applyWithCartesianIndices((value, indices) -> (short)(Math.sqrt(value) + indices[0]));
         for (int i = 0; i < array.dims(0); i++)
             for (int j = 0; j < array.dims(1); j++)
@@ -326,7 +325,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testAdd() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         NDArray<Short> array3 = array.add(array2);
         for (int i = 0; i < array.length(); i++)
             assertEquals((short)(array.get(i) * 2), array3.get(i));
@@ -341,7 +340,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testAddMultiple() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         NDArray<Short> array3 = array.add(array2, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             double expected = array.get(i) * 3 + 5.3 + 3;
@@ -351,7 +350,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testAddInplace() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         array2.addInplace(array);
         for (int i = 0; i < array.length(); i++)
             assertEquals((short)(array.get(i) * 2), array2.get(i));
@@ -359,7 +358,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         array2.addInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals((short)(array.get(i) + 5), array2.get(i));
@@ -367,7 +366,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         array2.addInplace(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             double expected = array.get(i) * 3 + 5.3 + 3;
@@ -377,7 +376,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testSubtract() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         NDArray<Short> array3 = array.subtract(array2);
         for (int i = 0; i < array.length(); i++)
             assertEquals((short)0, array3.get(i));
@@ -392,7 +391,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testSubtractMultiple() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         NDArray<Short> array3 = array.subtract(array2, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             float expected = array.get(i) * -1.f - 5.3f - 3.f;
@@ -402,7 +401,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testSubtractInplace() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         array2.subtractInplace(array);
         for (int i = 0; i < array.length(); i++)
             assertEquals((short)0, array2.get(i));
@@ -410,7 +409,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testSubtractInplaceScalar() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         array2.subtractInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals((short)(array.get(i) - 5), array2.get(i));
@@ -418,7 +417,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testSubtractInplaceMultiple() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         array2.subtractInplace(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             float expected = array.get(i) * -1.f - 5.3f - 3.f;
@@ -428,7 +427,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testMultiply() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         NDArray<Short> array3 = array.multiply(array2);
         for (int i = 0; i < array.length(); i++)
             assertEquals((short)(array.get(i) * array.get(i)), array3.get(i));
@@ -443,7 +442,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testMultiplyMultiple() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         NDArray<Short> array3 = array.multiply(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             float expected = array.get(i) * array.get(i) * 5.3f *
@@ -454,7 +453,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testMultiplyInplace() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         array2.multiplyInplace(array);
         for (int i = 0; i < array.length(); i++)
             assertEquals((short)(array.get(i) * array.get(i)), array2.get(i));
@@ -462,7 +461,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testMultiplyInplaceScalar() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         array2.multiplyInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals((short)(array.get(i) * 5), array2.get(i));
@@ -470,7 +469,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testMultiplyInplaceMultiple() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         array2.multiplyInplace(array, 5.3, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             float expected = array.get(i) * array.get(i) * 5.3f *
@@ -484,7 +483,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testDivide() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         NDArray<Short> array3 = array.add(1).divide(array2.add(1));
         for (int i = 0; i < array.length(); i++) {
             assertEquals((short)1, array3.get(i));
@@ -500,7 +499,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testDivideMultiple() {
-        NDArray<Short> array2 = createShortNDArray(array.addInplace(1));
+        NDArray<Short> array2 = new BasicShortNDArray(array.addInplace(1));
         NDArray<Short> array3 = array.divide(array, 5, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             Short expected = (short)(array.get(i) / array.get(i) / 5 / array2.get(i) / 3);
@@ -510,7 +509,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testDivideInplace() {
-        NDArray<Short> array2 = createShortNDArray(array.addInplace(1));
+        NDArray<Short> array2 = new BasicShortNDArray(array.addInplace(1));
         array2.divideInplace(array);
         for (int i = 0; i < array.length(); i++)
             assertEquals((short)1, array2.get(i));
@@ -518,7 +517,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testDivideInplaceScalar() {
-        NDArray<Short> array2 = createShortNDArray(array);
+        NDArray<Short> array2 = new BasicShortNDArray(array);
         array2.divideInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertTrue(Math.abs(array.get(i) / 5 - array2.get(i)) < 1e-5);
@@ -526,7 +525,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testDivideInplaceMultiple() {
-        NDArray<Short> array2 = createShortNDArray(array.addInplace(1));
+        NDArray<Short> array2 = new BasicShortNDArray(array.addInplace(1));
         array2.divideInplace(array, 5, array2, 3);
         for (int i = 0; i < array.length(); i++) {
             Short expected = (short)(array.get(i) / array.get(i) / 5 / array.get(i) / 3);
@@ -659,7 +658,7 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
 
     @Test
     void testConcatenate() {
-        NDArray<Short> array2 = createShortNDArray(new int[]{4, 2, 3}).fill(1);
+        NDArray<Short> array2 = new BasicShortNDArray(new int[]{4, 2, 3}).fill(1);
         NDArray<Short> array3 = array.concatenate(1, array2);
         for (int i = 0; i < array.dims(0); i++)
             for (int j = 0; j < array.dims(1); j++)
@@ -674,8 +673,8 @@ class TestShortNDArrayFunctions implements ShortNDArrayConstructorTrait, Constru
     @Test
     void testConcatenateMultiple() {
         NDArray<Short> array2 = array.copy().fill(1).slice(":", "1:3", ":");
-        NDArray<Short> array3 = createShortNDArray(new int[]{3, 4, 4}).permuteDims(2, 1, 0);
-        NDArray<Short> array4 = createShortNDArray(new int[]{12}).fill(2).reshape(4, 1, 3);
+        NDArray<Short> array3 = new BasicShortNDArray(new int[]{3, 4, 4}).permuteDims(2, 1, 0);
+        NDArray<Short> array4 = new BasicShortNDArray(new int[]{12}).fill(2).reshape(4, 1, 3);
         NDArray<Short> array5 = array.concatenate(1, array2, array3, array4);
         int start = 0;
         int end = array.dims(1);

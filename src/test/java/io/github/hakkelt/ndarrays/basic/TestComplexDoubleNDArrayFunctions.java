@@ -11,17 +11,16 @@ import org.apache.commons.math3.complex.Complex;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.hakkelt.ndarrays.ComplexDoubleNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.ComplexNDArray;
 import io.github.hakkelt.ndarrays.Errors;
 import io.github.hakkelt.ndarrays.NDArray;
 
-class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstructorTrait, ConstructorTrait {
+class TestComplexDoubleNDArrayFunctions implements NameTrait {
     ComplexNDArray<Double> array;
 
     @BeforeEach
     void setup() {
-        array = createComplexDoubleNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicComplexDoubleNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> new Complex(index, -index));
     }
 
@@ -178,7 +177,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testEqual() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         assertEquals(array, array2);
         array2.set(new Complex(0,0), 10);
         assertNotEquals(array, array2);
@@ -220,7 +219,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
         final Complex one = new Complex(1,-1);
         NDArray<?> increased = array.stream()
             .map((value) -> value.add(one))
-            .collect(getComplexDoubleNDArrayCollector(array.dims()));
+            .collect(BasicComplexDoubleNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).add(one), increased.get(i));
     }
@@ -230,7 +229,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
         final Complex one = new Complex(1,-1);
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value.add(one))
-            .collect(getComplexDoubleNDArrayCollector(array.dims()));
+            .collect(BasicComplexDoubleNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).add(one), increased.get(i));
     }
@@ -271,7 +270,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testApply() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array).apply(value -> value.atan());
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array).apply(value -> value.atan());
         for (int i = 1; i < array.length(); i++) {
             assertTrue(Math.abs(array.get(i).atan().getReal() - array2.get(i).getReal()) / array2.get(i).getReal() < 1e-6);
             assertTrue(Math.abs(array.get(i).atan().getImaginary() - array2.get(i).getImaginary()) / array2.get(i).getImaginary() < 1e-6);
@@ -280,7 +279,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testApplyWithLinearIndices() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array).applyWithLinearIndices((value, index) -> value.atan().add(index));
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array).applyWithLinearIndices((value, index) -> value.atan().add(index));
         for (int i = 1; i < array.length(); i++) {
             assertTrue(Math.abs(array.get(i).atan().add(i).getReal() - array2.get(i).getReal()) / array2.get(i).getReal() < 1e-6);
             assertTrue(Math.abs(array.get(i).atan().add(i).getImaginary() - array2.get(i).getImaginary()) / array2.get(i).getImaginary() < 1e-6);
@@ -289,7 +288,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testApplyWithCartesianIndex() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array).applyWithCartesianIndices((value, indices) -> value.atan().add(indices[0]));
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array).applyWithCartesianIndices((value, indices) -> value.atan().add(indices[0]));
         for (int i = 0; i < array.dims(0); i++)
             for (int j = 0; j < array.dims(1); j++)
                 for (int k = 0; k < array.dims(2); k++) {
@@ -347,7 +346,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testAdd() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> array3 = array.add(array2);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).multiply(2), array3.get(i));
@@ -362,7 +361,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testAddMultiple() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> array3 = array.add(array2, 5.3, array2, new Complex(3,1));
         for (int i = 0; i < array.length(); i++) {
             Complex expected = array.get(i).multiply(3).add(new Complex(5.3 + 3,1));
@@ -372,7 +371,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testAddInplace() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         array2.addInplace(array);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).multiply(2), array2.get(i));
@@ -380,7 +379,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testAddInplaceScalar() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         array2.addInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).add(5), array2.get(i));
@@ -388,7 +387,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testAddInplaceMultiple() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         array2.addInplace(array, 5.3, array2, new Complex(3,1));
         for (int i = 0; i < array.length(); i++) {
             Complex expected = array.get(i).multiply(3).add(new Complex(5.3 + 3,1));
@@ -398,7 +397,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testSubtract() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> array3 = array.subtract(array2);
         for (int i = 0; i < array.length(); i++)
             assertEquals(new Complex(0,0), array3.get(i));
@@ -413,7 +412,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testSubtractMultiple() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> array3 = array.subtract(array2, 5.3, array2, new Complex(3,1));
         for (int i = 0; i < array.length(); i++) {
             Complex expected = array.get(i).multiply(-1).subtract(new Complex(5.3 + 3,1));
@@ -423,7 +422,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testSubtractInplace() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         array2.subtractInplace(array);
         for (int i = 0; i < array.length(); i++)
             assertEquals(new Complex(0,0), array2.get(i));
@@ -431,7 +430,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testSubtractInplaceScalar() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         array2.subtractInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).subtract(5), array2.get(i));
@@ -439,7 +438,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testSubtractInplaceMultiple() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         array2.subtractInplace(array, 5.3, array2, new Complex(3,1));
         for (int i = 0; i < array.length(); i++) {
             Complex expected = array.get(i).multiply(-1).subtract(new Complex(5.3 + 3,1));
@@ -449,7 +448,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testMultiply() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> array3 = array.multiply(array2);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).multiply(array.get(i)), array3.get(i));
@@ -464,7 +463,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testMultiplyMultiple() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> array3 = array.multiply(array, 5.3, array2, new Complex(3,1));
         for (int i = 0; i < array.length(); i++) {
             Complex expected = array.get(i).multiply(array.get(i)).multiply((float)5.3)
@@ -475,7 +474,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testMultiplyInplace() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         array2.multiplyInplace(array);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).multiply(array.get(i)), array2.get(i));
@@ -483,7 +482,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testMultiplyInplaceScalar() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         array2.multiplyInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i).multiply(5), array2.get(i));
@@ -491,7 +490,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testMultiplyInplaceMultiple() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         array2.multiplyInplace(array, 5.3, array2, new Complex(3,1));
         for (int i = 0; i < array.length(); i++) {
             Complex expected = array.get(i).multiply(array.get(i)).multiply((float)5.3)
@@ -505,7 +504,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testDivide() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> array3 = array.divide(array2);
         for (int i = 0; i < array.length(); i++) {
             if (array.get(i).equals(new Complex(0,0)))
@@ -524,7 +523,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testDivideMultiple() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         ComplexNDArray<Double> array3 = array.divide(array, 5.3, array2, new Complex(3,1));
         for (int i = 0; i < array.length(); i++) {
             Complex expected = array.get(i).divide(array.get(i)).divide((float)5.3)
@@ -538,7 +537,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testDivideInplace() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         array2.divideInplace(array);
         for (int i = 0; i < array.length(); i++)
         if (array.get(i).equals(new Complex(0,0)))
@@ -549,7 +548,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testDivideInplaceScalar() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         array2.divideInplace(5);
         for (int i = 0; i < array.length(); i++)
             assertTrue(array.get(i).divide(5).subtract(array2.get(i)).abs() < 1e-5);
@@ -557,7 +556,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testDivideInplaceMultiple() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(array);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(array);
         array2.divideInplace(array, 5.3, array2, new Complex(3,1));
         for (int i = 0; i < array.length(); i++) {
             Complex expected = array.get(i).divide(array.get(i)).divide((float)5.3)
@@ -694,7 +693,7 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
 
     @Test
     void testConcatenate() {
-        ComplexNDArray<Double> array2 = createComplexDoubleNDArray(new int[]{4, 2, 3}).fill(1);
+        ComplexNDArray<Double> array2 = new BasicComplexDoubleNDArray(new int[]{4, 2, 3}).fill(1);
         ComplexNDArray<Double> array3 = array.concatenate(1, array2);
         for (int i = 0; i < array.dims(0); i++)
             for (int j = 0; j < array.dims(1); j++)
@@ -709,8 +708,8 @@ class TestComplexDoubleNDArrayFunctions implements ComplexDoubleNDArrayConstruct
     @Test
     void testConcatenateMultiple() {
         ComplexNDArray<Double> array2 = array.copy().fill(1).slice(":", "1:3", ":");
-        ComplexNDArray<Double> array3 = createComplexDoubleNDArray(new int[]{3, 4, 4}).permuteDims(2, 1, 0);
-        ComplexNDArray<Double> array4 = createComplexDoubleNDArray(new int[]{12}).fill(new Complex(2, -2)).reshape(4, 1, 3);
+        ComplexNDArray<Double> array3 = new BasicComplexDoubleNDArray(new int[]{3, 4, 4}).permuteDims(2, 1, 0);
+        ComplexNDArray<Double> array4 = new BasicComplexDoubleNDArray(new int[]{12}).fill(new Complex(2, -2)).reshape(4, 1, 3);
         ComplexNDArray<Double> array5 = array.concatenate(1, array2, array3, array4);
         int start = 0;
         int end = array.dims(1);

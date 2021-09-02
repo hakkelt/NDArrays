@@ -10,17 +10,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.Errors;
-import io.github.hakkelt.ndarrays.LongNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.NDArray;
 
-class TestLongNDArrayReshape implements LongNDArrayConstructorTrait, ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestLongNDArrayReshape implements NameTrait {
     NDArray<Long> array, reshaped;
 
     @BeforeEach
     void setup() {
-        array = createLongNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicLongNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> index.longValue());
         reshaped = array.reshape(20, 3);
     }
@@ -181,7 +179,7 @@ class TestLongNDArrayReshape implements LongNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testEqual() {
-        NDArray<Long> array2 = createLongNDArray(reshaped);
+        NDArray<Long> array2 = new BasicLongNDArray(reshaped);
         assertEquals(reshaped, array2);
         array2.set(0, 10);
         assertNotEquals(reshaped, array2);
@@ -222,7 +220,7 @@ class TestLongNDArrayReshape implements LongNDArrayConstructorTrait, ByteNDArray
     void testCollector() {
         NDArray<?> increased = reshaped.stream()
             .map((value) -> value + 1)
-            .collect(getLongNDArrayCollector(reshaped.dims()));
+            .collect(BasicLongNDArray.getCollector(reshaped.dims()));
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals((long)(reshaped.get(i) + 1), increased.get(i));
     }
@@ -231,7 +229,7 @@ class TestLongNDArrayReshape implements LongNDArrayConstructorTrait, ByteNDArray
     void testParallelCollector() {
         NDArray<?> increased = reshaped.stream().parallel()
             .map((value) -> value + 1)
-            .collect(getLongNDArrayCollector(reshaped.dims()));
+            .collect(BasicLongNDArray.getCollector(reshaped.dims()));
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals((long)(reshaped.get(i) + 1), increased.get(i));
     }
@@ -274,7 +272,7 @@ class TestLongNDArrayReshape implements LongNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testApply() {
-        NDArray<Long> reshaped2 = createLongNDArray(array).reshape(20, 3);
+        NDArray<Long> reshaped2 = new BasicLongNDArray(array).reshape(20, 3);
         reshaped2.apply(value -> (long)Math.sqrt(value));
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals((long)Math.sqrt(reshaped.get(i)), reshaped2.get(i));
@@ -282,7 +280,7 @@ class TestLongNDArrayReshape implements LongNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testApplyWithLinearIndices() {
-        NDArray<Long> reshaped2 = createLongNDArray(array).reshape(20, 3);
+        NDArray<Long> reshaped2 = new BasicLongNDArray(array).reshape(20, 3);
         reshaped2.applyWithLinearIndices((value, index) -> (long)(Math.sqrt(value) + index));
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals((long)(Math.sqrt(reshaped.get(i)) + i), reshaped2.get(i));
@@ -290,7 +288,7 @@ class TestLongNDArrayReshape implements LongNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testApplyWithCartesianIndex() {
-        NDArray<Long> reshaped2 = createLongNDArray(array).reshape(20, 3);
+        NDArray<Long> reshaped2 = new BasicLongNDArray(array).reshape(20, 3);
         reshaped2.applyWithCartesianIndices((value, indices) -> (long)(Math.sqrt(value) + indices[0]));
         for (int i = 0; i < reshaped.dims(0); i++)
             for (int j = 0; j < reshaped.dims(1); j++)
@@ -337,7 +335,7 @@ class TestLongNDArrayReshape implements LongNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testAdd() {
-        NDArray<Long> array2 = createLongNDArray(reshaped);
+        NDArray<Long> array2 = new BasicLongNDArray(reshaped);
         NDArray<Long> array3 = reshaped.add(array2);
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals((long)(reshaped.get(i) * 2), array3.get(i));
@@ -352,7 +350,7 @@ class TestLongNDArrayReshape implements LongNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testAddMultiple() {
-        NDArray<Long> array2 = createLongNDArray(reshaped);
+        NDArray<Long> array2 = new BasicLongNDArray(reshaped);
         NDArray<Long> array3 = reshaped.add(array2, 5.3, array2, 3);
         for (int i = 0; i < reshaped.length(); i++) {
             float expected = reshaped.get(i) * 3.f + 5.3f + 3.f;
@@ -362,7 +360,7 @@ class TestLongNDArrayReshape implements LongNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testAddInplace() {
-        NDArray<Long> array2 = createLongNDArray(reshaped);
+        NDArray<Long> array2 = new BasicLongNDArray(reshaped);
         array2.addInplace(reshaped);
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals((long)(reshaped.get(i) * 2), array2.get(i));
@@ -370,7 +368,7 @@ class TestLongNDArrayReshape implements LongNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Long> array2 = createLongNDArray(reshaped);
+        NDArray<Long> array2 = new BasicLongNDArray(reshaped);
         array2.addInplace(5);
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals((long)(reshaped.get(i) + 5), array2.get(i));
@@ -378,7 +376,7 @@ class TestLongNDArrayReshape implements LongNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Long> array2 = createLongNDArray(reshaped);
+        NDArray<Long> array2 = new BasicLongNDArray(reshaped);
         array2.addInplace(reshaped, 5.3, array2, 3);
         for (int i = 0; i < reshaped.length(); i++) {
             float expected = reshaped.get(i) * 3.f + 5.3f + 3.f;
@@ -519,7 +517,7 @@ class TestLongNDArrayReshape implements LongNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testMaskReshaped() {
-        NDArray<Byte> mask = createByteNDArray(reshaped.map(value -> value > 20 ? (long)1 : (long)0));
+        NDArray<Byte> mask = new BasicByteNDArray(reshaped.map(value -> value > 20 ? (long)1 : (long)0));
         NDArray<Long> masked = reshaped.mask(mask);
         masked.forEach((value) -> assertTrue(value > 20));
         masked.fill(0);
@@ -552,7 +550,7 @@ class TestLongNDArrayReshape implements LongNDArrayConstructorTrait, ByteNDArray
 
     @Test
     void testConcatenate() {
-        NDArray<Long> array2 = createLongNDArray(new int[]{5, 3}).fill(1);
+        NDArray<Long> array2 = new BasicLongNDArray(new int[]{5, 3}).fill(1);
         NDArray<Long> array3 = reshaped.concatenate(0, array2);
         for (int i = 0; i < reshaped.dims(0); i++)
             for (int j = 0; j < reshaped.dims(1); j++)
@@ -565,8 +563,8 @@ class TestLongNDArrayReshape implements LongNDArrayConstructorTrait, ByteNDArray
     @Test
     void testConcatenateMultiple() {
         NDArray<Long> array2 = reshaped.copy().fill(1).slice("1:5", ":");
-        NDArray<Long> array3 = createLongNDArray(new int[]{3, 2}).permuteDims(1, 0);
-        NDArray<Long> array4 = createLongNDArray(new int[]{9}).fill(2).reshape(3, 3);
+        NDArray<Long> array3 = new BasicLongNDArray(new int[]{3, 2}).permuteDims(1, 0);
+        NDArray<Long> array4 = new BasicLongNDArray(new int[]{9}).fill(2).reshape(3, 3);
         NDArray<Long> array5 = reshaped.concatenate(0, array2, array3, array4);
         int start = 0;
         int end = reshaped.dims(0);

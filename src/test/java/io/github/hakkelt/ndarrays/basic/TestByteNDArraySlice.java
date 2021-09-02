@@ -10,16 +10,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.Errors;
 import io.github.hakkelt.ndarrays.NDArray;
 
-class TestByteNDArraySlice implements ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestByteNDArraySlice implements NameTrait {
     NDArray<Byte> array, slice;
 
     @BeforeEach
     void setup() {
-        array = createByteNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicByteNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> index.byteValue());
         slice = array.slice(1, "1:4", ":");
     }
@@ -180,7 +179,7 @@ class TestByteNDArraySlice implements ByteNDArrayConstructorTrait, ConstructorTr
 
     @Test
     void testEqual() {
-        NDArray<Byte> array2 = createByteNDArray(slice);
+        NDArray<Byte> array2 = new BasicByteNDArray(slice);
         assertEquals(slice, array2);
         array2.set(0, 5);
         assertNotEquals(slice, array2);
@@ -221,7 +220,7 @@ class TestByteNDArraySlice implements ByteNDArrayConstructorTrait, ConstructorTr
     void testCollector() {
         NDArray<Byte> increased = slice.stream()
             .map((value) -> value + 1)
-            .collect(getCollector(slice.dims()));
+            .collect(BasicByteNDArray.getCollector(slice.dims()));
         for (int i = 0; i < slice.length(); i++)
             assertEquals((byte)(slice.get(i) + 1), increased.get(i));
     }
@@ -230,7 +229,7 @@ class TestByteNDArraySlice implements ByteNDArrayConstructorTrait, ConstructorTr
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(getCollector(array.dims()));
+            .collect(BasicByteNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals((byte)(array.get(i) + 1), increased.get(i));
     }
@@ -256,7 +255,7 @@ class TestByteNDArraySlice implements ByteNDArrayConstructorTrait, ConstructorTr
 
     @Test
     void testApply() {
-        NDArray<Byte> slice2 = createByteNDArray(array).slice(1, "1:4", ":");
+        NDArray<Byte> slice2 = new BasicByteNDArray(array).slice(1, "1:4", ":");
         slice2.apply(value -> (byte)Math.sqrt(value));
         for (int i = 0; i < slice.length(); i++)
             assertEquals((byte)Math.sqrt(slice.get(i)), slice2.get(i));
@@ -264,7 +263,7 @@ class TestByteNDArraySlice implements ByteNDArrayConstructorTrait, ConstructorTr
 
     @Test
     void testApplyWithLinearIndices() {
-        NDArray<Byte> slice2 = createByteNDArray(array).slice(1, "1:4", ":");
+        NDArray<Byte> slice2 = new BasicByteNDArray(array).slice(1, "1:4", ":");
         slice2.applyWithLinearIndices((value, index) -> (byte)(Math.sqrt(value) + index));
         for (int i = 0; i < slice.length(); i++)
             assertEquals((byte)(Math.sqrt(slice.get(i)) + i), slice2.get(i));
@@ -272,7 +271,7 @@ class TestByteNDArraySlice implements ByteNDArrayConstructorTrait, ConstructorTr
 
     @Test
     void testApplyWithCartesianIndex() {
-        NDArray<Byte> slice2 = createByteNDArray(array).slice(1, "1:4", ":");
+        NDArray<Byte> slice2 = new BasicByteNDArray(array).slice(1, "1:4", ":");
         slice2.applyWithCartesianIndices((value, indices) -> (byte)(Math.sqrt(value) + indices[0]));
         for (int i = 0; i < slice.dims(0); i++)
             for (int j = 0; j < slice.dims(1); j++)
@@ -319,7 +318,7 @@ class TestByteNDArraySlice implements ByteNDArrayConstructorTrait, ConstructorTr
 
     @Test
     void testAddArrayToSlice() {
-        NDArray<Byte> array2 = createByteNDArray(slice);
+        NDArray<Byte> array2 = new BasicByteNDArray(slice);
         NDArray<Byte> array3 = slice.add(array2);
         for (int i = 0; i < slice.length(); i++)
             assertEquals((byte)(slice.get(i) * 2), array3.get(i));
@@ -327,7 +326,7 @@ class TestByteNDArraySlice implements ByteNDArrayConstructorTrait, ConstructorTr
 
     @Test
     void testAddSliceToArray() {
-        NDArray<Byte> array2 = createByteNDArray(slice);
+        NDArray<Byte> array2 = new BasicByteNDArray(slice);
         NDArray<Byte> array3 = array2.add(slice);
         for (int i = 0; i < slice.length(); i++)
             assertEquals((byte)(slice.get(i) * 2), array3.get(i));
@@ -350,7 +349,7 @@ class TestByteNDArraySlice implements ByteNDArrayConstructorTrait, ConstructorTr
 
     @Test
     void testAddMultiple() {
-        NDArray<Byte> array2 = createByteNDArray(array);
+        NDArray<Byte> array2 = new BasicByteNDArray(array);
         NDArray<Byte> slice2 = array2.slice(1, "1:4", ":");
         NDArray<Byte> array3 = slice2.add(slice, 5, slice2, 3);
         for (int i = 0; i < slice.length(); i++) {
@@ -361,7 +360,7 @@ class TestByteNDArraySlice implements ByteNDArrayConstructorTrait, ConstructorTr
 
     @Test
     void testAddInplace() {
-        NDArray<Byte> array2 = createByteNDArray(array);
+        NDArray<Byte> array2 = new BasicByteNDArray(array);
         NDArray<Byte> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(slice);
         for (int i = 0; i < slice.length(); i++)
@@ -370,7 +369,7 @@ class TestByteNDArraySlice implements ByteNDArrayConstructorTrait, ConstructorTr
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Byte> array2 = createByteNDArray(array);
+        NDArray<Byte> array2 = new BasicByteNDArray(array);
         NDArray<Byte> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(5);
         for (int i = 0; i < slice.length(); i++)
@@ -379,7 +378,7 @@ class TestByteNDArraySlice implements ByteNDArrayConstructorTrait, ConstructorTr
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Byte> array2 = createByteNDArray(array);
+        NDArray<Byte> array2 = new BasicByteNDArray(array);
         NDArray<Byte> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(slice, 5, slice2, 3);
         for (int i = 0; i < slice.length(); i++) {
@@ -477,7 +476,7 @@ class TestByteNDArraySlice implements ByteNDArrayConstructorTrait, ConstructorTr
 
     @Test
     void testMaskSlice() {
-        NDArray<Byte> mask = createByteNDArray(slice.map(value -> value > 20 ? (byte)1 : (byte)0));
+        NDArray<Byte> mask = new BasicByteNDArray(slice.map(value -> value > 20 ? (byte)1 : (byte)0));
         NDArray<Byte> masked = slice.mask(mask);
         masked.forEach((value) -> assertTrue(value > 20));
         masked.fill(0);
@@ -510,7 +509,7 @@ class TestByteNDArraySlice implements ByteNDArrayConstructorTrait, ConstructorTr
 
     @Test
     void testConcatenate() {
-        NDArray<Byte> array2 = createByteNDArray(new int[]{5, 3}).fill(1);
+        NDArray<Byte> array2 = new BasicByteNDArray(new int[]{5, 3}).fill(1);
         NDArray<Byte> array3 = slice.concatenate(0, array2);
         for (int i = 0; i < slice.dims(0); i++)
             for (int j = 0; j < slice.dims(1); j++)
@@ -523,8 +522,8 @@ class TestByteNDArraySlice implements ByteNDArrayConstructorTrait, ConstructorTr
     @Test
     void testConcatenateMultiple() {
         NDArray<Byte> array2 = slice.copy().fill(1).slice("1:1", ":");
-        NDArray<Byte> array3 = createByteNDArray(new int[]{3, 2}).permuteDims(1, 0);
-        NDArray<Byte> array4 = createByteNDArray(new int[]{9}).fill(2).reshape(3, 3);
+        NDArray<Byte> array3 = new BasicByteNDArray(new int[]{3, 2}).permuteDims(1, 0);
+        NDArray<Byte> array4 = new BasicByteNDArray(new int[]{9}).fill(2).reshape(3, 3);
         NDArray<Byte> array5 = slice.concatenate(0, array2, array3, array4);
         int start = 0;
         int end = slice.dims(0);

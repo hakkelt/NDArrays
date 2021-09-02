@@ -9,16 +9,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.github.hakkelt.ndarrays.Errors;
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
-import io.github.hakkelt.ndarrays.DoubleNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.NDArray;
 
-class TestDoubleNDArrayReshape implements DoubleNDArrayConstructorTrait, ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestDoubleNDArrayReshape implements NameTrait {
     NDArray<Double> array, reshaped;
 
     @BeforeEach
     void setup() {
-        array = createDoubleNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicDoubleNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> (double)index);
         reshaped = array.reshape(20, 3);
     }
@@ -179,7 +177,7 @@ class TestDoubleNDArrayReshape implements DoubleNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testEqual() {
-        NDArray<Double> array2 = createDoubleNDArray(reshaped);
+        NDArray<Double> array2 = new BasicDoubleNDArray(reshaped);
         assertEquals(reshaped, array2);
         array2.set(0, 10);
         assertNotEquals(reshaped, array2);
@@ -220,7 +218,7 @@ class TestDoubleNDArrayReshape implements DoubleNDArrayConstructorTrait, ByteNDA
     void testCollector() {
         NDArray<?> increased = reshaped.stream()
             .map((value) -> value + 1)
-            .collect(getDoubleNDArrayCollector(reshaped.dims()));
+            .collect(BasicDoubleNDArray.getCollector(reshaped.dims()));
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals(reshaped.get(i) + 1, increased.get(i));
     }
@@ -229,7 +227,7 @@ class TestDoubleNDArrayReshape implements DoubleNDArrayConstructorTrait, ByteNDA
     void testParallelCollector() {
         NDArray<?> increased = reshaped.stream().parallel()
             .map((value) -> value + 1)
-            .collect(getDoubleNDArrayCollector(reshaped.dims()));
+            .collect(BasicDoubleNDArray.getCollector(reshaped.dims()));
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals(reshaped.get(i) + 1, increased.get(i));
     }
@@ -272,7 +270,7 @@ class TestDoubleNDArrayReshape implements DoubleNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testAdd() {
-        NDArray<Double> array2 = createDoubleNDArray(reshaped);
+        NDArray<Double> array2 = new BasicDoubleNDArray(reshaped);
         NDArray<Double> array3 = reshaped.add(array2);
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals(reshaped.get(i) * 2, array3.get(i));
@@ -287,7 +285,7 @@ class TestDoubleNDArrayReshape implements DoubleNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testAddMultiple() {
-        NDArray<Double> array2 = createDoubleNDArray(reshaped);
+        NDArray<Double> array2 = new BasicDoubleNDArray(reshaped);
         NDArray<Double> array3 = reshaped.add(array2, 5.3, array2, 3);
         for (int i = 0; i < reshaped.length(); i++) {
             double expected = reshaped.get(i) * 3. + 5.3 + 3.;
@@ -297,7 +295,7 @@ class TestDoubleNDArrayReshape implements DoubleNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testAddInplace() {
-        NDArray<Double> array2 = createDoubleNDArray(reshaped);
+        NDArray<Double> array2 = new BasicDoubleNDArray(reshaped);
         array2.addInplace(reshaped);
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals(reshaped.get(i) * 2, array2.get(i));
@@ -305,7 +303,7 @@ class TestDoubleNDArrayReshape implements DoubleNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Double> array2 = createDoubleNDArray(reshaped);
+        NDArray<Double> array2 = new BasicDoubleNDArray(reshaped);
         array2.addInplace(5);
         for (int i = 0; i < reshaped.length(); i++)
             assertEquals(reshaped.get(i) + 5, array2.get(i));
@@ -313,7 +311,7 @@ class TestDoubleNDArrayReshape implements DoubleNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Double> array2 = createDoubleNDArray(reshaped);
+        NDArray<Double> array2 = new BasicDoubleNDArray(reshaped);
         array2.addInplace(reshaped, 5.3, array2, 3);
         for (int i = 0; i < reshaped.length(); i++) {
             double expected = reshaped.get(i) * 3. + 5.3f + 3.;
@@ -454,7 +452,7 @@ class TestDoubleNDArrayReshape implements DoubleNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testMaskReshaped() {
-        NDArray<Byte> mask = createByteNDArray(reshaped.map(value -> value > 20 ? (double)1 : (double)0));
+        NDArray<Byte> mask = new BasicByteNDArray(reshaped.map(value -> value > 20 ? (double)1 : (double)0));
         NDArray<Double> masked = reshaped.mask(mask);
         masked.forEach((value) -> assertTrue(value > 20));
         masked.fill(0);
@@ -487,7 +485,7 @@ class TestDoubleNDArrayReshape implements DoubleNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testConcatenate() {
-        NDArray<Double> array2 = createDoubleNDArray(new int[]{5, 3}).fill(1);
+        NDArray<Double> array2 = new BasicDoubleNDArray(new int[]{5, 3}).fill(1);
         NDArray<Double> array3 = reshaped.concatenate(0, array2);
         for (int i = 0; i < reshaped.dims(0); i++)
             for (int j = 0; j < reshaped.dims(1); j++)
@@ -500,8 +498,8 @@ class TestDoubleNDArrayReshape implements DoubleNDArrayConstructorTrait, ByteNDA
     @Test
     void testConcatenateMultiple() {
         NDArray<Double> array2 = reshaped.copy().fill(1).slice("1:5", ":");
-        NDArray<Double> array3 = createDoubleNDArray(new int[]{3, 2}).permuteDims(1, 0);
-        NDArray<Double> array4 = createDoubleNDArray(new int[]{9}).fill(2).reshape(3, 3);
+        NDArray<Double> array3 = new BasicDoubleNDArray(new int[]{3, 2}).permuteDims(1, 0);
+        NDArray<Double> array4 = new BasicDoubleNDArray(new int[]{9}).fill(2).reshape(3, 3);
         NDArray<Double> array5 = reshaped.concatenate(0, array2, array3, array4);
         int start = 0;
         int end = reshaped.dims(0);

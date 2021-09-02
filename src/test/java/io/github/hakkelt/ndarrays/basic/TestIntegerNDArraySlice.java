@@ -10,17 +10,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.Errors;
-import io.github.hakkelt.ndarrays.IntegerNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.NDArray;
 
-class TestIntegerNDArraySlice implements IntegerNDArrayConstructorTrait, ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestIntegerNDArraySlice implements NameTrait {
     NDArray<Integer> array, slice;
 
     @BeforeEach
     void setup() {
-        array = createIntegerNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicIntegerNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> index.intValue());
         slice = array.slice(1, "1:4", ":");
     }
@@ -181,7 +179,7 @@ class TestIntegerNDArraySlice implements IntegerNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testEqual() {
-        NDArray<Integer> array2 = createIntegerNDArray(slice);
+        NDArray<Integer> array2 = new BasicIntegerNDArray(slice);
         assertEquals(slice, array2);
         array2.set(0, 5);
         assertNotEquals(slice, array2);
@@ -222,7 +220,7 @@ class TestIntegerNDArraySlice implements IntegerNDArrayConstructorTrait, ByteNDA
     void testCollector() {
         NDArray<Integer> increased = slice.stream()
             .map((value) -> value + 1)
-            .collect(getIntegerNDArrayCollector(slice.dims()));
+            .collect(BasicIntegerNDArray.getCollector(slice.dims()));
         for (int i = 0; i < slice.length(); i++)
             assertEquals(slice.get(i) + 1, increased.get(i));
     }
@@ -231,7 +229,7 @@ class TestIntegerNDArraySlice implements IntegerNDArrayConstructorTrait, ByteNDA
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(getIntegerNDArrayCollector(array.dims()));
+            .collect(BasicIntegerNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals(array.get(i) + 1, increased.get(i));
     }
@@ -257,7 +255,7 @@ class TestIntegerNDArraySlice implements IntegerNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testApply() {
-        NDArray<Integer> slice2 = createIntegerNDArray(array).slice(1, "1:4", ":");
+        NDArray<Integer> slice2 = new BasicIntegerNDArray(array).slice(1, "1:4", ":");
         slice2.apply(value -> (int)Math.sqrt(value));
         for (int i = 0; i < slice.length(); i++)
             assertEquals((int)Math.sqrt(slice.get(i)), slice2.get(i));
@@ -265,7 +263,7 @@ class TestIntegerNDArraySlice implements IntegerNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testApplyWithLinearIndices() {
-        NDArray<Integer> slice2 = createIntegerNDArray(array).slice(1, "1:4", ":");
+        NDArray<Integer> slice2 = new BasicIntegerNDArray(array).slice(1, "1:4", ":");
         slice2.applyWithLinearIndices((value, index) -> (int)(Math.sqrt(value) + index));
         for (int i = 0; i < slice.length(); i++)
             assertEquals((int)(Math.sqrt(slice.get(i)) + i), slice2.get(i));
@@ -273,7 +271,7 @@ class TestIntegerNDArraySlice implements IntegerNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testApplyWithCartesianIndex() {
-        NDArray<Integer> slice2 = createIntegerNDArray(array).slice(1, "1:4", ":");
+        NDArray<Integer> slice2 = new BasicIntegerNDArray(array).slice(1, "1:4", ":");
         slice2.applyWithCartesianIndices((value, indices) -> (int)(Math.sqrt(value) + indices[0]));
         for (int i = 0; i < slice.dims(0); i++)
             for (int j = 0; j < slice.dims(1); j++)
@@ -320,7 +318,7 @@ class TestIntegerNDArraySlice implements IntegerNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testAddArrayToSlice() {
-        NDArray<Integer> array2 = createIntegerNDArray(slice);
+        NDArray<Integer> array2 = new BasicIntegerNDArray(slice);
         NDArray<Integer> array3 = slice.add(array2);
         for (int i = 0; i < slice.length(); i++)
             assertEquals((int)(slice.get(i) * 2), array3.get(i));
@@ -328,7 +326,7 @@ class TestIntegerNDArraySlice implements IntegerNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testAddSliceToArray() {
-        NDArray<Integer> array2 = createIntegerNDArray(slice);
+        NDArray<Integer> array2 = new BasicIntegerNDArray(slice);
         NDArray<Integer> array3 = array2.add(slice);
         for (int i = 0; i < slice.length(); i++)
             assertEquals((int)(slice.get(i) * 2), array3.get(i));
@@ -351,7 +349,7 @@ class TestIntegerNDArraySlice implements IntegerNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testAddMultiple() {
-        NDArray<Integer> array2 = createIntegerNDArray(array);
+        NDArray<Integer> array2 = new BasicIntegerNDArray(array);
         NDArray<Integer> slice2 = array2.slice(1, "1:4", ":");
         NDArray<Integer> array3 = slice2.add(slice, 5.3, slice2, 3);
         for (int i = 0; i < slice.length(); i++) {
@@ -362,7 +360,7 @@ class TestIntegerNDArraySlice implements IntegerNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testAddInplace() {
-        NDArray<Integer> array2 = createIntegerNDArray(array);
+        NDArray<Integer> array2 = new BasicIntegerNDArray(array);
         NDArray<Integer> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(slice);
         for (int i = 0; i < slice.length(); i++)
@@ -371,7 +369,7 @@ class TestIntegerNDArraySlice implements IntegerNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Integer> array2 = createIntegerNDArray(array);
+        NDArray<Integer> array2 = new BasicIntegerNDArray(array);
         NDArray<Integer> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(5);
         for (int i = 0; i < slice.length(); i++)
@@ -380,7 +378,7 @@ class TestIntegerNDArraySlice implements IntegerNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Integer> array2 = createIntegerNDArray(array);
+        NDArray<Integer> array2 = new BasicIntegerNDArray(array);
         NDArray<Integer> slice2 = array2.slice(1, "1:4", ":");
         slice2.addInplace(slice, 5.3, slice2, 3);
         for (int i = 0; i < slice.length(); i++) {
@@ -478,7 +476,7 @@ class TestIntegerNDArraySlice implements IntegerNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testMaskSlice() {
-        NDArray<Byte> mask = createByteNDArray(slice.map(value -> value > 20 ? 1 : 0));
+        NDArray<Byte> mask = new BasicByteNDArray(slice.map(value -> value > 20 ? 1 : 0));
         NDArray<Integer> masked = slice.mask(mask);
         masked.forEach((value) -> assertTrue(value > 20));
         masked.fill(0);
@@ -511,7 +509,7 @@ class TestIntegerNDArraySlice implements IntegerNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testConcatenate() {
-        NDArray<Integer> array2 = createIntegerNDArray(new int[]{5, 3}).fill(1);
+        NDArray<Integer> array2 = new BasicIntegerNDArray(new int[]{5, 3}).fill(1);
         NDArray<Integer> array3 = slice.concatenate(0, array2);
         for (int i = 0; i < slice.dims(0); i++)
             for (int j = 0; j < slice.dims(1); j++)
@@ -524,8 +522,8 @@ class TestIntegerNDArraySlice implements IntegerNDArrayConstructorTrait, ByteNDA
     @Test
     void testConcatenateMultiple() {
         NDArray<Integer> array2 = slice.copy().fill(1).slice("1:1", ":");
-        NDArray<Integer> array3 = createIntegerNDArray(new int[]{3, 2}).permuteDims(1, 0);
-        NDArray<Integer> array4 = createIntegerNDArray(new int[]{9}).fill(2).reshape(3, 3);
+        NDArray<Integer> array3 = new BasicIntegerNDArray(new int[]{3, 2}).permuteDims(1, 0);
+        NDArray<Integer> array4 = new BasicIntegerNDArray(new int[]{9}).fill(2).reshape(3, 3);
         NDArray<Integer> array5 = slice.concatenate(0, array2, array3, array4);
         int start = 0;
         int end = slice.dims(0);

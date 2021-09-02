@@ -10,17 +10,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.github.hakkelt.ndarrays.ByteNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.Errors;
-import io.github.hakkelt.ndarrays.LongNDArrayConstructorTrait;
 import io.github.hakkelt.ndarrays.NDArray;
 
-class TestLongNDArrayPermuteDims implements LongNDArrayConstructorTrait, ByteNDArrayConstructorTrait, ConstructorTrait {
+class TestLongNDArrayPermuteDims implements NameTrait {
     NDArray<Long> array, pArray;
 
     @BeforeEach
     void setup() {
-        array = createLongNDArray(new int[]{ 4, 5, 3 });
+        array = new BasicLongNDArray(new int[]{ 4, 5, 3 });
         array.applyWithLinearIndices((value, index) -> index.longValue());
         pArray = array.permuteDims(0, 2, 1);
     }
@@ -178,7 +176,7 @@ class TestLongNDArrayPermuteDims implements LongNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testEqual() {
-        NDArray<Long> array2 = createLongNDArray(pArray);
+        NDArray<Long> array2 = new BasicLongNDArray(pArray);
         assertEquals(pArray, array2);
         array2.set(0.f, 5);
         assertNotEquals(pArray, array2);
@@ -220,7 +218,7 @@ class TestLongNDArrayPermuteDims implements LongNDArrayConstructorTrait, ByteNDA
     void testCollector() {
         NDArray<Long> increased = pArray.stream()
             .map((value) -> value + 1)
-            .collect(getLongNDArrayCollector(pArray.dims()));
+            .collect(BasicLongNDArray.getCollector(pArray.dims()));
         for (int i = 0; i < pArray.length(); i++)
             assertEquals((long)(pArray.get(i) + 1), increased.get(i));
     }
@@ -229,7 +227,7 @@ class TestLongNDArrayPermuteDims implements LongNDArrayConstructorTrait, ByteNDA
     void testParallelCollector() {
         NDArray<?> increased = array.stream().parallel()
             .map((value) -> value + 1)
-            .collect(getLongNDArrayCollector(array.dims()));
+            .collect(BasicLongNDArray.getCollector(array.dims()));
         for (int i = 0; i < array.length(); i++)
             assertEquals((long)(array.get(i) + 1), increased.get(i));
     }
@@ -282,7 +280,7 @@ class TestLongNDArrayPermuteDims implements LongNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testApply() {
-        NDArray<Long> pArray2 = createLongNDArray(array).permuteDims(0, 2, 1);
+        NDArray<Long> pArray2 = new BasicLongNDArray(array).permuteDims(0, 2, 1);
         pArray2.apply(value -> (long)Math.sqrt(value));
         for (int i = 0; i < pArray.length(); i++)
             assertEquals((long)Math.sqrt(pArray.get(i)), pArray2.get(i));
@@ -290,7 +288,7 @@ class TestLongNDArrayPermuteDims implements LongNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testApplyWithLinearIndices() {
-        NDArray<Long> pArray2 = createLongNDArray(array).permuteDims(0, 2, 1);
+        NDArray<Long> pArray2 = new BasicLongNDArray(array).permuteDims(0, 2, 1);
         pArray2.applyWithLinearIndices((value, index) -> (long)(Math.sqrt(value) + index));
         for (int i = 0; i < pArray.length(); i++)
             assertEquals((long)(Math.sqrt(pArray.get(i)) + i), pArray2.get(i));
@@ -298,7 +296,7 @@ class TestLongNDArrayPermuteDims implements LongNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testApplyWithCartesianIndex() {
-        NDArray<Long> pArray2 = createLongNDArray(array).permuteDims(0, 2, 1);
+        NDArray<Long> pArray2 = new BasicLongNDArray(array).permuteDims(0, 2, 1);
         pArray2.applyWithCartesianIndices((value, indices) -> (long)(Math.sqrt(value) + indices[0]));
         for (int i = 0; i < pArray.dims(0); i++)
             for (int j = 0; j < pArray.dims(1); j++)
@@ -347,7 +345,7 @@ class TestLongNDArrayPermuteDims implements LongNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testAddArrayTopArray() {
-        NDArray<Long> array2 = createLongNDArray(pArray);
+        NDArray<Long> array2 = new BasicLongNDArray(pArray);
         NDArray<Long> array3 = pArray.add(array2);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals((long)(pArray.get(i) * 2), array3.get(i));
@@ -355,7 +353,7 @@ class TestLongNDArrayPermuteDims implements LongNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testAddpArrayToArray() {
-        NDArray<Long> array2 = createLongNDArray(pArray);
+        NDArray<Long> array2 = new BasicLongNDArray(pArray);
         NDArray<Long> array3 = array2.add(pArray);
         for (int i = 0; i < pArray.length(); i++)
             assertEquals((long)(pArray.get(i) * 2), array3.get(i));
@@ -378,7 +376,7 @@ class TestLongNDArrayPermuteDims implements LongNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testAddMultiple() {
-        NDArray<Long> array2 = createLongNDArray(array);
+        NDArray<Long> array2 = new BasicLongNDArray(array);
         NDArray<Long> pArray2 = array2.permuteDims(0, 2, 1);
         NDArray<Long> array3 = pArray2.add(pArray, 5, pArray2, 3);
         for (int i = 0; i < pArray.length(); i++) {
@@ -389,7 +387,7 @@ class TestLongNDArrayPermuteDims implements LongNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testAddInplace() {
-        NDArray<Long> array2 = createLongNDArray(array);
+        NDArray<Long> array2 = new BasicLongNDArray(array);
         NDArray<Long> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(pArray);
         for (int i = 0; i < pArray.length(); i++)
@@ -398,7 +396,7 @@ class TestLongNDArrayPermuteDims implements LongNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testAddInplaceScalar() {
-        NDArray<Long> array2 = createLongNDArray(array);
+        NDArray<Long> array2 = new BasicLongNDArray(array);
         NDArray<Long> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(5);
         for (int i = 0; i < pArray.length(); i++)
@@ -407,7 +405,7 @@ class TestLongNDArrayPermuteDims implements LongNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testAddInplaceMultiple() {
-        NDArray<Long> array2 = createLongNDArray(array);
+        NDArray<Long> array2 = new BasicLongNDArray(array);
         NDArray<Long> pArray2 = array2.permuteDims(0, 2, 1);
         pArray2.addInplace(pArray, 5, pArray2, 3);
         for (int i = 0; i < pArray.length(); i++) {
@@ -490,7 +488,7 @@ class TestLongNDArrayPermuteDims implements LongNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testMaskPermuted() {
-        NDArray<Byte> mask = createByteNDArray(pArray.map(value -> value > 20 ? (long)1 : (long)0));
+        NDArray<Byte> mask = new BasicByteNDArray(pArray.map(value -> value > 20 ? (long)1 : (long)0));
         NDArray<Long> masked = pArray.mask(mask);
         masked.forEach((value) -> assertTrue(value > 20));
         masked.fill(0);
@@ -532,7 +530,7 @@ class TestLongNDArrayPermuteDims implements LongNDArrayConstructorTrait, ByteNDA
 
     @Test
     void testConcatenate() {
-        NDArray<Long> array2 = createLongNDArray(new int[]{4, 3, 2}).fill(1);
+        NDArray<Long> array2 = new BasicLongNDArray(new int[]{4, 3, 2}).fill(1);
         NDArray<Long> array3 = pArray.concatenate(2, array2);
         for (int i = 0; i < pArray.dims(0); i++)
             for (int j = 0; j < pArray.dims(1); j++)
@@ -547,8 +545,8 @@ class TestLongNDArrayPermuteDims implements LongNDArrayConstructorTrait, ByteNDA
     @Test
     void testConcatenateMultiple() {
         NDArray<Long> array2 = pArray.copy().fill(1).slice(":", ":", "1:3");
-        NDArray<Long> array3 = createLongNDArray(new int[]{5, 3, 4}).permuteDims(2, 1, 0);
-        NDArray<Long> array4 = createLongNDArray(new int[]{36}).fill(2.f).reshape(4, 3, 3);
+        NDArray<Long> array3 = new BasicLongNDArray(new int[]{5, 3, 4}).permuteDims(2, 1, 0);
+        NDArray<Long> array4 = new BasicLongNDArray(new int[]{36}).fill(2.f).reshape(4, 3, 3);
         NDArray<Long> array5 = pArray.concatenate(2, array2, array3, array4);
         int start = 0;
         int end = pArray.dims(2);
