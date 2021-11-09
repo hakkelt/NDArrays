@@ -1,53 +1,67 @@
+/**
+ * ---------------------------------------------------------------------------------------------------------------------
+ * This file was generated, so instead of changing it, consider updating the template:
+ * src\template\io\github\hakkelt\ndarrays\AbstractByteNDArray.java
+ * 
+ * Generated at Mon, 8 Nov 2021 11:40:50 +0100
+ * ---------------------------------------------------------------------------------------------------------------------
+ */
+
 package io.github.hakkelt.ndarrays;
+
+import io.github.hakkelt.ndarrays.internal.AbstractRealNDArray;
+import io.github.hakkelt.ndarrays.internal.AccumulateOperators;
 
 /**
  * Abstract NDArray class for byte (8-bit integer) values.
  */
 public abstract class AbstractByteNDArray extends AbstractRealNDArray<Byte> {
 
-    protected AbstractByteNDArray() {}
-
-    protected Byte wrapValue(Number value) {
-        return Byte.valueOf(value.byteValue());
+    protected AbstractByteNDArray() {
     }
 
+    @Override
     protected Byte zeroT() {
         return Byte.valueOf((byte) 0);
     }
 
-    protected Byte oneT() {
-        return Byte.valueOf((byte) 1);
+    @Override
+    protected Byte wrapValue(Number value) {
+        return Byte.valueOf(value.byteValue());
     }
 
+    @Override
     protected Byte wrapValue(Object value) {
-        if (value instanceof Number) {
-            return Byte.valueOf(((Number)value).byteValue());
-        }
-        throw new UnsupportedOperationException();
+        return wrapValue((Number) value);
     }
 
-    public Object eltype() {
+    @Override
+    public Class<?> dtype() {
         return Byte.class;
     }
 
-    public void set(Byte real, int linearIndex) {
-        set((Number)real, linearIndex);
+    @Override
+    public void set(Number value, int linearIndex) {
+        set(value.byteValue(), linearIndex);
+    }
+
+    @Override
+    public void set(Number value, int... indices) {
+        set(value.byteValue(), indices);
     }
 
     @Override
     protected double absSum() {
-        return stream().mapToLong(Byte::longValue).reduce(0, (a,b) -> a + Math.abs(b));
+        return stream().mapToLong(Byte::longValue).reduce(0, (a, b) -> a + Math.abs(b));
     }
 
-    protected Byte accumulateAtIndex(int linearIndex, AccumulateOperators operator, Object ...objects) {
+    @Override
+    protected Byte accumulateAtIndex(int linearIndex, AccumulateOperators operator, Object... objects) {
         Byte acc = get(linearIndex);
-        for (Object item : objects) {
-            if (item instanceof NDArray<?>) {
-                acc = accumulate(acc, ((NDArray<?>)item), linearIndex, operator);
-            } else if (item instanceof Number) {
-                acc = accumulate(acc, (Number)item, operator);
-            } else throw new IllegalArgumentException();
-        }
+        for (Object item : objects)
+            acc = item instanceof NDArray<?>
+                    ? accumulate(acc, ((NDArray<?>) item), linearIndex, operator)
+                    : accumulate(acc, (Number) item, operator);
         return acc;
     }
 

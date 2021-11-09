@@ -1,28 +1,40 @@
+/**
+ * ---------------------------------------------------------------------------------------------------------------------
+ * This file was generated, so instead of changing it, consider updating the template:
+ * src\template\io\github\hakkelt\ndarrays\basic\BasicByteNDArray.java
+ * 
+ * Generated at Mon, 8 Nov 2021 11:40:50 +0100
+ * ---------------------------------------------------------------------------------------------------------------------
+ */
+
 package io.github.hakkelt.ndarrays.basic;
 
+import io.github.hakkelt.ndarrays.*;
+import io.github.hakkelt.ndarrays.internal.Generated;
+import io.github.hakkelt.ndarrays.internal.RealNDArrayCollector;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collector;
-
-import io.github.hakkelt.ndarrays.AbstractByteNDArray;
-import io.github.hakkelt.ndarrays.IndexingOperations;
-import io.github.hakkelt.ndarrays.NDArray;
-import io.github.hakkelt.ndarrays.RealNDArrayCollector;
 
 /**
  * Reference implementation for the NDArray of byte (8 bit integer) values.
  */
-public class BasicByteNDArray extends AbstractByteNDArray {
+public final class BasicByteNDArray extends AbstractByteNDArray {
+
     protected byte[] data;
 
-    protected BasicByteNDArray() {}
+    @SuppressWarnings("unused")
+    private BasicByteNDArray() {}
 
     /**
-     * Simple constructor that defines only the shape of the NDArray and fills it with zeros.
+     * Simple constructor that defines only the shape of the NDArray and fills it
+     * with zeros.
      * 
-     * @param dims dimensions / shape of the NDArray
+     * @param shape dimensions / shape of the NDArray
      */
-    public BasicByteNDArray(int... dims) {
-        baseConstuctor(dims);
+    public BasicByteNDArray(int... shape) {
+        baseConstuctor(shape);
         this.data = new byte[length()];
     }
 
@@ -32,115 +44,149 @@ public class BasicByteNDArray extends AbstractByteNDArray {
      * @param array NDArray from which entries are copied from.
      */
     public BasicByteNDArray(NDArray<? extends Number> array) {
-        baseConstuctor(array.dims());
+        baseConstuctor(array.shape());
         this.data = new byte[length()];
         copyFrom(array);
     }
 
     /**
-     * Factory method that creates an NDArray from a list or 1D array of float values.
+     * Factory method that creates an NDArray from a list or 1D array of byte
+     * values.
      * 
-     * @param array a list or 1D array of float values from which a BasicByteNDArray is created.
-     * @return an NDArray created from a list or 1D array of float values
+     * @param array a list or 1D array of byte values from which a BasicByteNDArray
+     * is created.
+     * @return an NDArray created from a list or 1D array of byte values
      */
     public static NDArray<Byte> of(float... array) {
         return new BasicByteNDArray(array.length).copyFrom(array);
     }
-    
+
     /**
-     * Factory method that creates an NDArray from a list or 1D array of double values.
+     * Factory method that creates an NDArray from a list or 1D array of byte
+     * values.
      * 
-     * @param array a list or 1D array of double values from which a BasicByteNDArray is created.
-     * @return an NDArray created from a list or 1D array of double values
+     * @param array a list or 1D array of byte values from which a BasicByteNDArray
+     * is created.
+     * @return an NDArray created from a list or 1D array of byte values
      */
     public static NDArray<Byte> of(double... array) {
         return new BasicByteNDArray(array.length).copyFrom(array);
     }
-    
+
     /**
-     * Factory method that creates an NDArray from a list or 1D array of byte values.
+     * Factory method that creates an NDArray from a list or 1D array of byte
+     * values.
      * 
-     * @param array a list or 1D array of byte values from which a BasicByteNDArray is created.
+     * @param array a list or 1D array of byte values from which a BasicByteNDArray
+     * is created.
      * @return an NDArray created from a list or 1D array of byte values
      */
     public static NDArray<Byte> of(byte... array) {
         return new BasicByteNDArray(array.length).copyFrom(array);
     }
-    
+
     /**
-     * Factory method that creates an NDArray from a list or 1D array of short values.
+     * Factory method that creates an NDArray from a list or 1D array of byte
+     * values.
      * 
-     * @param array a list or 1D array of short values from which a BasicByteNDArray is created.
-     * @return an NDArray created from a list or 1D array of short values
+     * @param array a list or 1D array of byte values from which a BasicByteNDArray
+     * is created.
+     * @return an NDArray created from a list or 1D array of byte values
      */
     public static NDArray<Byte> of(short... array) {
         return new BasicByteNDArray(array.length).copyFrom(array);
     }
-    
+
     /**
-     * Factory method that creates an NDArray from a list or 1D array of int values.
+     * Factory method that creates an NDArray from a list or 1D array of byte
+     * values.
      * 
-     * @param array a list or 1D array of int values from which a BasicByteNDArray is created.
-     * @return an NDArray created from a list or 1D array of int values
+     * @param array a list or 1D array of byte values from which a BasicByteNDArray
+     * is created.
+     * @return an NDArray created from a list or 1D array of byte values
      */
     public static NDArray<Byte> of(int... array) {
         return new BasicByteNDArray(array.length).copyFrom(array);
     }
-    
+
     /**
-     * Factory method that creates an NDArray from a list or 1D array of long values.
+     * Factory method that creates an NDArray from a list or 1D array of byte
+     * values.
      * 
-     * @param array a list or 1D array of long values from which a BasicByteNDArray is created.
-     * @return an NDArray created from a list or 1D array of long values
+     * @param array a list or 1D array of byte values from which a BasicByteNDArray
+     * is created.
+     * @return an NDArray created from a list or 1D array of byte values
      */
     public static NDArray<Byte> of(long... array) {
         return new BasicByteNDArray(array.length).copyFrom(array);
     }
-    
+
     /**
-     * Factory method that creates an NDArray from a multi-dimensional array of numeric values.
+     * Factory method that creates an NDArray from a multi-dimensional array of
+     * numeric values.
      * 
-     * @param array a multi-dimensional array of numeric values from which a BasicByteNDArray is created.
+     * @param array a multi-dimensional array of numeric values from which a
+     *              BasicByteNDArray is created.
      * @return an NDArray created from a multi-dimensional array of numeric values
      */
     public static NDArray<Byte> of(Object[] array) {
-        return new BasicByteNDArray(IndexingOperations.computeDims(array)).copyFrom(array);
-    }
-
-    public NDArray<Byte> copyFrom(BasicByteNDArray array) {
-        data = array.data.clone();
-        return this;
-    }
-
-    public Byte get(int linearIndex) {
-        linearIndex = IndexingOperations.boundaryCheck(linearIndex, length());
-        return data[linearIndex];
-    }
-
-    public void set(Number real, int linearIndex) {
-        linearIndex = IndexingOperations.boundaryCheck(linearIndex, length());
-        data[linearIndex] = real.byteValue();
-    }
-    public Byte get(int... indices) {
-        return get(IndexingOperations.cartesianIndicesToLinearIndex(indices, dims, multipliers));
-    }
-
-    public void set(Byte value, int... indices) {
-        set(value, IndexingOperations.cartesianIndicesToLinearIndex(indices, dims, multipliers));
-    }
-
-    public static Collector<Object, List<Object>, NDArray<Byte>> getCollector(int[] dims) {
-        return new RealNDArrayCollector<>(new BasicByteNDArray(dims));
-    }
-
-    protected BasicByteNDArray createNewNDArrayOfSameTypeAsMe(int... dims) {
-        return new BasicByteNDArray(dims);
+        return new BasicByteNDArray(NDArrayUtils.computeDims(array)).copyFrom(array);
     }
 
     @Override
-    protected String name() {
+    public NDArray<Byte> copyFrom(NDArray<?> array) {
+        if (array instanceof BasicByteNDArray) {
+            NDArrayUtils.checkShapeCompatibility(this, array.shape());
+            data = ((BasicByteNDArray) array).data.clone();
+        } else
+            super.copyFrom(array);
+        return this;
+    }
+
+    @Override
+    public String getNamePrefix() {
         return "basic";
     }
-    
-}
 
+    public static Collector<Object,List<Object>,NDArray<Byte>> getCollector(int... shape) {
+        return new RealNDArrayCollector<>(new BasicByteNDArray(shape));
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof BasicByteNDArray
+                ? Arrays.equals(data, ((BasicByteNDArray) other).data)
+                : super.equals(other);
+    }
+
+    @Generated
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    protected BasicByteNDArray createNewNDArrayOfSameTypeAsMe(int... shape) {
+        return new BasicByteNDArray(shape);
+    }
+
+    @Override
+    protected Byte getUnchecked(int linearIndex) {
+        return data[linearIndex];
+    }
+
+    @Override
+    protected Byte getUnchecked(int... indices) {
+        return getUncheckedDefault(indices);
+    }
+
+    @Override
+    protected void setUnchecked(Byte value, int linearIndex) {
+        data[linearIndex] = value;
+    }
+
+    @Override
+    protected void setUnchecked(Byte value, int... indices) {
+        setUncheckedDefault(value, indices);
+    }
+
+}

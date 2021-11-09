@@ -1,48 +1,67 @@
+/**
+ * ---------------------------------------------------------------------------------------------------------------------
+ * This file was generated, so instead of changing it, consider updating the template:
+ * src\template\io\github\hakkelt\ndarrays\AbstractByteNDArrayTemplate.java
+ * 
+ * Generated at Mon, 8 Nov 2021 11:40:49 +0100
+ * ---------------------------------------------------------------------------------------------------------------------
+ */
+
 package io.github.hakkelt.ndarrays;
 
+import io.github.hakkelt.ndarrays.internal.AbstractRealNDArray;
+import io.github.hakkelt.ndarrays.internal.AccumulateOperators;
+
 /**
- * Abstract NDArray class for double (64-bit floating point) values.
+ * Abstract NDArray class for float (8-bit integer) values.
  */
 public abstract class AbstractFloatNDArray extends AbstractRealNDArray<Float> {
 
-    protected AbstractFloatNDArray() {}
-    
+    protected AbstractFloatNDArray() {
+    }
+
+    @Override
+    protected Float zeroT() {
+        return Float.valueOf((float) 0);
+    }
+
+    @Override
     protected Float wrapValue(Number value) {
         return Float.valueOf(value.floatValue());
     }
-    
-    protected Float zeroT() {
-        return Float.valueOf(0.f);
-    }
 
-    protected Float oneT() {
-        return Float.valueOf(1.f);
-    }
-
+    @Override
     protected Float wrapValue(Object value) {
-        if (value instanceof Number) {
-            return Float.valueOf(((Number)value).floatValue());
-        }
-        throw new UnsupportedOperationException();
+        return wrapValue((Number) value);
     }
-    
-    public Object eltype() {
+
+    @Override
+    public Class<?> dtype() {
         return Float.class;
     }
 
-    public void set(Float real, int linearIndex) {
-        set((Number)real, linearIndex);
+    @Override
+    public void set(Number value, int linearIndex) {
+        set(value.floatValue(), linearIndex);
     }
-    
-    protected Float accumulateAtIndex(int linearIndex, AccumulateOperators operator, Object ...objects) {
+
+    @Override
+    public void set(Number value, int... indices) {
+        set(value.floatValue(), indices);
+    }
+
+    @Override
+    protected double absSum() {
+        return stream().mapToLong(Float::longValue).reduce(0, (a, b) -> a + Math.abs(b));
+    }
+
+    @Override
+    protected Float accumulateAtIndex(int linearIndex, AccumulateOperators operator, Object... objects) {
         Float acc = get(linearIndex);
-        for (Object item : objects) {
-            if (item instanceof NDArray<?>) {
-                acc = accumulate(acc, ((NDArray<?>)item), linearIndex, operator);
-            } else if (item instanceof Number) {
-                acc = accumulate(acc, (Number)item, operator);
-            } else throw new IllegalArgumentException();
-        }
+        for (Object item : objects)
+            acc = item instanceof NDArray<?>
+                    ? accumulate(acc, ((NDArray<?>) item), linearIndex, operator)
+                    : accumulate(acc, (Number) item, operator);
         return acc;
     }
 

@@ -1,8 +1,27 @@
+/**
+ * ---------------------------------------------------------------------------------------------------------------------
+ * This file was generated, so instead of changing it, consider updating the template:
+ * src\template\io\github\hakkelt\ndarrays\AbstractComplexNDArray.java
+ * 
+ * Generated at Mon, 8 Nov 2021 11:40:50 +0100
+ * ---------------------------------------------------------------------------------------------------------------------
+ */
+
 package io.github.hakkelt.ndarrays;
 
-import java.lang.reflect.Type;
+import io.github.hakkelt.ndarrays.internal.*;
+import io.github.hakkelt.ndarrays.internal.AbstractNDArray;
+import io.github.hakkelt.ndarrays.internal.AccumulateOperators;
+
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.IntFunction;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
 
 import org.apache.commons.math3.complex.Complex;
@@ -10,281 +29,330 @@ import org.apache.commons.math3.complex.Complex;
 /**
  * Abstract NDArray class for Complex values.
  */
-public abstract class AbstractComplexNDArray<T extends Number> extends AbstractNDArray<Complex,T> implements ComplexNDArrayTrait<T> {
+public abstract class AbstractComplexNDArray<T extends Number> extends AbstractNDArray<Complex,T> implements ComplexNDArray<T> {
 
-    protected AbstractComplexNDArray() {}
+    protected AbstractComplexNDArray() {
+    }
 
-    public Object eltype() {
+    @Override
+    public Class<?> dtype() {
         return Complex.class;
     }
 
+    @Override
+    public Class<?> dtype2() {
+        Type[] types = ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments();
+        return (Class<?>) types[types.length - 1];
+    }
+
+    @Override
     public String dataTypeAsString() {
-        String[] str = eltype2().toString().split("\\.");
-        return "Complex " + str[str.length - 1];
+        return "Complex " + dtype2().getSimpleName();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public ComplexNDArray<T> copy() {
-        return (ComplexNDArray<T>)super.copy();
+        return (ComplexNDArray<T>) super.copy();
     }
 
     @Override
     public NDArray<T> real() {
-        return streamLinearIndices()
-            .mapToObj(this::getReal).collect(getRealCollectorInternal(dims));
+        return streamLinearIndices().mapToObj(this::getReal).collect(getRealCollectorInternal(shape));
     }
 
     @Override
     public NDArray<T> imaginary() {
-        return streamLinearIndices()
-            .mapToObj(this::getImag).collect(getRealCollectorInternal(dims));
+        return streamLinearIndices().mapToObj(this::getImag).collect(getRealCollectorInternal(shape));
     }
 
     @Override
     public NDArray<T> abs() {
-        return streamLinearIndices()
-            .mapToObj(i -> get(i).abs()).collect(getRealCollectorInternal(dims));
+        return streamLinearIndices().mapToObj(i -> get(i).abs()).collect(getRealCollectorInternal(shape));
     }
 
     @Override
     public NDArray<T> angle() {
-        return streamLinearIndices()
-            .mapToObj(i -> get(i).getArgument()).collect(getRealCollectorInternal(dims));
+        return streamLinearIndices().mapToObj(i -> get(i).getArgument()).collect(getRealCollectorInternal(shape));
     }
 
     @Override
     public ComplexNDArray<T> similar() {
-        return createNewNDArrayOfSameTypeAsMe(dims);
+        return createNewNDArrayOfSameTypeAsMe(shape);
     }
 
-    protected abstract ComplexNDArray<T> createNewNDArrayOfSameTypeAsMe(int... dims);
+    @Override
+    public void set(Number value, int linearIndex) {
+        NDArrayUtils.boundaryCheck(linearIndex, length());
+        linearIndex = NDArrayUtils.unwrap(linearIndex, length());
+        setRealUnchecked(wrapRealValue(value), linearIndex);
+        setImagUnchecked(zeroT2(), linearIndex);
+    }
 
-    protected Complex accumulateAtIndex(int linearIndex, AccumulateOperators operator, Object ...objects) {
+    @Override
+    public void set(Number value, int... indices) {
+        NDArrayUtils.boundaryCheck(indices, shape());
+        indices = NDArrayUtils.unwrap(indices, shape());
+        setRealUnchecked(wrapRealValue(value), indices);
+        setImagUnchecked(zeroT2(), indices);
+    }
+
+    @Override
+    public void setReal(Number value, int linearIndex) {
+        NDArrayUtils.boundaryCheck(linearIndex, length());
+        setRealUnchecked(wrapRealValue(value), NDArrayUtils.unwrap(linearIndex, length()));
+    }
+
+    @Override
+    public void setReal(Number value, int... indices) {
+        NDArrayUtils.boundaryCheck(indices, shape());
+        setRealUnchecked(wrapRealValue(value), NDArrayUtils.unwrap(indices, shape()));
+    }
+
+    @Override
+    public void setImag(Number value, int linearIndex) {
+        NDArrayUtils.boundaryCheck(linearIndex, length());
+        setImagUnchecked(wrapRealValue(value), NDArrayUtils.unwrap(linearIndex, length()));
+    }
+
+    @Override
+    public void setImag(Number value, int... indices) {
+        NDArrayUtils.boundaryCheck(indices, shape());
+        setImagUnchecked(wrapRealValue(value), NDArrayUtils.unwrap(indices, shape()));
+    }
+
+    @Override
+    public ComplexNDArray<T> fillUsingLinearIndices(IntFunction<Complex> func) {
+        super.fillUsingLinearIndices(func);
+        return this;
+    }
+
+    @Override
+    public ComplexNDArray<T> fillUsingCartesianIndices(Function<int[],Complex> func) {
+        super.fillUsingCartesianIndices(func);
+        return this;
+    }
+
+    @Override
+    public ComplexNDArray<T> apply(UnaryOperator<Complex> func) {
+        super.apply(func);
+        return this;
+    }
+
+    @Override
+    public ComplexNDArray<T> applyWithLinearIndices(BiFunction<Complex,Integer,Complex> func) {
+        super.applyWithLinearIndices(func);
+        return this;
+    }
+
+    @Override
+    public ComplexNDArray<T> applyWithCartesianIndices(BiFunction<Complex,int[],Complex> func) {
+        super.applyWithCartesianIndices(func);
+        return this;
+    }
+
+    @Override
+    protected abstract ComplexNDArray<T> createNewNDArrayOfSameTypeAsMe(int... shape);
+
+    @Override
+    protected Complex accumulateAtIndex(int linearIndex, AccumulateOperators operator, Object... objects) {
         Complex acc = get(linearIndex);
-        for (Object item : objects) {
-            if (item instanceof NDArray<?>) {
-                acc = accumulate(acc, ((NDArray<?>)item), linearIndex, operator);
-            } else if (item instanceof Complex) {
-                acc = accumulate(acc, (Complex)item, operator);
-            } else if (item instanceof Number) {
-                acc = accumulate(acc, (Number)item, operator);
-            }
-        }
+        for (Object item : objects)
+            if (item instanceof NDArray<?>)
+                acc = accumulate(acc, ((NDArray<?>) item), linearIndex, operator);
+            else if (item instanceof Complex)
+                acc = accumulate(acc, (Complex) item, operator);
+            else
+                acc = accumulate(acc, (Number) item, operator);
         return acc;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     protected T wrapRealValue(Number value) {
-        if (eltype2() == Float.class)
+        if (dtype2() == Float.class)
             return (T) Float.valueOf(value.floatValue());
-        if (eltype2() == Double.class)
+        else
             return (T) Double.valueOf(value.doubleValue());
-        if (eltype2() == Byte.class)
-            return (T) Byte.valueOf(value.byteValue());
-        if (eltype2() == Short.class)
-            return (T) Short.valueOf(value.shortValue());
-        if (eltype2() == Integer.class)
-            return (T) Integer.valueOf(value.intValue());
-        if (eltype2() == Long.class)
-            return (T) Long.valueOf(value.longValue());
-        throw new IllegalArgumentException();
     }
 
+    @Override
     protected long countNonZero() {
-        return stream().filter(item -> item != Complex.ZERO).count();
+        return stream().filter(item -> !item.equals(Complex.ZERO)).count();
     }
 
-    protected Object eltype2() {
-        Type[] types = ((ParameterizedType)this.getClass().getGenericSuperclass()).getActualTypeArguments();
-        return types[types.length - 1];
-    }
-    
-    protected Collector<Object, List<Object>, NDArray<Complex>> getCollectorInternal(int[] dims) {
-        return new ComplexNDArrayCollector<>(createNewNDArrayOfSameTypeAsMe(dims));
+    @Override
+    protected Collector<Object,List<Object>,NDArray<Complex>> getCollectorInternal(int[] shape) {
+        return new ComplexNDArrayCollector<>(createNewNDArrayOfSameTypeAsMe(shape));
     }
 
+    @Override
     protected String printItem(int index, String format) {
         Complex item = get(index);
         String complexFormat = format + (item.getImaginary() < 0 ? "-" : "+") + format + "i";
         return String.format(complexFormat, item.getReal(), Math.abs(item.getImaginary()));
     }
 
+    @Generated
     protected Complex accumulate(Float acc, NDArray<?> array, int linearIndex, AccumulateOperators operator) {
-        throw new UnsupportedOperationException();   
+        throw new UnsupportedOperationException();
     }
 
+    @Generated
     protected Complex accumulate(Double acc, NDArray<?> array, int linearIndex, AccumulateOperators operator) {
-        throw new UnsupportedOperationException();   
+        throw new UnsupportedOperationException();
     }
 
+    @Generated
     protected Complex accumulate(Byte acc, NDArray<?> array, int linearIndex, AccumulateOperators operator) {
-        throw new UnsupportedOperationException();   
+        throw new UnsupportedOperationException();
     }
 
+    @Generated
     protected Complex accumulate(Short acc, NDArray<?> array, int linearIndex, AccumulateOperators operator) {
-        throw new UnsupportedOperationException();   
+        throw new UnsupportedOperationException();
     }
 
+    @Generated
     protected Complex accumulate(Integer acc, NDArray<?> array, int linearIndex, AccumulateOperators operator) {
-        throw new UnsupportedOperationException();   
+        throw new UnsupportedOperationException();
     }
 
+    @Generated
     protected Complex accumulate(Long acc, NDArray<?> array, int linearIndex, AccumulateOperators operator) {
-        throw new UnsupportedOperationException();   
+        throw new UnsupportedOperationException();
     }
 
-    protected Complex accumulate(Complex acc, NDArray<?> array, int linearIndex, AbstractNDArray.AccumulateOperators operation) {
-        if (array.eltype() == Complex.class)
-            return accumulate(acc, (Complex)array.get(linearIndex), operation);
-        else if (array.eltype() == Double.class)
-            return accumulate(acc, (Double)array.get(linearIndex), operation);
-        else
-            return accumulate(acc, (Float)array.get(linearIndex), operation);
+    @Generated
+    protected Complex accumulate(BigInteger acc, NDArray<?> array, int linearIndex, AccumulateOperators operator) {
+        throw new UnsupportedOperationException();
     }
 
+    @Generated
+    protected Complex accumulate(BigDecimal acc, NDArray<?> array, int linearIndex, AccumulateOperators operator) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Generated
     protected Complex accumulate(Float acc, Number item, AccumulateOperators operator) {
-        throw new UnsupportedOperationException();   
+        throw new UnsupportedOperationException();
     }
 
+    @Generated
     protected Complex accumulate(Double acc, Number item, AccumulateOperators operator) {
-        throw new UnsupportedOperationException();   
+        throw new UnsupportedOperationException();
     }
 
+    @Generated
     protected Complex accumulate(Byte acc, Number item, AccumulateOperators operator) {
-        throw new UnsupportedOperationException();   
+        throw new UnsupportedOperationException();
     }
 
+    @Generated
     protected Complex accumulate(Short acc, Number item, AccumulateOperators operator) {
-        throw new UnsupportedOperationException();   
+        throw new UnsupportedOperationException();
     }
 
+    @Generated
     protected Complex accumulate(Integer acc, Number item, AccumulateOperators operator) {
-        throw new UnsupportedOperationException();   
+        throw new UnsupportedOperationException();
     }
 
+    @Generated
     protected Complex accumulate(Long acc, Number item, AccumulateOperators operator) {
-        throw new UnsupportedOperationException();   
+        throw new UnsupportedOperationException();
+    }
+
+    @Generated
+    protected Complex accumulate(BigInteger acc, Number item, AccumulateOperators operator) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Generated
+    protected Complex accumulate(BigDecimal acc, Number item, AccumulateOperators operator) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    protected Complex accumulate(Complex acc, Complex value, AbstractNDArray.AccumulateOperators operation) {
+    protected Complex accumulate(Complex acc, NDArray<?> array, int linearIndex, AccumulateOperators operation) {
+        if (array.dtype() == Complex.class)
+            return accumulate(acc, (Complex) array.get(linearIndex), operation);
+        else if (array.dtype() == Byte.class)
+            return accumulate(acc, (Byte) array.get(linearIndex), operation);
+        else if (array.dtype() == Short.class)
+            return accumulate(acc, (Short) array.get(linearIndex), operation);
+        else if (array.dtype() == Integer.class)
+            return accumulate(acc, (Integer) array.get(linearIndex), operation);
+        else if (array.dtype() == Long.class)
+            return accumulate(acc, (Long) array.get(linearIndex), operation);
+        else if (array.dtype() == Double.class)
+            return accumulate(acc, (Double) array.get(linearIndex), operation);
+        else if (array.dtype() == Float.class)
+            return accumulate(acc, (Float) array.get(linearIndex), operation);
+        else if (array.dtype() == BigInteger.class)
+            return accumulate(acc, (BigInteger) array.get(linearIndex), operation);
+        else
+            return accumulate(acc, (BigDecimal) array.get(linearIndex), operation);
+    }
+
+    @Override
+    protected Complex accumulate(Complex acc, Complex value, AccumulateOperators operation) {
         switch (operation) {
-            case ADD: return acc.add(value);
-            case SUBTRACT: return acc.subtract(value);
-            case MULTIPLY: return acc.multiply(value);
-            case DIVIDE: return acc.divide(value);
-            default: throw new IllegalArgumentException();
+            case ADD:
+                return acc.add(value);
+            case SUBTRACT:
+                return acc.subtract(value);
+            case MULTIPLY:
+                return acc.multiply(value);
+            case DIVIDE:
+            default:
+                return acc.divide(value);
         }
     }
 
-    protected Complex accumulate(Complex acc, Number value, AbstractNDArray.AccumulateOperators operation) {
+    @Override
+    protected Complex accumulate(Complex acc, Number value, AccumulateOperators operation) {
         switch (operation) {
-            case ADD: return acc.add(value.doubleValue());
-            case SUBTRACT: return acc.subtract(value.doubleValue());
-            case MULTIPLY: return acc.multiply(value.doubleValue());
-            case DIVIDE: return acc.divide(value.doubleValue());
-            default: throw new IllegalArgumentException();
+            case ADD:
+                return acc.add(value.doubleValue());
+            case SUBTRACT:
+                return acc.subtract(value.doubleValue());
+            case MULTIPLY:
+                return acc.multiply(value.doubleValue());
+            case DIVIDE:
+            default:
+                return acc.divide(value.doubleValue());
         }
     }
 
-    protected static void checkEqualLength(byte[] real, byte[] imag) {
-        if (imag.length != real.length)
-            throw new IllegalArgumentException(Errors.ARRAYS_DIFFER_IN_SIZE);
+    @Override
+    protected Collector<Object,List<Object>,NDArray<T>> getRealCollectorInternal(int[] shape) {
+        return new RealNDArrayCollector<>(createNewRealNDArrayOfSameTypeAsMe(shape));
     }
 
-    protected static void checkEqualLength(short[] real, short[] imag) {
-        if (imag.length != real.length)
-            throw new IllegalArgumentException(Errors.ARRAYS_DIFFER_IN_SIZE);
-    }
-
-    protected static void checkEqualLength(int[] real, int[] imag) {
-        if (imag.length != real.length)
-            throw new IllegalArgumentException(Errors.ARRAYS_DIFFER_IN_SIZE);
-    }
-
-    protected static void checkEqualLength(long[] real, long[] imag) {
-        if (imag.length != real.length)
-            throw new IllegalArgumentException(Errors.ARRAYS_DIFFER_IN_SIZE);
-    }
-
-    protected static void checkEqualLength(float[] real, float[] imag) {
-        if (imag.length != real.length)
-            throw new IllegalArgumentException(Errors.ARRAYS_DIFFER_IN_SIZE);
-    }
-
-    protected static void checkEqualLength(double[] real, double[] imag) {
-        if (imag.length != real.length)
-            throw new IllegalArgumentException(Errors.ARRAYS_DIFFER_IN_SIZE);
-    }
-
-    protected static void checkEqualLength(Object[] real, Object[] imag) {
-        if (imag.length != real.length)
-            throw new IllegalArgumentException(Errors.ARRAYS_DIFFER_IN_SIZE);
-        if (!(real[0] instanceof Complex)) {
-            if (real[0] instanceof byte[])
-                checkEqualLength((byte[])real[0], (byte[])imag[0]);
-            if (real[0] instanceof short[])
-                checkEqualLength((short[])real[0], (short[])imag[0]);
-            if (real[0] instanceof int[])
-                checkEqualLength((int[])real[0], (int[])imag[0]);
-            if (real[0] instanceof long[])
-                checkEqualLength((long[])real[0], (long[])imag[0]);
-            if (real[0] instanceof float[])
-                checkEqualLength((float[])real[0], (float[])imag[0]);
-            if (real[0] instanceof double[])
-                checkEqualLength((double[])real[0], (double[])imag[0]);
-        }
-    }
-    
-    protected Complex wrapValue(Object value) {
-        if (value instanceof Float)
-            return new Complex((Float)value);
-        if (value instanceof Double)
-            return new Complex((Double)value);
-        if (value instanceof Byte)
-            return new Complex((Byte)value);
-        if (value instanceof Short)
-            return new Complex((Short)value);
-        if (value instanceof Long)
-            return new Complex((Long)value);
-        if (value instanceof Integer)
-            return new Complex((Integer)value);
-        if (value instanceof Complex)
-            return (Complex)value;
-        throw new UnsupportedOperationException(String.format(Errors.TYPE_MISMATCH, value.getClass()));
-    }
-
-    @SuppressWarnings("unchecked")
-    protected T zeroT2() {
-        if (eltype2() == Float.class)
-            return (T) Float.valueOf(0.f);
-        if (eltype2() == Double.class)
-            return (T) Double.valueOf(0.);
-        if (eltype2() == Byte.class)
-            return (T) Byte.valueOf((byte) 0);
-        if (eltype2() == Short.class)
-            return (T) Short.valueOf((short) 0);
-        if (eltype2() == Integer.class)
-            return (T) Integer.valueOf(0);
-        if (eltype2() == Long.class)
-            return (T) Long.valueOf(0);
-        throw new UnsupportedOperationException();
-    }
-    
-    protected Collector<Object, List<Object>, NDArray<T>> getRealCollectorInternal(int[] dims) {
-        return new RealNDArrayCollector<>(createNewRealNDArrayOfSameTypeAsMe(dims));
-    }
-
+    @Override
     protected Complex wrapValue(Number value) {
         return new Complex(value.doubleValue());
     }
-    
+
+    @Override
+    protected Complex wrapValue(Object value) {
+        if (value instanceof Number)
+            return new Complex(((Number) value).doubleValue());
+        return (Complex) value;
+    }
+
+    @Override
     protected Complex zeroT() {
         return Complex.ZERO;
     }
 
-    protected Complex oneT() {
-        return Complex.ONE;
+    @Override
+    @SuppressWarnings("unchecked")
+    protected T zeroT2() {
+        if (dtype2() == Float.class)
+            return (T) Float.valueOf(0.f);
+        return (T) Double.valueOf(0.);
     }
+
 }
