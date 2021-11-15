@@ -2,8 +2,6 @@
  * ---------------------------------------------------------------------------------------------------------------------
  * This file was generated, so instead of changing it, consider updating the template:
  * src\test\java\io\github\hakkelt\ndarrays\template\TestBasicComplexFloatNDArrayComplexSpecific.java
- * 
- * Generated at Mon, 8 Nov 2021 11:40:54 +0100
  * ---------------------------------------------------------------------------------------------------------------------
  */
 
@@ -82,8 +80,8 @@ class TestBasicComplexFloatNDArrayComplexSpecific extends TestBase {
 
     @ParameterizedTest
     @MethodSource("provideNDArrays")
-    void testAngle(ComplexNDArray<Float> target) {
-        NDArray<Float> result = target.angle();
+    void testargument(ComplexNDArray<Float> target) {
+        NDArray<Float> result = target.argument();
         result.forEachWithLinearIndices((value, i) -> assertEquals(target.get(i).getArgument(), value.doubleValue()));
     }
 

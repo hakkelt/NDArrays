@@ -3,6 +3,7 @@ package io.github.hakkelt.ndarrays;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.*;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -55,7 +56,7 @@ public abstract class AbstractComplexNDArrayTemplate<T extends Number> extends  
     @Patterns({"real", "this::getReal"})
     @Replacements({"imaginary", "this::getImag"})
     @Replacements({"abs", "i -> get(i).abs()"})
-    @Replacements({"angle", "i -> get(i).getArgument()"})
+    @Replacements({"argument", "i -> get(i).getArgument()"})
     public NDArray<T> real() {
         return streamLinearIndices().mapToObj(this::getReal).collect(getRealCollectorInternal(shape));
     }
@@ -264,4 +265,5 @@ public abstract class AbstractComplexNDArrayTemplate<T extends Number> extends  
             return (T) Float.valueOf(0.f);
         return (T) Double.valueOf(0.);
     }
+
 }

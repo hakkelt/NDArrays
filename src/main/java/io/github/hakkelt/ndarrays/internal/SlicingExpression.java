@@ -47,11 +47,8 @@ public class SlicingExpression {
             return prevExpr;
         if (newExpr.isScalar())
             return prevExpr == Range.ALL ? newExpr : new Range(prevExpr.start() + newExpr.start());
-        if (newExpr instanceof Range) {
-            int start = prevExpr.start() + newExpr.start();
-            return new Range(start, start + newExpr.length());
-        }
-        throw new IllegalArgumentException(String.format(Errors.ILLEGAL_SLICING_EXPRESSION, newExpr));
+        int start = prevExpr.start() + prevExpr.step() * newExpr.start();
+        return new Range(start, prevExpr.step() * newExpr.step(), start + prevExpr.step() * newExpr.length());
     }
 
     public void checkAgainstParentDims() {
@@ -96,7 +93,7 @@ public class SlicingExpression {
             else if (expr.isScalar())
                 parentIndices[parentIndicesIndex++] = expr.start();
             else
-                parentIndices[parentIndicesIndex++] = viewIndices[viewIndicesIndex++] * expr.step() + expr.start();
+                parentIndices[parentIndicesIndex++] = expr.start() + viewIndices[viewIndicesIndex++] * expr.step();
         }
         return parentIndices;
     }

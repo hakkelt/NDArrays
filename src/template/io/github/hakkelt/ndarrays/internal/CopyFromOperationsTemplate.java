@@ -113,6 +113,20 @@ public class CopyFromOperationsTemplate<T,T2 extends Number> {
         return me;
     }
 
+    @SuppressWarnings("unchecked")
+    public ComplexNDArray<T2> copyFromMagnitudePhase(ComplexNDArray<T2> me, NDArray<? extends Number> magnitude, NDArray<? extends Number> phase) {
+        if (!Arrays.equals(magnitude.shape(), phase.shape()))
+            throw new IllegalArgumentException(Errors.ARRAYS_DIFFER_IN_SHAPE);
+        AbstractNDArray<? extends Number, ?> castedMagnitude = (AbstractNDArray<? extends Number,?>) magnitude;
+        AbstractNDArray<? extends Number, ?> castedPhase = (AbstractNDArray<? extends Number,?>) phase;
+        me.fillUsingLinearIndices(i -> {
+                double m = castedMagnitude.getUnchecked(i).doubleValue();
+                double phi = castedPhase.getUnchecked(i).doubleValue();
+                return new Complex(Math.cos(phi), Math.sin(phi)).multiply(m);
+            });
+        return me;
+    }
+
     @Replace(pattern = "float", replacements = {"double", "byte", "short", "int", "long", "BigInteger", "BigDecimal", "Complex"})
     protected void flatten(AbstractNDArray<T,T2> me, float[] real, int startIndex, int dimension) {
         IntStream.range(0, real.length).parallel()

@@ -47,15 +47,15 @@ public class TestBaseTemplate {
     @Replacements({"BigInteger", "double", "BigInteger.valueOf((long) value)"})
     @Replacements({"BigDecimal", "double", "new BigDecimal(value)"})
     @Replacements({"Complex", "double", "new Complex(value)"})
-    public Byte wrapToByte(double value) {
+    public static Byte wrapToByte(double value) {
         return (byte) value;
     }
 
-    public Double wrapToDouble(BigInteger value) {
+    public static Double wrapToDouble(BigInteger value) {
         return value.doubleValue();
     }
 
-    public Double wrapToDouble(BigDecimal value) {
+    public static Double wrapToDouble(BigDecimal value) {
         return value.doubleValue();
     }
 

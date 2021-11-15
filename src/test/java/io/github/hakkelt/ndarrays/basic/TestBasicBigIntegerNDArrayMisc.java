@@ -2,8 +2,6 @@
  * ---------------------------------------------------------------------------------------------------------------------
  * This file was generated, so instead of changing it, consider updating the template:
  * src\test\java\io\github\hakkelt\ndarrays\template\TestMisc.java
- * 
- * Generated at Mon, 8 Nov 2021 11:40:55 +0100
  * ---------------------------------------------------------------------------------------------------------------------
  */
 
@@ -32,7 +30,7 @@ class TestBasicBigIntegerNDArrayMisc extends TestBase {
     @BeforeEach
     void setup() {
         array = arrayOriginal = new BasicBigIntegerNDArray(4, 5, 3);
-        array.applyWithLinearIndices((value, index) -> wrapToBigInteger(index));
+        array.fillUsingLinearIndices(TestBase::wrapToBigInteger);
         slice = array.slice(1, "1:4", ":");
         reshaped = array.reshape(20, 3);
         pArray = array.permuteDims(0, 2, 1);

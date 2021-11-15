@@ -2,17 +2,18 @@
  * ---------------------------------------------------------------------------------------------------------------------
  * This file was generated, so instead of changing it, consider updating the template:
  * src\template\io\github\hakkelt\ndarrays\basic\BasicByteNDArrayTemplate.java
- * 
- * Generated at Mon, 8 Nov 2021 11:40:50 +0100
  * ---------------------------------------------------------------------------------------------------------------------
  */
 
 package io.github.hakkelt.ndarrays.basic;
 
 import io.github.hakkelt.ndarrays.*;
+import io.github.hakkelt.ndarrays.internal.FileOperations;
 import io.github.hakkelt.ndarrays.internal.Generated;
 import io.github.hakkelt.ndarrays.internal.RealNDArrayCollector;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
@@ -120,6 +121,10 @@ public final class BasicBigDecimalNDArray extends AbstractBigDecimalNDArray {
      */
     public static NDArray<BigDecimal> of(long... array) {
         return new BasicBigDecimalNDArray(array.length).copyFrom(array);
+    }
+
+    public static BasicBigDecimalNDArray readFromFile(File file) throws IOException {
+        return new FileOperations<BigDecimal,BigDecimal>().readFromFile(file, BasicBigDecimalNDArray::new);
     }
 
     /**

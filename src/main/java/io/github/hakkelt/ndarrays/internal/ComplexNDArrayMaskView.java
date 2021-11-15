@@ -2,8 +2,6 @@
  * ---------------------------------------------------------------------------------------------------------------------
  * This file was generated, so instead of changing it, consider updating the template:
  * src\template\io\github\hakkelt\ndarrays\internal\ComplexNDArrayMaskView.java
- * 
- * Generated at Mon, 8 Nov 2021 11:40:51 +0100
  * ---------------------------------------------------------------------------------------------------------------------
  */
 
@@ -58,7 +56,7 @@ public class ComplexNDArrayMaskView<T extends Number> extends AbstractNDArrayMas
     }
 
     @Override
-    public NDArray<T> angle() {
+    public NDArray<T> argument() {
         return streamLinearIndices()
             .mapToObj(i -> get(i).getArgument())
             .collect(parent.getRealCollectorInternal(shape));

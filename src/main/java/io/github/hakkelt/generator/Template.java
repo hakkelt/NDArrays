@@ -4,8 +4,6 @@ import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -211,13 +209,11 @@ class Template {
     private void printGeneratedNote(StringBuilder sb) {
         String path = Path.of(sourceFolder).relativize(Path.of(source.getURL().toURI())).toString();
         String warning = String.format(GENERATED_HEADER_COMMENT, path);
-        String dateTime = ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME);
         int lineLength = 120 - " * ".length();
         String wrapped = WordUtils.wrap(warning, lineLength, BR, true);
         sb.append("/**").append(BR).append(" * ").append("-".repeat(lineLength));
         for (String line : wrapped.split(BR))
             sb.append(BR).append(" * ").append(line);
-        sb.append(BR).append(" * ").append(BR).append(" * ").append("Generated at ").append(dateTime);
         sb.append(BR).append(" * ").append("-".repeat(lineLength)).append(BR).append(" */").append(BR).append(BR);
     }
 
@@ -355,6 +351,7 @@ class Template {
         List<List<String>> replacementsList;
         boolean isAbstract;
         String typeParameters;
+        String throwsList;
 
         public PreparedMethod(JavaMethod method, String leftPadding, boolean isInInterface) {
             this.comment = method.getComment();
@@ -368,7 +365,9 @@ class Template {
             this.isAbstract = isInInterface ? !method.isDefault() && !method.isStatic() : method.isAbstract();
             this.leftPadding = leftPadding;
             this.typeParameters = String.join(", ",
-                method.getTypeParameters().stream().map(Object::toString).collect(Collectors.toList()));
+                method.getTypeParameters().stream().map(JavaType::getGenericValue).collect(Collectors.toList()));
+            this.throwsList = String.join(", ",
+                method.getExceptionTypes().stream().map(JavaType::getValue).collect(Collectors.toList()));
 
             var pair = processAnnotations(method.getAnnotations(), false);
             this.patterns = pair.getLeft();
@@ -390,6 +389,8 @@ class Template {
             this.isAbstract = false;
             this.leftPadding = leftPadding;
             this.typeParameters = "";
+            this.throwsList = String.join(", ",
+                method.getExceptionTypes().stream().map(JavaType::getValue).collect(Collectors.toList()));
 
             var pair = processAnnotations(method.getAnnotations(), false);
             this.patterns = pair.getLeft();
@@ -418,10 +419,12 @@ class Template {
             sb2.append(leftPadding);
             printModifiers(sb2, modifiers);
             if (!this.typeParameters.isBlank())
-                sb2.append("<").append(typeParameters).append("> ");
+                sb2.append(typeParameters).append(" ");
 
             sb2.append(returnType).append(baseName).append("(")
                 .append(parameterList).append(")");
+            if (!throwsList.isBlank())
+                sb2.append(" throws ").append(throwsList);
             if (isAbstract)
                 sb2.append(";");
             else
@@ -438,10 +441,12 @@ class Template {
             sb2.append(leftPadding);
             printModifiers(sb2, modifiers);
             if (!this.typeParameters.isBlank())
-                sb2.append("<").append(typeParameters).append("> ");
+                sb2.append(typeParameters).append(" ");
 
             sb2.append(returnType).append(methodNewName).append("(")
                 .append(parameterList).append(")");
+            if (!throwsList.isBlank())
+                sb2.append(" throws ").append(throwsList);
             if (isAbstract)
                 sb2.append(";");
             else

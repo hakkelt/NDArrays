@@ -338,4 +338,17 @@ class TestComplexNDArrayConstructors extends TestBase {
         assertEquals(String.format(Errors.ARRAYS_DIFFER_IN_SHAPE), exception.getMessage());
     }
 
+    @Test
+    void testOfMagnitudePhase() {
+        NDArray<Double> magnitude = new BasicDoubleNDArray(4, 5, 3)
+            .fillUsingLinearIndices(i -> (double) (i + 1));
+        NDArray<Double> phase = new BasicDoubleNDArray(4, 5, 3)
+            .fillUsingLinearIndices(i -> (double) ((i / (double) magnitude.length() - 0.5) * Math.PI));
+        ComplexNDArray<Float> array = BasicComplexFloatNDArray.ofMagnitudePhase(magnitude, phase);
+        array.forEachWithLinearIndices((value, index) -> {
+            assertEquals(wrapToDouble(magnitude.get(index)), value.abs(), 1e-5);
+            assertEquals(wrapToDouble(phase.get(index)), value.getArgument(), 1e-5);
+        });
+    }
+
 }

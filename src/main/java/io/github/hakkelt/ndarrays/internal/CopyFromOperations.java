@@ -2,8 +2,6 @@
  * ---------------------------------------------------------------------------------------------------------------------
  * This file was generated, so instead of changing it, consider updating the template:
  * src\template\io\github\hakkelt\ndarrays\internal\CopyFromOperations.java
- * 
- * Generated at Mon, 8 Nov 2021 11:40:52 +0100
  * ---------------------------------------------------------------------------------------------------------------------
  */
 
@@ -243,6 +241,20 @@ public class CopyFromOperations<T, T2 extends Number> {
             .forEach(i -> {
                 castedMe.setRealUnchecked(castedMe.wrapRealValue(castedReal.getUnchecked(i)), i);
                 castedMe.setImagUnchecked(castedMe.wrapRealValue(castedImag.getUnchecked(i)), i);
+            });
+        return me;
+    }
+
+    @SuppressWarnings("unchecked")
+    public ComplexNDArray<T2> copyFromMagnitudePhase(ComplexNDArray<T2> me, NDArray<? extends Number> magnitude, NDArray<? extends Number> phase) {
+        if (!Arrays.equals(magnitude.shape(), phase.shape()))
+            throw new IllegalArgumentException(Errors.ARRAYS_DIFFER_IN_SHAPE);
+        AbstractNDArray<? extends Number, ?> castedMagnitude = (AbstractNDArray<? extends Number,?>) magnitude;
+        AbstractNDArray<? extends Number, ?> castedPhase = (AbstractNDArray<? extends Number,?>) phase;
+        me.fillUsingLinearIndices(i -> {
+                double m = castedMagnitude.getUnchecked(i).doubleValue();
+                double phi = castedPhase.getUnchecked(i).doubleValue();
+                return new Complex(Math.cos(phi), Math.sin(phi)).multiply(m);
             });
         return me;
     }

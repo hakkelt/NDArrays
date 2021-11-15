@@ -33,7 +33,7 @@ public class ComplexNDArrayMaskViewTemplate<T extends Number> extends AbstractND
     @Patterns({"real", "this::getReal"})
     @Replacements({"imaginary", "this::getImag"})
     @Replacements({"abs", "i -> get(i).abs()"})
-    @Replacements({"angle", "i -> get(i).getArgument()"})
+    @Replacements({"argument", "i -> get(i).getArgument()"})
     public NDArray<T> real() {
         return streamLinearIndices()
             .mapToObj(this::getReal)

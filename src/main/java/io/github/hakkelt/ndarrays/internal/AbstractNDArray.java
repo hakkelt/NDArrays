@@ -2,8 +2,6 @@
  * ---------------------------------------------------------------------------------------------------------------------
  * This file was generated, so instead of changing it, consider updating the template:
  * src\template\io\github\hakkelt\ndarrays\internal\AbstractNDArray.java
- * 
- * Generated at Mon, 8 Nov 2021 11:40:51 +0100
  * ---------------------------------------------------------------------------------------------------------------------
  */
 
@@ -12,9 +10,12 @@ package io.github.hakkelt.ndarrays.internal;
 import io.github.hakkelt.ndarrays.NDArray;
 import io.github.hakkelt.ndarrays.NDArrayUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.*;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -255,7 +256,7 @@ public abstract class AbstractNDArray<T, T2 extends Number> implements NDArray<T
 
     @Override
     public int[] shape() {
-        return shape;
+        return shape.clone();
     }
 
     @Override
@@ -940,6 +941,47 @@ public abstract class AbstractNDArray<T, T2 extends Number> implements NDArray<T
                 copyTo1DArray((BigDecimal[]) destination, index);
             else
                 copyTo1DArray((Complex[]) destination, index);
+        }
+    }
+
+    @Override
+    public void writeToFile(File file) throws IOException {
+        new FileOperations<T,T2>().writeToFile(file, this);
+    }
+
+    protected void fillFromBuffer(ByteBuffer buffer) {
+        for (int i = 0; i < length(); i++) {
+            setUnchecked(wrapValue(buffer.get()), i);
+        }
+    }
+
+    protected void fillFromBuffer(ShortBuffer buffer) {
+        for (int i = 0; i < length(); i++) {
+            setUnchecked(wrapValue(buffer.get()), i);
+        }
+    }
+
+    protected void fillFromBuffer(IntBuffer buffer) {
+        for (int i = 0; i < length(); i++) {
+            setUnchecked(wrapValue(buffer.get()), i);
+        }
+    }
+
+    protected void fillFromBuffer(LongBuffer buffer) {
+        for (int i = 0; i < length(); i++) {
+            setUnchecked(wrapValue(buffer.get()), i);
+        }
+    }
+
+    protected void fillFromBuffer(FloatBuffer buffer) {
+        for (int i = 0; i < length(); i++) {
+            setUnchecked(wrapValue(buffer.get()), i);
+        }
+    }
+
+    protected void fillFromBuffer(DoubleBuffer buffer) {
+        for (int i = 0; i < length(); i++) {
+            setUnchecked(wrapValue(buffer.get()), i);
         }
     }
 

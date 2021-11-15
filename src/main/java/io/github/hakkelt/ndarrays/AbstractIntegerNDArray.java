@@ -2,8 +2,6 @@
  * ---------------------------------------------------------------------------------------------------------------------
  * This file was generated, so instead of changing it, consider updating the template:
  * src\template\io\github\hakkelt\ndarrays\AbstractByteNDArrayTemplate.java
- * 
- * Generated at Mon, 8 Nov 2021 11:40:49 +0100
  * ---------------------------------------------------------------------------------------------------------------------
  */
 

@@ -1,11 +1,14 @@
 package io.github.hakkelt.ndarrays.basic;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collector;
 
 import io.github.hakkelt.generator.*;
 import io.github.hakkelt.ndarrays.*;
+import io.github.hakkelt.ndarrays.internal.FileOperations;
 import io.github.hakkelt.ndarrays.internal.Generated;
 import io.github.hakkelt.ndarrays.internal.RealNDArrayCollector;
 
@@ -62,6 +65,10 @@ public final class BasicByteNDArrayTemplate extends AbstractByteNDArray {
     @Replace(pattern = "float", replacements = { "double", "byte", "short", "int", "long" })
     public static NDArray<Byte> of(float... array) {
         return new BasicByteNDArrayTemplate(array.length).copyFrom(array);
+    }
+
+    public static BasicByteNDArray readFromFile(File file) throws IOException {
+        return new FileOperations<Byte,Byte>().readFromFile(file, BasicByteNDArray::new);
     }
 
     /**

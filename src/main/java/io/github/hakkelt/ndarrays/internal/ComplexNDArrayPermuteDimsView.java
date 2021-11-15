@@ -2,8 +2,6 @@
  * ---------------------------------------------------------------------------------------------------------------------
  * This file was generated, so instead of changing it, consider updating the template:
  * src\template\io\github\hakkelt\ndarrays\internal\ComplexNDArrayPermuteDimsView.java
- * 
- * Generated at Mon, 8 Nov 2021 11:40:52 +0100
  * ---------------------------------------------------------------------------------------------------------------------
  */
 
@@ -47,7 +45,7 @@ public class ComplexNDArrayPermuteDimsView<T extends Number> extends AbstractNDA
     }
 
     @Override
-    public NDArray<T> angle() {
+    public NDArray<T> argument() {
         return streamLinearIndices()
             .mapToObj(i -> get(i).getArgument())
             .collect(parent.getRealCollectorInternal(shape));

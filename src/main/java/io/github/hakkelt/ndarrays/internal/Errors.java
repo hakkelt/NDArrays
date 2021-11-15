@@ -74,10 +74,10 @@ public class Errors {
     public static final String CONCATENATION_SHAPE_MISMATCH =
         "Cannot concatenate %s array to the current array of shape %s along dimension %d!";
     /**
-     * Input arrays differ in shape!
+     * Shape of input arrays are not the same!
      */
     public static final String ARRAYS_DIFFER_IN_SHAPE =
-        "Input arrays differ in shape!";
+        "Shape of input arrays are not the same!";
     /**
      * Cannot initialize new ComplexNDArray from NDArray of type %s!
      */
@@ -173,5 +173,9 @@ public class Errors {
      */
     public static final String ALL_DIMS_DROPPED = 
         "Cannot drop all dimensions!";
-    
+    /**
+     * Cannot read the given file: It is not a properly formatted NDArray file!
+     */
+    public static final String READ_FROM_FILE_WRONG_FILE_IDENTIFIER =
+        "Cannot read the given file: It is not a properly formatted NDArray file!";
 }

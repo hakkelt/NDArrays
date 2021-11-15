@@ -3,7 +3,7 @@
   
     <groupId>io.github.hakkelt</groupId>
     <artifactId>ndarrays</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>2.0.0</version>
     <packaging>jar</packaging>
 
     <name>NDArrays</name>
@@ -30,7 +30,7 @@
         <developerConnection>
             scm:git:git@github.com:hakkelt/NDArrays.git
         </developerConnection>
-      <tag>ndarrays-2.0.0-snapshot</tag>
+      <tag>ndarrays-2.0.0</tag>
     </scm>
 
     <developers>
@@ -51,6 +51,25 @@
             <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
+    
+    <!--distributionManagement>
+        <snapshotRepository>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+            <id>snapshots</id>
+            <url>http://10.2.0.125:8081/artifactory/libs-snapshot-local</url>
+        </snapshotRepository>
+        <repository>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+            <id>central</id>
+            <url>http://10.2.0.125:8081/artifactory/libs-release-local</url>
+        </repository>
+    </distributionManagement-->
 
     <dependencies>
         <dependency>
@@ -196,6 +215,7 @@
                     <reportOutputDirectory>${project.basedir}</reportOutputDirectory>
                     <destDir>docs</destDir>
                     <show>public</show>
+                    <notimestamp>true</notimestamp>
                 </configuration>
                 <executions>
                     <execution>

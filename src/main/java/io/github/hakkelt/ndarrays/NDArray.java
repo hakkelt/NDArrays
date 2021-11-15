@@ -2,13 +2,13 @@
  * ---------------------------------------------------------------------------------------------------------------------
  * This file was generated, so instead of changing it, consider updating the template:
  * src\template\io\github\hakkelt\ndarrays\NDArray.java
- * 
- * Generated at Mon, 8 Nov 2021 11:40:52 +0100
  * ---------------------------------------------------------------------------------------------------------------------
  */
 
 package io.github.hakkelt.ndarrays;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.function.*;
@@ -1371,7 +1371,7 @@ public interface NDArray<T> extends Iterable<T> {
      * <ul>
      *  <li>p = 0: Hamming distance of the vector from zero (number of non-zero entries) -- it is not a true norm!</li>
      *  <li>0 &#60; p &#60; 1: Hamming distance of the vector from zero (number of non-zero entries) --
-     *          it is only a quasi norm (triangle inequality doesn't hold)!</li>
+     *          it is only a quasi norm (triargument inequality doesn't hold)!</li>
      *  <li>1: Absolute-value norm (sum of the absolute values of the entries)</li>
      *  <li>2: Euclidean norm (square root of sum of the squared entry values)</li>
      *  <li>1 &#60; p: General p-norm (Σ(|p|)ᵖ)^(1/p)</li>
@@ -1394,7 +1394,7 @@ public interface NDArray<T> extends Iterable<T> {
      * <ul>
      *  <li>p = 0: Hamming distance of the vector from zero (number of non-zero entries) -- it is not a true norm!</li>
      *  <li>0 &#60; p &#60; 1: Hamming distance of the vector from zero (number of non-zero entries) --
-     *          it is only a quasi norm (triangle inequality doesn't hold)!</li>
+     *          it is only a quasi norm (triargument inequality doesn't hold)!</li>
      *  <li>1: Absolute-value norm (sum of the absolute values of the entries)</li>
      *  <li>2: Euclidean norm (square root of sum of the squared entry values)</li>
      *  <li>1 &#60; p: General p-norm (Σ(|p|)ᵖ)^(1/p)</li>
@@ -1619,5 +1619,7 @@ public interface NDArray<T> extends Iterable<T> {
      * @return a stream of cartesian indices
      */
     public Stream<int[]> streamCartesianIndices();
+
+    public void writeToFile(File file) throws IOException;
 
 }

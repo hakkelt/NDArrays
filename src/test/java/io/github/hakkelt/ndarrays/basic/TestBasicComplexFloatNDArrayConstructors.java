@@ -2,8 +2,6 @@
  * ---------------------------------------------------------------------------------------------------------------------
  * This file was generated, so instead of changing it, consider updating the template:
  * src\test\java\io\github\hakkelt\ndarrays\template\TestBasicComplexFloatNDArrayConstructors.java
- * 
- * Generated at Mon, 8 Nov 2021 11:40:54 +0100
  * ---------------------------------------------------------------------------------------------------------------------
  */
 
@@ -1762,6 +1760,19 @@ class TestBasicComplexFloatNDArrayConstructors extends TestBase {
         NDArray<Double> imag = new BasicDoubleNDArray(4, 3, 5);
         Exception exception = assertThrows(IllegalArgumentException.class, () -> array.copyFrom(real, imag));
         assertEquals(String.format(Errors.ARRAYS_DIFFER_IN_SHAPE), exception.getMessage());
+    }
+
+    @Test
+    void testOfMagnitudePhase() {
+        NDArray<Float> magnitude = new BasicFloatNDArray(4, 5, 3)
+            .fillUsingLinearIndices(i -> wrapToFloat(i + 1));
+        NDArray<Float> phase = new BasicFloatNDArray(4, 5, 3)
+            .fillUsingLinearIndices(i -> wrapToFloat((i / (double) magnitude.length() - 0.5) * Math.PI));
+        ComplexNDArray<Float> array = BasicComplexFloatNDArray.ofMagnitudePhase(magnitude, phase);
+        array.forEachWithLinearIndices((value, index) -> {
+            assertEquals(magnitude.get(index), wrapToFloat(value.abs()), 1e-6);
+            assertEquals(phase.get(index), wrapToFloat(value.getArgument()), 1e-6);
+        });
     }
 
 }

@@ -78,8 +78,8 @@ class TestComplexSpecific extends TestBase {
 
     @ParameterizedTest
     @MethodSource("provideNDArrays")
-    void testAngle(ComplexNDArray<Float> target) {
-        NDArray<Float> result = target.angle();
+    void testargument(ComplexNDArray<Float> target) {
+        NDArray<Float> result = target.argument();
         result.forEachWithLinearIndices((value, i) -> assertEquals(target.get(i).getArgument(), value.doubleValue()));
     }
 

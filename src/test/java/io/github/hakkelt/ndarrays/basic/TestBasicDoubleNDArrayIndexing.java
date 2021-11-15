@@ -2,8 +2,6 @@
  * ---------------------------------------------------------------------------------------------------------------------
  * This file was generated, so instead of changing it, consider updating the template:
  * src\test\java\io\github\hakkelt\ndarrays\template\TestIndexing.java
- * 
- * Generated at Mon, 8 Nov 2021 11:40:55 +0100
  * ---------------------------------------------------------------------------------------------------------------------
  */
 

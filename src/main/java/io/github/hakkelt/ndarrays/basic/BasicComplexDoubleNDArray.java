@@ -2,8 +2,6 @@
  * ---------------------------------------------------------------------------------------------------------------------
  * This file was generated, so instead of changing it, consider updating the template:
  * src\template\io\github\hakkelt\ndarrays\basic\BasicComplexFloatNDArrayTemplate.java
- * 
- * Generated at Mon, 8 Nov 2021 11:40:50 +0100
  * ---------------------------------------------------------------------------------------------------------------------
  */
 
@@ -11,8 +9,12 @@ package io.github.hakkelt.ndarrays.basic;
 
 import io.github.hakkelt.ndarrays.*;
 import io.github.hakkelt.ndarrays.internal.ComplexNDArrayCollector;
+import io.github.hakkelt.ndarrays.internal.CopyFromOperations;
+import io.github.hakkelt.ndarrays.internal.FileOperations;
 import io.github.hakkelt.ndarrays.internal.Generated;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collector;
@@ -20,14 +22,16 @@ import java.util.stream.Collector;
 import org.apache.commons.math3.complex.Complex;
 
 /**
- * Reference implementation for the NDArray of complex double (single-precision, 32 bit doubleing point) values.
+ * Reference implementation for the NDArray of complex double (single-precision,
+ * 32 bit doubleing point) values.
  */
 public final class BasicComplexDoubleNDArray extends AbstractComplexNDArray<Double> {
 
     protected double[] data;
 
     @SuppressWarnings("unused")
-    private BasicComplexDoubleNDArray() {}
+    private BasicComplexDoubleNDArray() {
+    }
 
     /**
      * Simple constructor that defines only the shape of the NDArray and fills it
@@ -245,6 +249,26 @@ public final class BasicComplexDoubleNDArray extends AbstractComplexNDArray<Doub
      */
     public static ComplexNDArray<Double> of(Object[] real, Object[] imag) {
         return new BasicComplexDoubleNDArray(NDArrayUtils.computeDims(real)).copyFrom(real, imag);
+    }
+
+    /**
+     * Factory method that creates a ComplexNDArray from two multi-dimensional
+     * arrays of numeric values.
+     * 
+     * @param magnitude a multi-dimensional array of numeric values that stores the
+     *                  magnitude of the complex array to be created.
+     * @param phase     a multi-dimensional array of numeric values that stores the
+     *                  phase of the complex array to be created.
+     * @return a ComplexNDArray created from the two multi-dimensional arrays of
+     *         numeric values
+     */
+    public static ComplexNDArray<Double> ofMagnitudePhase(NDArray<? extends Number> magnitude, NDArray<? extends Number> phase) {
+        return new CopyFromOperations<Complex, Double>()
+            .copyFromMagnitudePhase(new BasicComplexDoubleNDArray(magnitude.shape()), magnitude, phase);
+    }
+
+    public static BasicComplexDoubleNDArray readFromFile(File file) throws IOException {
+        return new FileOperations<Complex,Double>().readFromFile(file, BasicComplexDoubleNDArray::new);
     }
 
     @Override

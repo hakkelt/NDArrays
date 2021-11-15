@@ -202,7 +202,7 @@ public interface ComplexNDArrayTemplate<T extends Number> extends NDArray<Comple
      * @return a new array holding the magnitude / absolute values of the elements.
      */
     @Patterns({"magnitude / absolute values", "abs"})
-    @Replacements({"angle / argument", "angle"})
+    @Replacements({"argument / argument", "argument"})
     public NDArray<T> abs();
 
     @Override

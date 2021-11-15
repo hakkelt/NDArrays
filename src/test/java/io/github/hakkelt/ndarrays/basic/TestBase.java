@@ -2,8 +2,6 @@
  * ---------------------------------------------------------------------------------------------------------------------
  * This file was generated, so instead of changing it, consider updating the template:
  * src\test\java\io\github\hakkelt\ndarrays\template\TestBase.java
- * 
- * Generated at Mon, 8 Nov 2021 11:40:53 +0100
  * ---------------------------------------------------------------------------------------------------------------------
  */
 
@@ -90,47 +88,47 @@ public class TestBase {
         assertEquals(1, lhs.equals(Complex.ZERO) && rhs.equals(Complex.ZERO) ? 1 : lhs.abs() / rhs.abs(), delta);
     }
 
-    public Byte wrapToByte(double value) {
+    public static Byte wrapToByte(double value) {
         return (byte) value;
     }
 
-    public Short wrapToShort(double value) {
+    public static Short wrapToShort(double value) {
         return (short) value;
     }
 
-    public Integer wrapToInteger(double value) {
+    public static Integer wrapToInteger(double value) {
         return (int) value;
     }
 
-    public Long wrapToLong(double value) {
+    public static Long wrapToLong(double value) {
         return (long) value;
     }
 
-    public Float wrapToFloat(double value) {
+    public static Float wrapToFloat(double value) {
         return (float) value;
     }
 
-    public Double wrapToDouble(double value) {
+    public static Double wrapToDouble(double value) {
         return value;
     }
 
-    public BigInteger wrapToBigInteger(double value) {
+    public static BigInteger wrapToBigInteger(double value) {
         return BigInteger.valueOf((long) value);
     }
 
-    public BigDecimal wrapToBigDecimal(double value) {
+    public static BigDecimal wrapToBigDecimal(double value) {
         return new BigDecimal(value);
     }
 
-    public Complex wrapToComplex(double value) {
+    public static Complex wrapToComplex(double value) {
         return new Complex(value);
     }
 
-    public Double wrapToDouble(BigInteger value) {
+    public static Double wrapToDouble(BigInteger value) {
         return value.doubleValue();
     }
 
-    public Double wrapToDouble(BigDecimal value) {
+    public static Double wrapToDouble(BigDecimal value) {
         return value.doubleValue();
     }
 

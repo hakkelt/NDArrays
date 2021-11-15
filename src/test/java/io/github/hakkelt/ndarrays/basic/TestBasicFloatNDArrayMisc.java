@@ -2,8 +2,6 @@
  * ---------------------------------------------------------------------------------------------------------------------
  * This file was generated, so instead of changing it, consider updating the template:
  * src\test\java\io\github\hakkelt\ndarrays\template\TestMisc.java
- * 
- * Generated at Mon, 8 Nov 2021 11:40:55 +0100
  * ---------------------------------------------------------------------------------------------------------------------
  */
 
@@ -31,7 +29,7 @@ class TestBasicFloatNDArrayMisc extends TestBase {
     @BeforeEach
     void setup() {
         array = arrayOriginal = new BasicFloatNDArray(4, 5, 3);
-        array.applyWithLinearIndices((value, index) -> wrapToFloat(index));
+        array.fillUsingLinearIndices(TestBase::wrapToFloat);
         slice = array.slice(1, "1:4", ":");
         reshaped = array.reshape(20, 3);
         pArray = array.permuteDims(0, 2, 1);

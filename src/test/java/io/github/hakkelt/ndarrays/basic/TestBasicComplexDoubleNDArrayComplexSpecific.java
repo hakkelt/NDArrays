@@ -2,8 +2,6 @@
  * ---------------------------------------------------------------------------------------------------------------------
  * This file was generated, so instead of changing it, consider updating the template:
  * src\test\java\io\github\hakkelt\ndarrays\template\TestComplexSpecific.java
- * 
- * Generated at Mon, 8 Nov 2021 11:40:54 +0100
  * ---------------------------------------------------------------------------------------------------------------------
  */
 
@@ -82,8 +80,8 @@ class TestBasicComplexDoubleNDArrayComplexSpecific extends TestBase {
 
     @ParameterizedTest
     @MethodSource("provideNDArrays")
-    void testAngle(ComplexNDArray<Double> target) {
-        NDArray<Double> result = target.angle();
+    void testargument(ComplexNDArray<Double> target) {
+        NDArray<Double> result = target.argument();
         result.forEachWithLinearIndices((value, i) -> assertEquals(target.get(i).getArgument(), value.doubleValue()));
     }
 

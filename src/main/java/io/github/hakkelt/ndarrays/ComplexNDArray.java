@@ -2,8 +2,6 @@
  * ---------------------------------------------------------------------------------------------------------------------
  * This file was generated, so instead of changing it, consider updating the template:
  * src\template\io\github\hakkelt\ndarrays\ComplexNDArray.java
- * 
- * Generated at Mon, 8 Nov 2021 11:40:50 +0100
  * ---------------------------------------------------------------------------------------------------------------------
  */
 
@@ -377,11 +375,11 @@ public interface ComplexNDArray<T extends Number> extends NDArray<Complex> {
     public NDArray<T> abs();
 
     /**
-     * Returns a new array holding the angle / argument of the elements.
+     * Returns a new array holding the argument / argument of the elements.
      * 
-     * @return a new array holding the angle / argument of the elements.
+     * @return a new array holding the argument / argument of the elements.
      */
-    public NDArray<T> angle();
+    public NDArray<T> argument();
 
     @Override
     public default ComplexNDArray<T> add(Object... addends) {

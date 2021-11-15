@@ -2,8 +2,6 @@
  * ---------------------------------------------------------------------------------------------------------------------
  * This file was generated, so instead of changing it, consider updating the template:
  * src\template\io\github\hakkelt\ndarrays\AbstractComplexNDArray.java
- * 
- * Generated at Mon, 8 Nov 2021 11:40:50 +0100
  * ---------------------------------------------------------------------------------------------------------------------
  */
 
@@ -17,6 +15,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.*;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -72,7 +71,7 @@ public abstract class AbstractComplexNDArray<T extends Number> extends AbstractN
     }
 
     @Override
-    public NDArray<T> angle() {
+    public NDArray<T> argument() {
         return streamLinearIndices().mapToObj(i -> get(i).getArgument()).collect(getRealCollectorInternal(shape));
     }
 

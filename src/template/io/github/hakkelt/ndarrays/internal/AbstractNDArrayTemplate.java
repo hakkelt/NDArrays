@@ -1,8 +1,11 @@
 package io.github.hakkelt.ndarrays.internal;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.*;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -197,7 +200,7 @@ public abstract class AbstractNDArrayTemplate<T, T2 extends Number> implements N
 
     @Override
     public int[] shape() {
-        return shape;
+        return shape.clone();
     }
 
     @Override
@@ -732,6 +735,18 @@ public abstract class AbstractNDArrayTemplate<T, T2 extends Number> implements N
                 copyTo1DArray((BigDecimal[]) destination, index);
             else
                 copyTo1DArray((Complex[]) destination, index);
+        }
+    }
+
+    @Override
+    public void writeToFile(File file) throws IOException {
+        new FileOperations<T,T2>().writeToFile(file, this);
+    }
+
+    @Replace(pattern = "ByteBuffer", replacements = {"ShortBuffer", "IntBuffer", "LongBuffer", "FloatBuffer", "DoubleBuffer"})
+    protected void fillFromBuffer(ByteBuffer buffer) {
+        for (int i = 0; i < length(); i++) {
+            setUnchecked(wrapValue(buffer.get()), i);
         }
     }
 

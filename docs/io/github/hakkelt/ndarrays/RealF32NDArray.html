@@ -257,9 +257,9 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Double.html?is-external=true" title="class or interface in java.lang" class="externalLink">Double</a>&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#angle()">angle</a></span>()</code></th>
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#argument()">argument</a></span>()</code></th>
 <td class="colLast">
-<div class="block">Returns a new array holding the angle / argument of elements.</div>
+<div class="block">Returns a new array holding the argument / argument of elements.</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
@@ -1357,20 +1357,20 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
 </dl>
 </li>
 </ul>
-<a id="angle()">
+<a id="argument()">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>angle</h4>
-<pre class="methodSignature">public&nbsp;<a href="NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Double.html?is-external=true" title="class or interface in java.lang" class="externalLink">Double</a>&gt;&nbsp;angle()</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="NDArray.html#angle()">NDArray</a></code></span></div>
-<div class="block">Returns a new array holding the angle / argument of elements.
+<h4>argument</h4>
+<pre class="methodSignature">public&nbsp;<a href="NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Double.html?is-external=true" title="class or interface in java.lang" class="externalLink">Double</a>&gt;&nbsp;argument()</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="NDArray.html#argument()">NDArray</a></code></span></div>
+<div class="block">Returns a new array holding the argument / argument of elements.
  
  For real arrays, it returns an array filled with zeros.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>a new array holding the angle / argument of elements.</dd>
+<dd>a new array holding the argument / argument of elements.</dd>
 </dl>
 </li>
 </ul>
@@ -2179,7 +2179,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
  <ul>
   <li>p = 0: Hamming distance of the vector from zero (number of non-zero entries) -- it is not a true norm!</li>
   <li>0 &#60; p &#60; 1: Hamming distance of the vector from zero (number of non-zero entries) --
-          it is only a quasi norm (triangle inequality doesn't hold)!</li>
+          it is only a quasi norm (triargument inequality doesn't hold)!</li>
   <li>1: Absolute-value norm (sum of the absolute values of the entries)</li>
   <li>2: Euclidean norm (square root of sum of the squared entry values)</li>
   <li>1 &#60; p: General p-norm (Σ(|p|)ᵖ)^(1/p)</li>
@@ -2211,7 +2211,7 @@ extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/ja
  <ul>
   <li>p = 0: Hamming distance of the vector from zero (number of non-zero entries) -- it is not a true norm!</li>
   <li>0 &#60; p &#60; 1: Hamming distance of the vector from zero (number of non-zero entries) --
-          it is only a quasi norm (triangle inequality doesn't hold)!</li>
+          it is only a quasi norm (triargument inequality doesn't hold)!</li>
   <li>1: Absolute-value norm (sum of the absolute values of the entries)</li>
   <li>2: Euclidean norm (square root of sum of the squared entry values)</li>
   <li>1 &#60; p: General p-norm (Σ(|p|)ᵖ)^(1/p)</li>
