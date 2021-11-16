@@ -47,6 +47,8 @@ public class SlicingExpression {
             return prevExpr;
         if (newExpr.isScalar())
             return prevExpr == Range.ALL ? newExpr : new Range(prevExpr.start() + newExpr.start());
+        if (prevExpr == Range.ALL)
+            return newExpr;
         int start = prevExpr.start() + prevExpr.step() * newExpr.start();
         return new Range(start, prevExpr.step() * newExpr.step(), start + prevExpr.step() * newExpr.length());
     }

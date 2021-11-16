@@ -122,6 +122,25 @@ public final class BasicShortNDArray extends AbstractShortNDArray {
         return new BasicShortNDArray(array.length).copyFrom(array);
     }
 
+    /**
+     * Load the content of the given file into a new BasicShortNDArray.
+     * 
+     * <p>Only the files written by function writeToFile can be loaded by this function.
+     * 
+     * <ul><li><b>Example:</b></li></ul>
+     * 
+     * <blockquote><pre>{@code 
+     * NDArray<Float> array = new BasicFloatNDArray(128, 128).fill(5);
+     * array.writeToFile(new File("array.nda"));
+     * NDArray<Short> array2 = BasicShortNDArray.readFromFile(new File("array.nda"));
+     * assertEquals(array, array2);
+     * }</pre></blockquote>
+     * 
+     * @param file file from which the content of the NDArray is read
+     *             (the extension of the file can be arbitrary, but .nda is recommended)
+     * @return a new BasicShortNDArray whose shape and content is loaded from the given file
+     * @throws IOException when the given file cannot be opened for read
+     */
     public static BasicShortNDArray readFromFile(File file) throws IOException {
         return new FileOperations<Short,Short>().readFromFile(file, BasicShortNDArray::new);
     }

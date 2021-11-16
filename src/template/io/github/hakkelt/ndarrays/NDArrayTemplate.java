@@ -870,7 +870,7 @@ public interface NDArrayTemplate<T> extends Iterable<T> {
      *  <li>integer values: selects a specific slice along the positionally selected dimension</li>
      *  <li>range (string that consists of two integer values specifying the start and the end of the range
      *       separated by a colon): selects a specific range of slices along the positionally selected dimension</li>
-     *  <li>all-range (string literal ":"): selects all slices along the positionally selected dimension</li>
+     *  <li>all-range (string literal ":" or Range.ALL): selects all slices along the positionally selected dimension</li>
      * </ul>
      * 
      * <p>For example, if <code>A</code> is a [5 × 8 × 3] array, then <code>B = A.slice(1, "2:5", ":")</code> returns
@@ -972,6 +972,24 @@ public interface NDArrayTemplate<T> extends Iterable<T> {
      */
     public Stream<int[]> streamCartesianIndices();
 
+    /**
+     * Save content of the NDArray to the given file.
+     * 
+     * <p>Files written that way can be later loaded by the static function readFromFile.
+     * 
+     * <ul><li><b>Example:</b></li></ul>
+     * 
+     * <blockquote><pre>{@code 
+NDArray<Float> array = new BasicFloatNDArray(128, 128).fill(5);
+array.writeToFile(new File("array.nda"));
+NDArray<Integer> array2 = BasicIntegerNDArray.readFromFile(new File("array.nda"));
+assertEquals(array, array2);
+     * }</pre></blockquote>
+     * 
+     * @param file file into which the content of the NDArray is written
+     *             (the extension of the file can be arbitrary, but .nda is recommended)
+     * @throws IOException when the given file cannot be opened for write
+     */
     public void writeToFile(File file) throws IOException;
 
 }

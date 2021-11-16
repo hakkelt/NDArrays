@@ -135,6 +135,25 @@ public final class BasicComplexFloatNDArrayTemplate extends AbstractComplexNDArr
             .copyFromMagnitudePhase(new BasicComplexFloatNDArray(magnitude.shape()), magnitude, phase);
     }
 
+    /**
+     * Load the content of the given file into a new BasicByteNDArray.
+     * 
+     * <p>Only the files written by function writeToFile can be loaded by this function.
+     * 
+     * <ul><li><b>Example:</b></li></ul>
+     * 
+     * <blockquote><pre>{@code 
+ComplexNDArray<Float> array = new BasicComplexFloatNDArray(128, 128).fill(5);
+array.writeToFile(new File("array.nda"));
+ComplexNDArray<Double> array2 = BasicComplexDoubleNDArray.readFromFile(new File("array.nda"));
+assertEquals(array, array2);
+     * }</pre></blockquote>
+     * 
+     * @param file file from which the content of the NDArray is read
+     *             (the extension of the file can be arbitrary, but .nda is recommended)
+     * @return     a new BasicByteNDArray whose shape and content is loaded from the given file
+     * @throws IOException when the given file cannot be opened for read
+     */
     public static BasicComplexFloatNDArray readFromFile(File file) throws IOException {
         return new FileOperations<Complex,Float>().readFromFile(file, BasicComplexFloatNDArray::new);
     }

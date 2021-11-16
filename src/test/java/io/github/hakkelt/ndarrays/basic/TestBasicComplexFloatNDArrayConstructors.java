@@ -1764,14 +1764,14 @@ class TestBasicComplexFloatNDArrayConstructors extends TestBase {
 
     @Test
     void testOfMagnitudePhase() {
-        NDArray<Float> magnitude = new BasicFloatNDArray(4, 5, 3)
-            .fillUsingLinearIndices(i -> wrapToFloat(i + 1));
-        NDArray<Float> phase = new BasicFloatNDArray(4, 5, 3)
-            .fillUsingLinearIndices(i -> wrapToFloat((i / (double) magnitude.length() - 0.5) * Math.PI));
+        NDArray<Double> magnitude = new BasicDoubleNDArray(4, 5, 3)
+            .fillUsingLinearIndices(i -> (double) (i + 1));
+        NDArray<Double> phase = new BasicDoubleNDArray(4, 5, 3)
+            .fillUsingLinearIndices(i -> (double) ((i / (double) magnitude.length() - 0.5) * Math.PI));
         ComplexNDArray<Float> array = BasicComplexFloatNDArray.ofMagnitudePhase(magnitude, phase);
         array.forEachWithLinearIndices((value, index) -> {
-            assertEquals(magnitude.get(index), wrapToFloat(value.abs()), 1e-6);
-            assertEquals(phase.get(index), wrapToFloat(value.getArgument()), 1e-6);
+            assertEquals(wrapToDouble(magnitude.get(index)), value.abs(), 1e-5);
+            assertEquals(wrapToDouble(phase.get(index)), value.getArgument(), 1e-5);
         });
     }
 
