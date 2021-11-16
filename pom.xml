@@ -214,6 +214,7 @@
                     <destDir>docs</destDir>
                     <show>public</show>
                     <notimestamp>true</notimestamp>
+                    <excludePackageNames>io.github.hakkelt.generator</excludePackageNames>
                 </configuration>
                 <executions>
                     <execution>
