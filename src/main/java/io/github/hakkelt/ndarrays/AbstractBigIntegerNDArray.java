@@ -7,7 +7,7 @@ import io.github.hakkelt.ndarrays.internal.AbstractRealNDArray;
 import io.github.hakkelt.ndarrays.internal.AccumulateOperators;
 
 /**
- * Abstract NDArray class for byte (8-bit integer) values.
+ * Abstract NDArray class for arbitrary precision integer values.
  */
 public abstract class AbstractBigIntegerNDArray extends AbstractRealNDArray<BigInteger> {
 
