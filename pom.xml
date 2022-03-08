@@ -3,7 +3,7 @@
   
     <groupId>io.github.hakkelt</groupId>
     <artifactId>ndarrays</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.2</version>
     <packaging>jar</packaging>
 
     <name>NDArrays</name>
@@ -30,7 +30,7 @@
         <developerConnection>
             scm:git:git@github.com:hakkelt/NDArrays.git
         </developerConnection>
-      <tag>ndarrays-2.0.1</tag>
+      <tag>ndarrays-2.0.2</tag>
     </scm>
 
     <developers>
@@ -59,7 +59,7 @@
                 <updatePolicy>always</updatePolicy>
             </snapshots>
             <id>snapshots</id>
-            <url>http://10.2.0.125:8081/artifactory/libs-snapshot-local</url>
+            <url>http://10.2.0.125:8081/artifactory/libs-snapshot</url>
         </snapshotRepository>
         <repository>
             <snapshots>
@@ -67,7 +67,7 @@
                 <updatePolicy>always</updatePolicy>
             </snapshots>
             <id>central</id>
-            <url>http://10.2.0.125:8081/artifactory/libs-release-local</url>
+            <url>http://10.2.0.125:8081/artifactory/libs-release</url>
         </repository>
     </distributionManagement-->
 

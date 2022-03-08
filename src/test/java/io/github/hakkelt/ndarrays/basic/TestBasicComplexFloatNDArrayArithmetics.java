@@ -4367,4 +4367,18 @@ class TestBasicComplexFloatNDArrayArithmetics extends TestBase {
         }
     }
 
+    @Test
+    void testSumByDim2() {
+        NDArray<Complex> sum = array.sum(0,1);
+        for (int k = 0; k < array.shape(2); k++) {
+            Complex acc = wrapToComplex(0);
+            for (int i = 0; i < array.shape(0); i++) {
+                for (int j = 0; j < array.shape(1); j++) {
+                    acc = add(acc, array.get(i, j, k));
+                }
+            }
+            assertSpecializedEquals(acc, sum.get(k));
+        }
+    }
+
 }

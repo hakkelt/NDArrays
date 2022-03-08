@@ -93,7 +93,7 @@ public abstract class AbstractNDArray<T, T2 extends Number> implements NDArray<T
         }
 
         public long estimateSize() {
-            return ((fence - origin) / 2);
+            return (long) fence - origin;
         }
 
         public int characteristics() {
@@ -756,7 +756,9 @@ public abstract class AbstractNDArray<T, T2 extends Number> implements NDArray<T
     }
 
     protected void incrementSlicingExpression(Object[] expressions, int dimension, int[] remainingDimsIndices) {
-        if ((int) expressions[dimension] == shape(dimension) - 1) {
+        if (expressions[dimension] instanceof String) {
+            incrementSlicingExpression(expressions, dimension + 1, remainingDimsIndices);
+        } else if ((int) expressions[dimension] == shape(dimension) - 1) {
             expressions[dimension] = 0;
             incrementSlicingExpression(expressions, remainingDimsIndices[dimension + 1], remainingDimsIndices);
         } else {

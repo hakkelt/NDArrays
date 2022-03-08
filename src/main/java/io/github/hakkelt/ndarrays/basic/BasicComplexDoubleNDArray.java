@@ -262,6 +262,25 @@ public final class BasicComplexDoubleNDArray extends AbstractComplexNDArray<Doub
      * @return a ComplexNDArray created from the two multi-dimensional arrays of
      *         numeric values
      */
+    public static ComplexNDArray<Double> ofMagnitudePhase(Object[] magnitude, Object[] phase) {
+        return new CopyFromOperations<Complex, Double>()
+            .copyFromMagnitudePhase(
+                new BasicComplexDoubleNDArray(NDArrayUtils.computeDims(magnitude)),
+                BasicDoubleNDArray.of(magnitude),
+                BasicDoubleNDArray.of(phase));
+    }
+
+    /**
+     * Factory method that creates a ComplexNDArray from two multi-dimensional
+     * arrays of numeric values.
+     * 
+     * @param magnitude a real-valued NDArray that stores the
+     *                  magnitude of the complex array to be created.
+     * @param phase     a real-valued NDArray that stores the
+     *                  phase of the complex array to be created.
+     * @return a ComplexNDArray created from the two multi-dimensional arrays of
+     *         numeric values
+     */
     public static ComplexNDArray<Double> ofMagnitudePhase(NDArray<? extends Number> magnitude, NDArray<? extends Number> phase) {
         return new CopyFromOperations<Complex, Double>()
             .copyFromMagnitudePhase(new BasicComplexDoubleNDArray(magnitude.shape()), magnitude, phase);

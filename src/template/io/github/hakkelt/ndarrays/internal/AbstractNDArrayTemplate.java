@@ -88,7 +88,7 @@ public abstract class AbstractNDArrayTemplate<T, T2 extends Number> implements N
         }
 
         public long estimateSize() {
-            return ((fence - origin) / 2);
+            return (long) fence - origin;
         }
 
         public int characteristics() {
@@ -615,7 +615,9 @@ public abstract class AbstractNDArrayTemplate<T, T2 extends Number> implements N
     }
 
     protected void incrementSlicingExpression(Object[] expressions, int dimension, int[] remainingDimsIndices) {
-        if ((int) expressions[dimension] == shape(dimension) - 1) {
+        if (expressions[dimension] instanceof String) {
+            incrementSlicingExpression(expressions, dimension + 1, remainingDimsIndices);
+        } else if ((int) expressions[dimension] == shape(dimension) - 1) {
             expressions[dimension] = 0;
             incrementSlicingExpression(expressions, remainingDimsIndices[dimension + 1], remainingDimsIndices);
         } else {

@@ -7,10 +7,15 @@
 
 package io.github.hakkelt.ndarrays;
 
+import io.github.hakkelt.ndarrays.internal.*;
+import io.github.hakkelt.ndarrays.internal.AbstractNDArray;
+import io.github.hakkelt.ndarrays.internal.AccumulateOperators;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.*;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -19,12 +24,6 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
 
 import org.apache.commons.math3.complex.Complex;
-
-import io.github.hakkelt.ndarrays.internal.AbstractNDArray;
-import io.github.hakkelt.ndarrays.internal.AccumulateOperators;
-import io.github.hakkelt.ndarrays.internal.ComplexNDArrayCollector;
-import io.github.hakkelt.ndarrays.internal.Generated;
-import io.github.hakkelt.ndarrays.internal.RealNDArrayCollector;
 
 /**
  * Abstract NDArray class for Complex values.
