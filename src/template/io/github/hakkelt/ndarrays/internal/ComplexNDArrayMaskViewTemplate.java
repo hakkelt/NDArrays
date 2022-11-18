@@ -28,6 +28,15 @@ public class ComplexNDArrayMaskViewTemplate<T extends Number> extends AbstractND
     public ComplexNDArrayMaskViewTemplate(NDArray<Complex> parent, BiPredicate<Complex,?> func, boolean withLinearIndices) {
         super(parent instanceof AbstractNDArrayMaskView ? (AbstractNDArrayMaskView<Complex,T>)parent : parent, func, withLinearIndices);
     }
+
+    @Patterns({"mapOnComplexSlices", "BiConsumer<ComplexNDArray<T>,int[]>", "copy()"})
+    @Replacements({"mapOnComplexSlices", "BiFunction<ComplexNDArray<T>,int[],NDArray<?>>", "copy()"})
+    @Replacements({"applyOnComplexSlices", "BiConsumer<ComplexNDArray<T>,int[]>", "this"})
+    @Replacements({"applyOnComplexSlices", "BiFunction<ComplexNDArray<T>,int[],NDArray<?>>", "this"})
+    @Override
+    public ComplexNDArray<T> mapOnComplexSlices(BiConsumer<ComplexNDArray<T>,int[]> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
+    }
     
     @Override
     @Patterns({"real", "this::getReal"})

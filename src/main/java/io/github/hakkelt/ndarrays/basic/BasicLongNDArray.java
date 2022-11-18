@@ -21,7 +21,7 @@ import java.util.stream.Collector;
 /**
  * Reference implementation for the NDArray of long (64 bit integer) values.
  */
-public final class BasicLongNDArray extends AbstractLongNDArray {
+public class BasicLongNDArray extends AbstractLongNDArray {
 
     protected long[] data;
 

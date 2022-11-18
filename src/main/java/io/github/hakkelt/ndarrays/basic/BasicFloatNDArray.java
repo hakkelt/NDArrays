@@ -21,7 +21,7 @@ import java.util.stream.Collector;
 /**
  * Reference implementation for the NDArray of float (single precision, 32 bit floating-point) values.
  */
-public final class BasicFloatNDArray extends AbstractFloatNDArray {
+public class BasicFloatNDArray extends AbstractFloatNDArray {
 
     protected float[] data;
 

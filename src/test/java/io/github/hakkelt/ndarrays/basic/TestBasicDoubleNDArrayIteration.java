@@ -272,7 +272,7 @@ class TestBasicDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithArray() {
-        Double sum = array.stream().parallel().reduce(wrapToDouble(0), (acc, item) -> add(acc, item));
+        Double sum = array.parallelStream().reduce(wrapToDouble(0), (acc, item) -> add(acc, item));
         Double acc = wrapToDouble(0);
         for (int i = 0; i < array.length(); i++)
             acc = add(acc, array.get(i));
@@ -281,7 +281,7 @@ class TestBasicDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithSlice() {
-        Double sum = slice.stream().parallel().reduce(wrapToDouble(0), (acc, item) -> add(acc, item));
+        Double sum = slice.parallelStream().reduce(wrapToDouble(0), (acc, item) -> add(acc, item));
         Double acc = wrapToDouble(0);
         for (int i = 0; i < slice.length(); i++)
             acc = add(acc, slice.get(i));
@@ -290,7 +290,7 @@ class TestBasicDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithReshaped() {
-        Double sum = reshaped.stream().parallel().reduce(wrapToDouble(0), (acc, item) -> add(acc, item));
+        Double sum = reshaped.parallelStream().reduce(wrapToDouble(0), (acc, item) -> add(acc, item));
         Double acc = wrapToDouble(0);
         for (int i = 0; i < reshaped.length(); i++)
             acc = add(acc, reshaped.get(i));
@@ -299,7 +299,7 @@ class TestBasicDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithPArray() {
-        Double sum = pArray.stream().parallel().reduce(wrapToDouble(0), (acc, item) -> add(acc, item));
+        Double sum = pArray.parallelStream().reduce(wrapToDouble(0), (acc, item) -> add(acc, item));
         Double acc = wrapToDouble(0);
         for (int i = 0; i < pArray.length(); i++)
             acc = add(acc, pArray.get(i));
@@ -308,7 +308,7 @@ class TestBasicDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithMasked() {
-        Double sum = masked.stream().parallel().reduce(wrapToDouble(0), (acc, item) -> add(acc, item));
+        Double sum = masked.parallelStream().reduce(wrapToDouble(0), (acc, item) -> add(acc, item));
         Double acc = wrapToDouble(0);
         for (int i = 0; i < masked.length(); i++)
             acc = add(acc, masked.get(i));
@@ -362,8 +362,8 @@ class TestBasicDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithArray() {
-        NDArray<Double> increased = array.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Double> increased = array.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicDoubleNDArray.getCollector(array.shape()));
         for (int i = 0; i < array.length(); i++)
             assertSpecializedEquals(add(array.get(i), 1), increased.get(i));
@@ -371,8 +371,8 @@ class TestBasicDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithSlice() {
-        NDArray<Double> increased = slice.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Double> increased = slice.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicDoubleNDArray.getCollector(slice.shape()));
         for (int i = 0; i < slice.length(); i++)
             assertSpecializedEquals(add(slice.get(i), 1), increased.get(i));
@@ -380,8 +380,8 @@ class TestBasicDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithReshaped() {
-        NDArray<Double> increased = reshaped.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Double> increased = reshaped.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicDoubleNDArray.getCollector(reshaped.shape()));
         for (int i = 0; i < reshaped.length(); i++)
             assertSpecializedEquals(add(reshaped.get(i), 1), increased.get(i));
@@ -389,8 +389,8 @@ class TestBasicDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithPArray() {
-        NDArray<Double> increased = pArray.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Double> increased = pArray.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicDoubleNDArray.getCollector(pArray.shape()));
         for (int i = 0; i < pArray.length(); i++)
             assertSpecializedEquals(add(pArray.get(i), 1), increased.get(i));
@@ -398,8 +398,8 @@ class TestBasicDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithMasked() {
-        NDArray<Double> increased = masked.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Double> increased = masked.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicDoubleNDArray.getCollector(masked.shape()));
         for (int i = 0; i < masked.length(); i++)
             assertSpecializedEquals(add(masked.get(i), 1), increased.get(i));
@@ -663,36 +663,6 @@ class TestBasicDoubleNDArrayIteration extends TestBase {
     void testForEachWithMasked() {
         NDArray<Double> array2 = masked.similar().fill(1);
         array2.forEach(value -> assertSpecializedEquals(wrapToDouble(1), value));
-    }
-
-    @Test
-    void testForEachSequentialWithArray() {
-        int[] i = {0};
-        array.forEachSequential(value -> assertSpecializedEquals(array.get(i[0]++), value));
-    }
-
-    @Test
-    void testForEachSequentialWithSlice() {
-        int[] i = {0};
-        slice.forEachSequential(value -> assertSpecializedEquals(slice.get(i[0]++), value));
-    }
-
-    @Test
-    void testForEachSequentialWithReshaped() {
-        int[] i = {0};
-        reshaped.forEachSequential(value -> assertSpecializedEquals(reshaped.get(i[0]++), value));
-    }
-
-    @Test
-    void testForEachSequentialWithPArray() {
-        int[] i = {0};
-        pArray.forEachSequential(value -> assertSpecializedEquals(pArray.get(i[0]++), value));
-    }
-
-    @Test
-    void testForEachSequentialWithMasked() {
-        int[] i = {0};
-        masked.forEachSequential(value -> assertSpecializedEquals(masked.get(i[0]++), value));
     }
 
     @Test

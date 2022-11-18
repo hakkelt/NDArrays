@@ -19,10 +19,10 @@ import io.github.hakkelt.ndarrays.internal.Generated;
  * Reference implementation for the NDArray of complex float (single-precision,
  * 32 bit floating point) values.
  */
-@ClassTemplate(outputDirectory = "main/java/io/github/hakkelt/ndarrays/basic", newName = "BasicComplex$2NDArray")
-@Patterns({ "/float/", "/Float/", "single precision, 32 bit floating-point" })
-@Replacements({ "double", "Double", "double precision, 64 bit floating-point" })
-public final class BasicComplexFloatNDArrayTemplate extends AbstractComplexNDArray<Float> {
+@ClassTemplate(outputDirectory = "main/java/io/github/hakkelt/ndarrays/basic", newName = "BasicComplex$3NDArray")
+@Patterns({ "(float) ", "/float/", "/Float/", "single precision, 32 bit floating-point" })
+@Replacements({ "", "double", "Double", "double precision, 64 bit floating-point" })
+public class BasicComplexFloatNDArrayTemplate extends AbstractComplexNDArray<Float> {
     protected float[] data;
 
     @SuppressWarnings("unused")
@@ -218,7 +218,8 @@ assertEquals(array, array2);
 
     @Override
     protected Complex getUnchecked(int linearIndex) {
-        return new Complex(getRealUnchecked(linearIndex), getImagUnchecked(linearIndex));
+        int pos = linearIndex * 2;
+        return new Complex(data[pos], data[pos + 1]);
     }
 
     @Override
@@ -248,8 +249,9 @@ assertEquals(array, array2);
 
     @Override
     protected void setUnchecked(Complex value, int linearIndex) {
-        setRealUnchecked(wrapRealValue(value.getReal()), linearIndex);
-        setImagUnchecked(wrapRealValue(value.getImaginary()), linearIndex);
+        int pos = linearIndex * 2;
+        data[pos] = (float) value.getReal();
+        data[pos + 1] = (float) value.getImaginary();
     }
 
     @Override

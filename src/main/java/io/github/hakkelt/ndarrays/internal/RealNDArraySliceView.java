@@ -15,7 +15,7 @@ import io.github.hakkelt.ndarrays.*;
  */
 public class RealNDArraySliceView<T extends Number> extends AbstractNDArraySliceView<T,T> implements RealNDArray<T> {
 
-    public RealNDArraySliceView(NDArray<T> parent, Range[] slicingExpressions) {
+    public RealNDArraySliceView(NDArray<T> parent, NormalizedRange[] slicingExpressions) {
         super(parent, slicingExpressions);
     }
 

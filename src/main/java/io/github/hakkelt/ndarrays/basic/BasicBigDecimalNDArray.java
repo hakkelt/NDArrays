@@ -22,7 +22,7 @@ import java.util.stream.Collector;
 /**
  * Reference implementation for the NDArray of BigDecimal (arbitrary precision floating-point) values.
  */
-public final class BasicBigDecimalNDArray extends AbstractBigDecimalNDArray {
+public class BasicBigDecimalNDArray extends AbstractBigDecimalNDArray {
 
     protected BigDecimal[] data;
 

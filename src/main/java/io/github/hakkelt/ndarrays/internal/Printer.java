@@ -41,7 +41,7 @@ public class Printer {
         return String.join(" × ", IntStream.of(shape).mapToObj(String::valueOf).collect(Collectors.toList()));
     }
 
-    static String printVector(int[] indices) {
+    public static String printVector(int[] indices) {
         return "[" + StringUtils.join(ArrayUtils.toObject(indices), ", ") + "]";
     }
     

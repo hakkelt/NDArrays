@@ -39,67 +39,67 @@ public class ArrayOperations<T, T2 extends Number> {
 
     public NDArray<T> add(AbstractNDArray<T,T2> me, Object... addends) {
         checkDimensionMatchBeforeCombine(me, addends, "add");
-        return me.streamLinearIndices().parallel()
+        return me.streamLinearIndices()
             .mapToObj(i -> me.accumulateAtIndex(i, AccumulateOperators.ADD, addends))
             .collect(me.getCollectorInternal(me.shape));
     }
 
     public NDArray<T> subtract(AbstractNDArray<T,T2> me, Object... substrahends) {
         checkDimensionMatchBeforeCombine(me, substrahends, "subtract");
-        return me.streamLinearIndices().parallel()
+        return me.streamLinearIndices()
             .mapToObj(i -> me.accumulateAtIndex(i, AccumulateOperators.SUBTRACT, substrahends))
             .collect(me.getCollectorInternal(me.shape));
     }
 
     public NDArray<T> multiply(AbstractNDArray<T,T2> me, Object... multiplicands) {
         checkDimensionMatchBeforeCombine(me, multiplicands, "multiply");
-        return me.streamLinearIndices().parallel()
+        return me.streamLinearIndices()
             .mapToObj(i -> me.accumulateAtIndex(i, AccumulateOperators.MULTIPLY, multiplicands))
             .collect(me.getCollectorInternal(me.shape));
     }
 
     public NDArray<T> divide(AbstractNDArray<T,T2> me, Object... divisors) {
         checkDimensionMatchBeforeCombine(me, divisors, "divide");
-        return me.streamLinearIndices().parallel()
+        return me.streamLinearIndices()
             .mapToObj(i -> me.accumulateAtIndex(i, AccumulateOperators.DIVIDE, divisors))
             .collect(me.getCollectorInternal(me.shape));
     }
 
     public NDArray<T> addInplace(AbstractNDArray<T,T2> me, Object... addends) {
         checkDimensionMatchBeforeCombine(me, addends, "addInplace");
-        me.streamLinearIndices().parallel()
+        me.streamLinearIndices()
             .forEach(i -> me.set(me.accumulateAtIndex(i, AccumulateOperators.ADD, addends), i));
         return me;
     }
 
     public NDArray<T> subtractInplace(AbstractNDArray<T,T2> me, Object... substrahends) {
         checkDimensionMatchBeforeCombine(me, substrahends, "subtractInplace");
-        me.streamLinearIndices().parallel()
+        me.streamLinearIndices()
             .forEach(i -> me.set(me.accumulateAtIndex(i, AccumulateOperators.SUBTRACT, substrahends), i));
         return me;
     }
 
     public NDArray<T> multiplyInplace(AbstractNDArray<T,T2> me, Object... multiplicands) {
         checkDimensionMatchBeforeCombine(me, multiplicands, "multiplyInplace");
-        me.streamLinearIndices().parallel()
+        me.streamLinearIndices()
             .forEach(i -> me.set(me.accumulateAtIndex(i, AccumulateOperators.MULTIPLY, multiplicands), i));
         return me;
     }
 
     public NDArray<T> divideInplace(AbstractNDArray<T,T2> me, Object... divisors) {
         checkDimensionMatchBeforeCombine(me, divisors, "divideInplace");
-        me.streamLinearIndices().parallel()
+        me.streamLinearIndices()
             .forEach(i -> me.set(me.accumulateAtIndex(i, AccumulateOperators.DIVIDE, divisors), i));
         return me;
     }
 
     public NDArray<T> fill(AbstractNDArray<T,T2> me, double value) {
-        me.streamLinearIndices().parallel().forEach(i -> me.set(value, i));
+        me.streamLinearIndices().forEach(i -> me.set(value, i));
         return me;
     }
 
     public NDArray<T> fill(AbstractNDArray<T,T2> me, T value) {
-        me.streamLinearIndices().parallel().forEach(i -> me.set(value, i));
+        me.streamLinearIndices().forEach(i -> me.set(value, i));
         return me;
     }
 
@@ -149,17 +149,17 @@ public class ArrayOperations<T, T2 extends Number> {
     }
 
     public ComplexNDArray<T2> fill(ComplexNDArray<T2> me, double value) {
-        me.streamLinearIndices().parallel().forEach(i -> me.set(value, i));
+        me.streamLinearIndices().forEach(i -> me.set(value, i));
         return me;
     }
 
     public ComplexNDArray<T2> fill(ComplexNDArray<T2> me, T2 value) {
-        me.streamLinearIndices().parallel().forEach(i -> me.set(value, i));
+        me.streamLinearIndices().forEach(i -> me.set(value, i));
         return me;
     }
 
     public ComplexNDArray<T2> fill(ComplexNDArray<T2> me, Complex value) {
-        me.streamLinearIndices().parallel().forEach(i -> me.set(value, i));
+        me.streamLinearIndices().forEach(i -> me.set(value, i));
         return me;
     }
 

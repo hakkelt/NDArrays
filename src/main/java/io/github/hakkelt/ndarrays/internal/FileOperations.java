@@ -165,62 +165,68 @@ public class FileOperations<T, T2 extends Number> {
     public <A extends AbstractNDArray<T,T2>> A readFromFile(ByteBuffer buffer, A array) {
         if (buffer.remaining() != array.length())
             throw new IllegalStateException();
-        array.streamLinearIndices().forEach(i -> array.setUnchecked(array.wrapValue(buffer.get()), i));
+        for (int i = 0; i < array.length(); i++)
+            array.setUnchecked(array.wrapValue(buffer.get()), i);
         return array;
     }
 
     public <A extends AbstractNDArray<T,T2>> A readFromFile(ShortBuffer buffer, A array) {
         if (buffer.remaining() != array.length())
             throw new IllegalStateException();
-        array.streamLinearIndices().forEach(i -> array.setUnchecked(array.wrapValue(buffer.get()), i));
+        for (int i = 0; i < array.length(); i++)
+            array.setUnchecked(array.wrapValue(buffer.get()), i);
         return array;
     }
 
     public <A extends AbstractNDArray<T,T2>> A readFromFile(IntBuffer buffer, A array) {
         if (buffer.remaining() != array.length())
             throw new IllegalStateException();
-        array.streamLinearIndices().forEach(i -> array.setUnchecked(array.wrapValue(buffer.get()), i));
+        for (int i = 0; i < array.length(); i++)
+            array.setUnchecked(array.wrapValue(buffer.get()), i);
         return array;
     }
 
     public <A extends AbstractNDArray<T,T2>> A readFromFile(LongBuffer buffer, A array) {
         if (buffer.remaining() != array.length())
             throw new IllegalStateException();
-        array.streamLinearIndices().forEach(i -> array.setUnchecked(array.wrapValue(buffer.get()), i));
+        for (int i = 0; i < array.length(); i++)
+            array.setUnchecked(array.wrapValue(buffer.get()), i);
         return array;
     }
 
     public <A extends AbstractNDArray<T,T2>> A readFromFile(FloatBuffer buffer, A array) {
         if (buffer.remaining() != array.length())
             throw new IllegalStateException();
-        array.streamLinearIndices().forEach(i -> array.setUnchecked(array.wrapValue(buffer.get()), i));
+        for (int i = 0; i < array.length(); i++)
+            array.setUnchecked(array.wrapValue(buffer.get()), i);
         return array;
     }
 
     public <A extends AbstractNDArray<T,T2>> A readFromFile(DoubleBuffer buffer, A array) {
         if (buffer.remaining() != array.length())
             throw new IllegalStateException();
-        array.streamLinearIndices().forEach(i -> array.setUnchecked(array.wrapValue(buffer.get()), i));
+        for (int i = 0; i < array.length(); i++)
+            array.setUnchecked(array.wrapValue(buffer.get()), i);
         return array;
     }
 
     public <A extends AbstractNDArray<T,T2>> A readComplexFromFile(FloatBuffer buffer, A array) {
         if (buffer.remaining() != array.length() * 2)
             throw new IllegalStateException();
-        array.streamLinearIndices().forEach(i -> {
+        for (int i = 0; i < array.length(); i++) {
             array.setRealUnchecked(array.wrapRealValue(buffer.get()), i);
             array.setImagUnchecked(array.wrapRealValue(buffer.get()), i);
-        });
+        }
         return array;
     }
 
     public <A extends AbstractNDArray<T,T2>> A readComplexFromFile(DoubleBuffer buffer, A array) {
         if (buffer.remaining() != array.length() * 2)
             throw new IllegalStateException();
-        array.streamLinearIndices().forEach(i -> {
+        for (int i = 0; i < array.length(); i++) {
             array.setRealUnchecked(array.wrapRealValue(buffer.get()), i);
             array.setImagUnchecked(array.wrapRealValue(buffer.get()), i);
-        });
+        }
         return array;
     }
 

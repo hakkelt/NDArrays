@@ -17,6 +17,11 @@ import io.github.hakkelt.ndarrays.internal.Printer;
  */
 public class NDArrayUtils {
 
+    /*
+     * Number of element over which streamLinearIndices produces a parallel stream by default.
+     */
+    public static final int PARALLEL_STREAM_THRESHOLD = 10000;
+
     private NDArrayUtils() {}
 
     public static void checkShapeCompatibility(NDArray<?> me, int[] arrayDims) {
@@ -117,6 +122,13 @@ public class NDArrayUtils {
         while (dtype.isArray())
             dtype = dtype.getComponentType();
         return dtype;
+    }
+
+    public static int[] getEndCartesianIndex(int[] shape) {
+        int[] end = shape.clone();
+        for (int i = 0; i < shape.length; i++)
+            end[i]--;
+        return end;
     }
 
 }

@@ -15,7 +15,12 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.*;
+import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
+import java.nio.ShortBuffer;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -23,7 +28,14 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.Spliterator;
-import java.util.function.*;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.IntFunction;
+import java.util.function.ObjIntConsumer;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -78,17 +90,17 @@ public abstract class AbstractNDArray<T, T2 extends Number> implements NDArray<T
             if (origin < fence) {
                 action.accept((T) array.get(origin++));
                 return true;
-            } else // cannot advance
+            } else
                 return false;
         }
 
         public Spliterator<T> trySplit() {
             int lo = origin;
             int mid = origin + (fence - origin) / 2;
-            if (lo < mid) { // split out left half
-                origin = mid; // reset this Spliterator's origin
+            if (lo < mid) {
+                origin = mid;
                 return new NDArraySpliterator<>(array, lo, mid);
-            } else // too small to split
+            } else
                 return null;
         }
 
@@ -160,7 +172,7 @@ public abstract class AbstractNDArray<T, T2 extends Number> implements NDArray<T
     @Override
     public boolean contains(Object o) {
         T wrapped = wrapValue(o);
-        return stream().anyMatch(wrapped::equals);
+        return maybeParallelStream().anyMatch(wrapped::equals);
     }
 
     @Override
@@ -513,9 +525,9 @@ public abstract class AbstractNDArray<T, T2 extends Number> implements NDArray<T
         if (!Arrays.equals(shape, other.shape()))
             return false;
         if (dtype() == BigDecimal.class)
-            return streamLinearIndices().parallel().allMatch(i ->
+            return streamLinearIndices().allMatch(i ->
                 0 == ((BigDecimal) get(i)).compareTo((BigDecimal) wrapValue(other.get(i))));
-        return streamLinearIndices().parallel().allMatch(i -> get(i).equals(wrapValue(other.get(i))));
+        return streamLinearIndices().allMatch(i -> get(i).equals(wrapValue(other.get(i))));
     }
 
     @Override
@@ -528,6 +540,15 @@ public abstract class AbstractNDArray<T, T2 extends Number> implements NDArray<T
         return StreamSupport.stream(spliterator(), false);
     }
 
+    /**
+     * Returns a sequential Stream with this collection as its source.
+     * 
+     * @return a sequential Stream with this collection as its source.
+     */
+    public Stream<T> maybeParallelStream() {
+        return StreamSupport.stream(spliterator(), length() > NDArrayUtils.PARALLEL_STREAM_THRESHOLD);
+    }
+
     @Override
     public Stream<T> parallelStream() {
         return StreamSupport.stream(spliterator(), true);
@@ -535,57 +556,70 @@ public abstract class AbstractNDArray<T, T2 extends Number> implements NDArray<T
 
     @Override
     public NDArray<T> fillUsingLinearIndices(IntFunction<T> func) {
-        streamLinearIndices().parallel()
-            .forEach(linearIndex -> setUnchecked(func.apply(linearIndex), linearIndex));
+        streamLinearIndices().forEach(linearIndex -> setUnchecked(func.apply(linearIndex), linearIndex));
         return this;
     }
 
     @Override
     public NDArray<T> fillUsingCartesianIndices(Function<int[],T> func) {
-        streamCartesianIndices().parallel()
-            .forEach(indices -> setUnchecked(func.apply(indices), indices));
+        streamCartesianIndices().forEach(indices -> setUnchecked(func.apply(indices), indices));
         return this;
     }
 
     @Override
     public NDArray<T> apply(UnaryOperator<T> func) {
-        streamLinearIndices().parallel()
+        streamLinearIndices()
             .forEach(linearIndex -> setUnchecked(func.apply(getUnchecked(linearIndex)), linearIndex));
         return this;
     }
 
     @Override
     public NDArray<T> applyWithLinearIndices(BiFunction<T,Integer,T> func) {
-        streamLinearIndices().parallel()
+        streamLinearIndices()
             .forEach(linearIndex -> setUnchecked(func.apply(getUnchecked(linearIndex), linearIndex), linearIndex));
         return this;
     }
 
     @Override
     public NDArray<T> applyWithCartesianIndices(BiFunction<T,int[],T> func) {
-        streamCartesianIndices().parallel()
+        streamCartesianIndices()
             .forEach(indices -> setUnchecked(func.apply(getUnchecked(indices), indices), indices));
         return this;
     }
 
     @Override
-    public void forEach(Consumer<? super T> func) {
-        stream().parallel().forEach(func::accept);
+    public NDArray<T> mapOnSlices(BiConsumer<NDArray<T>,int[]> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
     }
 
     @Override
-    public void forEachSequential(Consumer<T> func) {
-        stream().forEach(func::accept);
+    public NDArray<T> mapOnSlices(BiFunction<NDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
+    }
+
+    @Override
+    public NDArray<T> applyOnSlices(BiConsumer<NDArray<T>,int[]> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(this, func, iterationDims);
+    }
+
+    @Override
+    public NDArray<T> applyOnSlices(BiFunction<NDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(this, func, iterationDims);
+    }
+
+    @Override
+    public void forEach(Consumer<? super T> func) {
+        maybeParallelStream().forEach(func::accept);
     }
 
     @Override
     public void forEachWithLinearIndices(ObjIntConsumer<T> func) {
-        streamLinearIndices().parallel().forEach(linearIndex -> func.accept(getUnchecked(linearIndex), linearIndex));
+        streamLinearIndices().forEach(linearIndex -> func.accept(getUnchecked(linearIndex), linearIndex));
     }
 
     @Override
     public void forEachWithCartesianIndices(BiConsumer<T,int[]> func) {
-        streamCartesianIndices().parallel().forEach(indices -> func.accept(getUnchecked(indices), indices));
+        streamCartesianIndices().forEach(indices -> func.accept(getUnchecked(indices), indices));
     }
 
     @Override
@@ -598,17 +632,17 @@ public abstract class AbstractNDArray<T, T2 extends Number> implements NDArray<T
 
     @Override
     public T sum() {
-        return stream().parallel().reduce(zeroT(), (acc, item) -> accumulate(acc, item, AccumulateOperators.ADD));
+        return maybeParallelStream().reduce(zeroT(), (acc, item) -> accumulate(acc, item, AccumulateOperators.ADD));
     }
 
     @Override
     public double norm() {
         if (dtype() == Complex.class)
-            return Math.sqrt(stream()
+            return Math.sqrt(maybeParallelStream()
                     .map(item -> ((Complex) item).multiply(((Complex) item).conjugate()).getReal())
                     .reduce(0., (acc, item) -> acc + item));
         else
-            return Math.sqrt(stream()
+            return Math.sqrt(maybeParallelStream()
                     .mapToDouble(item -> ((Number) item).doubleValue() * ((Number) item).doubleValue())
                     .reduce(0., (acc, item) -> acc + item));
     }
@@ -634,13 +668,13 @@ public abstract class AbstractNDArray<T, T2 extends Number> implements NDArray<T
 
     @Override
     public IntStream streamLinearIndices() {
-        return IntStream.range(0, length());
+        IntStream stream = IntStream.range(0, length());
+        return length() > NDArrayUtils.PARALLEL_STREAM_THRESHOLD ? stream.parallel() : stream;
     }
 
     @Override
     public Stream<int[]> streamCartesianIndices() {
-        return streamLinearIndices()
-                .mapToObj(i -> NDArrayUtils.linearIndexToCartesianIndices(i, multipliers));
+        return StreamSupport.stream(new CartesianIndexSpliterator(shape, multipliers), length() > NDArrayUtils.PARALLEL_STREAM_THRESHOLD);
     }
 
     protected abstract Class<?> dtype2();
@@ -737,39 +771,39 @@ public abstract class AbstractNDArray<T, T2 extends Number> implements NDArray<T
 
     protected Stream<T2> streamAbs() {
         if (dtype() == Complex.class)
-            return stream().map(value -> wrapRealValue(((Complex) value).abs()));
+            return maybeParallelStream().map(value -> wrapRealValue(((Complex) value).abs()));
         if (dtype() == Double.class)
-            return stream().map(value -> wrapRealValue(Math.abs((Double) value)));
+            return maybeParallelStream().map(value -> wrapRealValue(Math.abs((Double) value)));
         if (dtype() == Float.class)
-            return stream().map(value -> wrapRealValue(Math.abs((Float) value)));
+            return maybeParallelStream().map(value -> wrapRealValue(Math.abs((Float) value)));
         if (dtype() == Byte.class)
-            return stream().map(value -> wrapRealValue(Math.abs((Byte) value)));
+            return maybeParallelStream().map(value -> wrapRealValue(Math.abs((Byte) value)));
         if (dtype() == Short.class)
-            return stream().map(value -> wrapRealValue(Math.abs((Short) value)));
+            return maybeParallelStream().map(value -> wrapRealValue(Math.abs((Short) value)));
         if (dtype() == Integer.class)
-            return stream().map(value -> wrapRealValue(Math.abs((Integer) value)));
+            return maybeParallelStream().map(value -> wrapRealValue(Math.abs((Integer) value)));
         if (dtype() == Long.class)
-            return stream().map(value -> wrapRealValue(Math.abs((Long) value)));
+            return maybeParallelStream().map(value -> wrapRealValue(Math.abs((Long) value)));
         if (dtype() == BigInteger.class)
-            return stream().map(value -> wrapRealValue(((BigInteger) value).abs()));
-        return stream().map(value -> wrapRealValue(((BigDecimal) value).abs()));
+            return maybeParallelStream().map(value -> wrapRealValue(((BigInteger) value).abs()));
+        return maybeParallelStream().map(value -> wrapRealValue(((BigDecimal) value).abs()));
     }
 
-    protected void incrementSlicingExpression(Object[] expressions, int dimension, int[] remainingDimsIndices) {
+    protected void incrementSlicingExpression(Object[] expressions, int dim, int[] remainingDimsIndices) {
+        int dimension = remainingDimsIndices[dim];
         if (expressions[dimension] instanceof String) {
             incrementSlicingExpression(expressions, dimension + 1, remainingDimsIndices);
         } else if ((int) expressions[dimension] == shape(dimension) - 1) {
             expressions[dimension] = 0;
-            incrementSlicingExpression(expressions, remainingDimsIndices[dimension + 1], remainingDimsIndices);
+            incrementSlicingExpression(expressions, dim + 1, remainingDimsIndices);
         } else {
             expressions[dimension] = (int) expressions[dimension] + 1;
         }
     }
 
     protected int[] calculateRemainingDims(int... selectedDims) {
-        Set<Integer> remainingDims = IntStream.range(0, ndim()).boxed().collect(Collectors.toSet());
-        remainingDims.removeAll(IntStream.of(selectedDims).boxed().collect(Collectors.toSet()));
-        return Stream.of(remainingDims.toArray()).mapToInt(i -> ((Integer) i).intValue()).sorted().toArray();
+        Set<Integer> selectedDimsSet = IntStream.of(selectedDims).boxed().collect(Collectors.toSet());
+        return IntStream.range(0, ndim()).filter(i -> !selectedDimsSet.contains(i)).toArray();
     }
 
     protected void copyTo1DArray(byte[] array, int[] index) {

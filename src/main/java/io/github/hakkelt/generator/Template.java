@@ -468,7 +468,7 @@ class Template {
             for (int i = 0; i < patterns.size(); i++) {
                 String regex = patterns.get(i).toString();
                 String deregexified = regex.substring(2, regex.length() - 2);
-                if (deregexified.matches("[a-zA-Z_][a-zA-Z0-9_]*"))
+                if (deregexified.matches("[a-zA-Z_]\\w*"))
                     return baseName + "With" + StringUtils.capitalize(replacements.get(i));
             }
             return baseName + String.valueOf(index);
@@ -503,7 +503,7 @@ class Template {
     private static List<JavaAnnotation> filterAnnotations(List<JavaAnnotation> src, Class<?> annotationClass,
             boolean skipMatches) {
         return src.stream()
-                .filter(annot -> skipMatches ^ annot.getType().getCanonicalName().equals(annotationClass.getName()))
+                .filter(annot -> skipMatches ^ annot.getType().getSimpleName().equals(annotationClass.getSimpleName()))
                 .collect(Collectors.toList());
     }
 
@@ -575,7 +575,7 @@ class Template {
             return Pattern.compile(removeQuotationMarks(str).replace("\\\\", "\\"));
         str = str.replace("\\\"", "\"");
         String regexified = SPECIAL_REGEX_CHARS.matcher(str).replaceAll("\\\\$0");
-        boolean isValidIdentifier = str.matches("[a-zA-Z_][a-zA-Z0-9_]*");
+        boolean isValidIdentifier = str.matches("[a-zA-Z_]\\w*");
         return isValidIdentifier ? Pattern.compile("\\b" + regexified + "\\b") : Pattern.compile(regexified);
     }
 
@@ -589,7 +589,7 @@ class Template {
     }
 
     private static boolean areEqual(JavaAnnotation annotation, Class<?> annotationClass) {
-        return annotation.getType().getCanonicalName().equals(annotationClass.getName());
+        return annotation.getType().getSimpleName().equals(annotationClass.getSimpleName());
     }
 
     private void printComment(String comment, List<DocletTag> doclets, StringBuilder stringBuilder,

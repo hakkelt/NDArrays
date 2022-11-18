@@ -82,7 +82,7 @@ public class CopyFromOperations<T, T2 extends Number> {
         NDArrayUtils.checkShapeCompatibility(me, array.shape());
         AbstractNDArray<T2,T2> castedMe = (AbstractNDArray<T2,T2>) me;
         AbstractNDArray<?, ?> castedArray = (AbstractNDArray<?,?>) array;
-        me.streamLinearIndices().parallel()
+        me.streamLinearIndices()
             .forEach(i -> castedMe.setUnchecked(castedMe.wrapValue(castedArray.getUnchecked(i)), i));
         return me;
     }
@@ -149,10 +149,10 @@ public class CopyFromOperations<T, T2 extends Number> {
         AbstractNDArray<Complex, T2> castedMe = (AbstractNDArray<Complex, T2>) me;
         AbstractNDArray<?, ?> castedArray = (AbstractNDArray<?,?>) array;
         if (array.dtype() == Complex.class)
-            me.streamLinearIndices().parallel()
+            me.streamLinearIndices()
                 .forEach(i -> castedMe.setUnchecked((Complex) castedArray.getUnchecked(i), i));
         else
-            me.streamLinearIndices().parallel()
+            me.streamLinearIndices()
                 .forEach(i -> castedMe.setUnchecked(castedMe.wrapValue(castedArray.getUnchecked(i)), i));
         return me;
     }
@@ -237,7 +237,7 @@ public class CopyFromOperations<T, T2 extends Number> {
         AbstractNDArray<T, T2> castedMe = (AbstractNDArray<T, T2>) me;
         AbstractNDArray<? extends Number, ?> castedReal = (AbstractNDArray<? extends Number,?>) real;
         AbstractNDArray<? extends Number, ?> castedImag = (AbstractNDArray<? extends Number,?>) imag;
-        me.streamLinearIndices().parallel()
+        me.streamLinearIndices()
             .forEach(i -> {
                 castedMe.setRealUnchecked(castedMe.wrapRealValue(castedReal.getUnchecked(i)), i);
                 castedMe.setImagUnchecked(castedMe.wrapRealValue(castedImag.getUnchecked(i)), i);
@@ -245,7 +245,6 @@ public class CopyFromOperations<T, T2 extends Number> {
         return me;
     }
 
-    @SuppressWarnings("unchecked")
     public ComplexNDArray<T2> copyFromMagnitudePhase(ComplexNDArray<T2> me, NDArray<? extends Number> magnitude, NDArray<? extends Number> phase) {
         if (!Arrays.equals(magnitude.shape(), phase.shape()))
             throw new IllegalArgumentException(Errors.ARRAYS_DIFFER_IN_SHAPE);
@@ -260,48 +259,48 @@ public class CopyFromOperations<T, T2 extends Number> {
     }
 
     protected void flatten(AbstractNDArray<T,T2> me, float[] real, int startIndex, int dimension) {
-        IntStream.range(0, real.length).parallel()
-            .forEach(i -> me.setUnchecked(me.wrapValue(real[i]), startIndex + i * me.multipliers[dimension]));
+        getIndexStream(real.length).forEach(i ->
+            me.setUnchecked(me.wrapValue(real[i]), startIndex + i * me.multipliers[dimension]));
     }
 
     protected void flatten(AbstractNDArray<T,T2> me, double[] real, int startIndex, int dimension) {
-        IntStream.range(0, real.length).parallel()
-            .forEach(i -> me.setUnchecked(me.wrapValue(real[i]), startIndex + i * me.multipliers[dimension]));
+        getIndexStream(real.length).forEach(i ->
+            me.setUnchecked(me.wrapValue(real[i]), startIndex + i * me.multipliers[dimension]));
     }
 
     protected void flatten(AbstractNDArray<T,T2> me, byte[] real, int startIndex, int dimension) {
-        IntStream.range(0, real.length).parallel()
-            .forEach(i -> me.setUnchecked(me.wrapValue(real[i]), startIndex + i * me.multipliers[dimension]));
+        getIndexStream(real.length).forEach(i ->
+            me.setUnchecked(me.wrapValue(real[i]), startIndex + i * me.multipliers[dimension]));
     }
 
     protected void flatten(AbstractNDArray<T,T2> me, short[] real, int startIndex, int dimension) {
-        IntStream.range(0, real.length).parallel()
-            .forEach(i -> me.setUnchecked(me.wrapValue(real[i]), startIndex + i * me.multipliers[dimension]));
+        getIndexStream(real.length).forEach(i ->
+            me.setUnchecked(me.wrapValue(real[i]), startIndex + i * me.multipliers[dimension]));
     }
 
     protected void flatten(AbstractNDArray<T,T2> me, int[] real, int startIndex, int dimension) {
-        IntStream.range(0, real.length).parallel()
-            .forEach(i -> me.setUnchecked(me.wrapValue(real[i]), startIndex + i * me.multipliers[dimension]));
+        getIndexStream(real.length).forEach(i ->
+            me.setUnchecked(me.wrapValue(real[i]), startIndex + i * me.multipliers[dimension]));
     }
 
     protected void flatten(AbstractNDArray<T,T2> me, long[] real, int startIndex, int dimension) {
-        IntStream.range(0, real.length).parallel()
-            .forEach(i -> me.setUnchecked(me.wrapValue(real[i]), startIndex + i * me.multipliers[dimension]));
+        getIndexStream(real.length).forEach(i ->
+            me.setUnchecked(me.wrapValue(real[i]), startIndex + i * me.multipliers[dimension]));
     }
 
     protected void flatten(AbstractNDArray<T,T2> me, BigInteger[] real, int startIndex, int dimension) {
-        IntStream.range(0, real.length).parallel()
-            .forEach(i -> me.setUnchecked(me.wrapValue(real[i]), startIndex + i * me.multipliers[dimension]));
+        getIndexStream(real.length).forEach(i ->
+            me.setUnchecked(me.wrapValue(real[i]), startIndex + i * me.multipliers[dimension]));
     }
 
     protected void flatten(AbstractNDArray<T,T2> me, BigDecimal[] real, int startIndex, int dimension) {
-        IntStream.range(0, real.length).parallel()
-            .forEach(i -> me.setUnchecked(me.wrapValue(real[i]), startIndex + i * me.multipliers[dimension]));
+        getIndexStream(real.length).forEach(i ->
+            me.setUnchecked(me.wrapValue(real[i]), startIndex + i * me.multipliers[dimension]));
     }
 
     protected void flatten(AbstractNDArray<T,T2> me, Complex[] real, int startIndex, int dimension) {
-        IntStream.range(0, real.length).parallel()
-            .forEach(i -> me.setUnchecked(me.wrapValue(real[i]), startIndex + i * me.multipliers[dimension]));
+        getIndexStream(real.length).forEach(i ->
+            me.setUnchecked(me.wrapValue(real[i]), startIndex + i * me.multipliers[dimension]));
     }
 
     protected void flatten(AbstractNDArray<T,T2> me, Object[] realOrComplex, int startIndex, int dimension) {
@@ -334,13 +333,13 @@ public class CopyFromOperations<T, T2 extends Number> {
 
     protected boolean flatten1D(AbstractNDArray<T,T2> me, Object[] realOrComplex, int startIndex, int dimension) {
         if (realOrComplex.getClass().equals(BigInteger[].class)) {
-            flatten(me, (BigInteger[]) realOrComplex, startIndex, dimension);
+            flatten(me, (BigInteger[]) realOrComplex, startIndex, dimension); // NOSONAR
             return true;
         } else if (realOrComplex.getClass().equals(BigDecimal[].class)) {
-            flatten(me, (BigDecimal[]) realOrComplex, startIndex, dimension);
+            flatten(me, (BigDecimal[]) realOrComplex, startIndex, dimension); // NOSONAR
             return true;
         } else if (realOrComplex.getClass().equals(Complex[].class)) {
-            flatten(me, (Complex[]) realOrComplex, startIndex, dimension);
+            flatten(me, (Complex[]) realOrComplex, startIndex, dimension); // NOSONAR
             return true;
         }
         return false;
@@ -349,7 +348,7 @@ public class CopyFromOperations<T, T2 extends Number> {
     @SuppressWarnings("unchecked")
     protected void flatten(ComplexNDArray<T2> me, float[] real, float[] imag, int startIndex, int dimension) {
         AbstractNDArray<T, T2> casted = (AbstractNDArray<T, T2>) me;
-        IntStream.range(0, real.length).parallel()
+        getIndexStream(real.length)
             .forEach(i -> {
                 int linearIndex = startIndex + i * ((AbstractNDArray<T,T2>)me).multipliers[dimension];
                 casted.setRealUnchecked(casted.wrapRealValue(real[i]), linearIndex);
@@ -360,7 +359,7 @@ public class CopyFromOperations<T, T2 extends Number> {
     @SuppressWarnings("unchecked")
     protected void flatten(ComplexNDArray<T2> me, double[] real, double[] imag, int startIndex, int dimension) {
         AbstractNDArray<T, T2> casted = (AbstractNDArray<T, T2>) me;
-        IntStream.range(0, real.length).parallel()
+        getIndexStream(real.length)
             .forEach(i -> {
                 int linearIndex = startIndex + i * ((AbstractNDArray<T,T2>)me).multipliers[dimension];
                 casted.setRealUnchecked(casted.wrapRealValue(real[i]), linearIndex);
@@ -371,7 +370,7 @@ public class CopyFromOperations<T, T2 extends Number> {
     @SuppressWarnings("unchecked")
     protected void flatten(ComplexNDArray<T2> me, byte[] real, byte[] imag, int startIndex, int dimension) {
         AbstractNDArray<T, T2> casted = (AbstractNDArray<T, T2>) me;
-        IntStream.range(0, real.length).parallel()
+        getIndexStream(real.length)
             .forEach(i -> {
                 int linearIndex = startIndex + i * ((AbstractNDArray<T,T2>)me).multipliers[dimension];
                 casted.setRealUnchecked(casted.wrapRealValue(real[i]), linearIndex);
@@ -382,7 +381,7 @@ public class CopyFromOperations<T, T2 extends Number> {
     @SuppressWarnings("unchecked")
     protected void flatten(ComplexNDArray<T2> me, short[] real, short[] imag, int startIndex, int dimension) {
         AbstractNDArray<T, T2> casted = (AbstractNDArray<T, T2>) me;
-        IntStream.range(0, real.length).parallel()
+        getIndexStream(real.length)
             .forEach(i -> {
                 int linearIndex = startIndex + i * ((AbstractNDArray<T,T2>)me).multipliers[dimension];
                 casted.setRealUnchecked(casted.wrapRealValue(real[i]), linearIndex);
@@ -393,7 +392,7 @@ public class CopyFromOperations<T, T2 extends Number> {
     @SuppressWarnings("unchecked")
     protected void flatten(ComplexNDArray<T2> me, int[] real, int[] imag, int startIndex, int dimension) {
         AbstractNDArray<T, T2> casted = (AbstractNDArray<T, T2>) me;
-        IntStream.range(0, real.length).parallel()
+        getIndexStream(real.length)
             .forEach(i -> {
                 int linearIndex = startIndex + i * ((AbstractNDArray<T,T2>)me).multipliers[dimension];
                 casted.setRealUnchecked(casted.wrapRealValue(real[i]), linearIndex);
@@ -404,7 +403,7 @@ public class CopyFromOperations<T, T2 extends Number> {
     @SuppressWarnings("unchecked")
     protected void flatten(ComplexNDArray<T2> me, long[] real, long[] imag, int startIndex, int dimension) {
         AbstractNDArray<T, T2> casted = (AbstractNDArray<T, T2>) me;
-        IntStream.range(0, real.length).parallel()
+        getIndexStream(real.length)
             .forEach(i -> {
                 int linearIndex = startIndex + i * ((AbstractNDArray<T,T2>)me).multipliers[dimension];
                 casted.setRealUnchecked(casted.wrapRealValue(real[i]), linearIndex);
@@ -415,7 +414,7 @@ public class CopyFromOperations<T, T2 extends Number> {
     @SuppressWarnings("unchecked")
     protected void flatten(ComplexNDArray<T2> me, BigInteger[] real, BigInteger[] imag, int startIndex, int dimension) {
         AbstractNDArray<T, T2> casted = (AbstractNDArray<T, T2>) me;
-        IntStream.range(0, real.length).parallel()
+        getIndexStream(real.length)
             .forEach(i -> {
                 int linearIndex = startIndex + i * ((AbstractNDArray<T,T2>)me).multipliers[dimension];
                 casted.setRealUnchecked(casted.wrapRealValue(real[i]), linearIndex);
@@ -426,7 +425,7 @@ public class CopyFromOperations<T, T2 extends Number> {
     @SuppressWarnings("unchecked")
     protected void flatten(ComplexNDArray<T2> me, BigDecimal[] real, BigDecimal[] imag, int startIndex, int dimension) {
         AbstractNDArray<T, T2> casted = (AbstractNDArray<T, T2>) me;
-        IntStream.range(0, real.length).parallel()
+        getIndexStream(real.length)
             .forEach(i -> {
                 int linearIndex = startIndex + i * ((AbstractNDArray<T,T2>)me).multipliers[dimension];
                 casted.setRealUnchecked(casted.wrapRealValue(real[i]), linearIndex);
@@ -436,11 +435,11 @@ public class CopyFromOperations<T, T2 extends Number> {
 
     protected void flatten(ComplexNDArray<T2> me, Object[] real, Object[] imag, int startIndex, int dimension) {
         if (real.getClass().equals(BigInteger[].class)) {
-            flatten(me, (BigInteger[]) real, (BigInteger[]) imag, startIndex, dimension);
+            flatten(me, (BigInteger[]) real, (BigInteger[]) imag, startIndex, dimension); // NOSONAR
             return;
         }
         if (real.getClass().equals(BigDecimal[].class)) {
-            flatten(me, (BigDecimal[]) real, (BigDecimal[]) imag, startIndex, dimension);
+            flatten(me, (BigDecimal[]) real, (BigDecimal[]) imag, startIndex, dimension); // NOSONAR
             return;
         }
         for (int i = 0; i < real.length; i++)
@@ -469,6 +468,11 @@ public class CopyFromOperations<T, T2 extends Number> {
             flatten(me, (BigDecimal[]) real, (BigDecimal[]) imag, startIndex, dimension);
         else
             flatten(me, (Object[]) real, (Object[]) imag, startIndex, dimension);
+    }
+
+    protected IntStream getIndexStream(int length) {
+        IntStream stream = IntStream.range(0, length);
+        return length > NDArrayUtils.PARALLEL_STREAM_THRESHOLD ? stream.parallel() : stream;
     }
 
     @SuppressWarnings("unchecked")

@@ -35,6 +35,26 @@ public class ComplexNDArrayMaskView<T extends Number> extends AbstractNDArrayMas
     }
 
     @Override
+    public ComplexNDArray<T> mapOnComplexSlices(BiConsumer<ComplexNDArray<T>,int[]> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
+    }
+
+    @Override
+    public ComplexNDArray<T> mapOnComplexSlices(BiFunction<ComplexNDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
+    }
+
+    @Override
+    public ComplexNDArray<T> applyOnComplexSlices(BiConsumer<ComplexNDArray<T>,int[]> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(this, func, iterationDims);
+    }
+
+    @Override
+    public ComplexNDArray<T> applyOnComplexSlices(BiFunction<ComplexNDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(this, func, iterationDims);
+    }
+
+    @Override
     public NDArray<T> real() {
         return streamLinearIndices()
             .mapToObj(this::getReal)

@@ -1,5 +1,8 @@
 package io.github.hakkelt.ndarrays.internal;
 
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+
 import io.github.hakkelt.ndarrays.NDArray;
 import io.github.hakkelt.ndarrays.NDArrayUtils;
 import io.github.hakkelt.ndarrays.Range;
@@ -20,6 +23,26 @@ abstract class AbstractNDArraySliceView<T, T2 extends Number> extends AbstractND
         this.shape = slicingExpression.resolveViewDims();
         this.multipliers = NDArrayUtils.calculateMultipliers(this.shape);
         this.dataLength = NDArrayUtils.calculateLength(this.shape);
+    }
+
+    @Override
+    public NDArray<T> mapOnSlices(BiConsumer<NDArray<T>,int[]> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
+    }
+
+    @Override
+    public NDArray<T> mapOnSlices(BiFunction<NDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
+    }
+
+    @Override
+    public NDArray<T> applyOnSlices(BiConsumer<NDArray<T>,int[]> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(this, func, iterationDims);
+    }
+
+    @Override
+    public NDArray<T> applyOnSlices(BiFunction<NDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(this, func, iterationDims);
     }
 
     @Override

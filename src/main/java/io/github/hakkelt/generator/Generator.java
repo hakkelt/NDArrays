@@ -74,7 +74,7 @@ public class Generator {
 
     private static boolean hasThisTypeOfAnnotation(List<JavaAnnotation> src, Class<?> annotationClass) {
         return src.stream()
-                .anyMatch(annot -> annot.getType().getCanonicalName().equals(annotationClass.getCanonicalName()));
+                .anyMatch(annot -> annot.getType().getSimpleName().equals(annotationClass.getSimpleName()));
     }
 
 }

@@ -1,10 +1,3 @@
-/**
- * ---------------------------------------------------------------------------------------------------------------------
- * This file was generated, so instead of changing it, consider updating the template:
- * src\test\java\io\github\hakkelt\ndarrays\template\TestRange.java
- * ---------------------------------------------------------------------------------------------------------------------
- */
-
 package io.github.hakkelt.ndarrays.basic;
 
 import static org.junit.Assert.assertThrows;
@@ -22,7 +15,7 @@ class TestRange {
     void testRangeToString() {
         assertEquals("2", new Range(2).toString());
         assertEquals("0:3", new Range(0, 3).toString());
-        assertEquals(":3", new Range(0, 1, 3, true, true, false).toString());
+        assertEquals("0:1:", new Range(0, 1, Range.END).toString());
         assertEquals("0:1:3", new Range(0, 1, 3).toString());
         assertEquals("0:2:3", new Range(0, 2, 3).toString());
         assertEquals("-1:-1:1", new Range(-1, -1, 1).toString());
@@ -30,12 +23,12 @@ class TestRange {
 
     @Test
     void testParsedRangeToString() {
-        assertEquals("2", Range.parseExpressions(new int[]{5}, 2)[0].toString());
-        assertEquals("0:3", Range.parseExpressions(new int[]{5}, "0:3")[0].toString());
-        assertEquals(":3", Range.parseExpressions(new int[]{5}, ":3")[0].toString());
-        assertEquals("0:1:3", Range.parseExpressions(new int[]{5}, "0:1:3")[0].toString());
-        assertEquals("0:2:3", Range.parseExpressions(new int[]{5}, "0:2:3")[0].toString());
-        assertEquals("-1:-1:1", Range.parseExpressions(new int[]{5}, "-1:-1:1")[0].toString());
+        assertEquals("2", Range.parseExpressions(2)[0].toString());
+        assertEquals("0:3", Range.parseExpressions("0:3")[0].toString());
+        assertEquals(":3", Range.parseExpressions(":3")[0].toString());
+        assertEquals("0:1:3", Range.parseExpressions("0:1:3")[0].toString());
+        assertEquals("0:2:3", Range.parseExpressions("0:2:3")[0].toString());
+        assertEquals("-1:-1:1", Range.parseExpressions("-1:-1:1")[0].toString());
     }
 
     @Test

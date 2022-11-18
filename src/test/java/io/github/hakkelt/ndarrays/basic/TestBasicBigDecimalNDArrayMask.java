@@ -203,12 +203,4 @@ class TestBasicBigDecimalNDArrayMask extends TestBase {
         assertEquals(masked.length() / 2 + masked.length() % 2, masked2.length());
     }
 
-    @Test
-    void testMaskInverseMask() {
-        NDArray<BigDecimal> mask2 = new BasicBigDecimalNDArray(
-                masked.map(value -> wrapToDouble(value) > 20 ? wrapToBigDecimal(1) : wrapToBigDecimal(0)));
-        NDArray<BigDecimal> masked2 = masked.inverseMask(mask2);
-        masked2.forEachSequential(value -> assertTrue(wrapToDouble(value) <= 20));
-    }
-
 }

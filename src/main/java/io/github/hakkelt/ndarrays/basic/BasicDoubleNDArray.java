@@ -21,7 +21,7 @@ import java.util.stream.Collector;
 /**
  * Reference implementation for the NDArray of double (double precision, 64 bit floating-point) values.
  */
-public final class BasicDoubleNDArray extends AbstractDoubleNDArray {
+public class BasicDoubleNDArray extends AbstractDoubleNDArray {
 
     protected double[] data;
 

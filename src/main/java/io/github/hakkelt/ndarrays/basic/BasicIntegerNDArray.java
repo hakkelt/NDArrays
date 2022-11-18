@@ -21,7 +21,7 @@ import java.util.stream.Collector;
 /**
  * Reference implementation for the NDArray of int (32 bit integer) values.
  */
-public final class BasicIntegerNDArray extends AbstractIntegerNDArray {
+public class BasicIntegerNDArray extends AbstractIntegerNDArray {
 
     protected int[] data;
 

@@ -3,9 +3,9 @@ package io.github.hakkelt.ndarrays;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.*;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -27,8 +27,7 @@ import io.github.hakkelt.ndarrays.internal.AccumulateOperators;
 public abstract class AbstractComplexNDArrayTemplate<T extends Number> extends  AbstractNDArray<Complex, T>
         implements ComplexNDArray<T> {
 
-    protected AbstractComplexNDArrayTemplate() {
-    }
+    protected AbstractComplexNDArrayTemplate() {}
 
     @Override
     public Class<?> dtype() {
@@ -37,7 +36,15 @@ public abstract class AbstractComplexNDArrayTemplate<T extends Number> extends  
 
     @Override
     public Class<?> dtype2() {
-        Type[] types = ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments();
+        Class<?> clazz = this.getClass();
+        Type superClass = clazz.getGenericSuperclass();
+        for (int i = 0; i < 50; i++) {
+            if (superClass instanceof ParameterizedType)
+                break;
+            clazz = clazz.getSuperclass();
+            superClass = clazz.getGenericSuperclass();
+        }
+        Type[] types = ((ParameterizedType) superClass).getActualTypeArguments();
         return (Class<?>) types[types.length - 1];
     }
 
@@ -128,6 +135,26 @@ public abstract class AbstractComplexNDArrayTemplate<T extends Number> extends  
     public ComplexNDArray<T> applyWithCartesianIndices(BiFunction<Complex,int[],Complex> func) {
         super.applyWithCartesianIndices(func);
         return this;
+    }
+
+    @Override
+    public ComplexNDArray<T> applyOnComplexSlices(BiConsumer<ComplexNDArray<T>,int[]> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(this, func, iterationDims);
+    }
+
+    @Override
+    public ComplexNDArray<T> applyOnComplexSlices(BiFunction<ComplexNDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(this, func, iterationDims);
+    }
+
+    @Override
+    public ComplexNDArray<T> mapOnComplexSlices(BiConsumer<ComplexNDArray<T>,int[]> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
+    }
+
+    @Override
+    public ComplexNDArray<T> mapOnComplexSlices(BiFunction<ComplexNDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
     }
 
     @Override

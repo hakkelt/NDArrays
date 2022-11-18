@@ -201,12 +201,4 @@ class TestBasicDoubleNDArrayMask extends TestBase {
         assertEquals(masked.length() / 2 + masked.length() % 2, masked2.length());
     }
 
-    @Test
-    void testMaskInverseMask() {
-        NDArray<Double> mask2 = new BasicDoubleNDArray(
-                masked.map(value -> wrapToDouble(value) > 20 ? wrapToDouble(1) : wrapToDouble(0)));
-        NDArray<Double> masked2 = masked.inverseMask(mask2);
-        masked2.forEachSequential(value -> assertTrue(wrapToDouble(value) <= 20));
-    }
-
 }

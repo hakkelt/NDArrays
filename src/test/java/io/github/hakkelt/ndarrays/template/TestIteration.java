@@ -97,7 +97,7 @@ class TestIteration extends TestBase {
     @Test
     @Replace(pattern = "array", replacements = {"slice", "reshaped", "pArray", "masked"})
     void testParallelStream() {
-        Byte sum = array.stream().parallel().reduce(wrapToByte(0), (acc, item) -> add(acc, item));
+        Byte sum = array.parallelStream().reduce(wrapToByte(0), (acc, item) -> add(acc, item));
         Byte acc = wrapToByte(0);
         for (int i = 0; i < array.length(); i++)
             acc = add(acc, array.get(i));
@@ -117,8 +117,8 @@ class TestIteration extends TestBase {
     @Test
     @Replace(pattern = "array", replacements = {"slice", "reshaped", "pArray", "masked"})
     void testParallelCollector() {
-        NDArray<Byte> increased = array.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Byte> increased = array.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicByteNDArray.getCollector(array.shape()));
         for (int i = 0; i < array.length(); i++)
             assertSpecializedEquals(add(array.get(i), 1), increased.get(i));
@@ -181,13 +181,6 @@ class TestIteration extends TestBase {
     void testForEach() {
         NDArray<Byte> array2 = array.similar().fill(1);
         array2.forEach(value -> assertSpecializedEquals(wrapToByte(1), value));
-    }
-
-    @Test
-    @Replace(pattern = "array", replacements = {"slice", "reshaped", "pArray", "masked"})
-    void testForEachSequential() {
-        int[] i = {0};
-        array.forEachSequential(value -> assertSpecializedEquals(array.get(i[0]++), value));
     }
 
     @Test

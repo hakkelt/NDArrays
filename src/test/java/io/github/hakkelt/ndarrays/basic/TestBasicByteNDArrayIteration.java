@@ -272,7 +272,7 @@ class TestBasicByteNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithArray() {
-        Byte sum = array.stream().parallel().reduce(wrapToByte(0), (acc, item) -> add(acc, item));
+        Byte sum = array.parallelStream().reduce(wrapToByte(0), (acc, item) -> add(acc, item));
         Byte acc = wrapToByte(0);
         for (int i = 0; i < array.length(); i++)
             acc = add(acc, array.get(i));
@@ -281,7 +281,7 @@ class TestBasicByteNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithSlice() {
-        Byte sum = slice.stream().parallel().reduce(wrapToByte(0), (acc, item) -> add(acc, item));
+        Byte sum = slice.parallelStream().reduce(wrapToByte(0), (acc, item) -> add(acc, item));
         Byte acc = wrapToByte(0);
         for (int i = 0; i < slice.length(); i++)
             acc = add(acc, slice.get(i));
@@ -290,7 +290,7 @@ class TestBasicByteNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithReshaped() {
-        Byte sum = reshaped.stream().parallel().reduce(wrapToByte(0), (acc, item) -> add(acc, item));
+        Byte sum = reshaped.parallelStream().reduce(wrapToByte(0), (acc, item) -> add(acc, item));
         Byte acc = wrapToByte(0);
         for (int i = 0; i < reshaped.length(); i++)
             acc = add(acc, reshaped.get(i));
@@ -299,7 +299,7 @@ class TestBasicByteNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithPArray() {
-        Byte sum = pArray.stream().parallel().reduce(wrapToByte(0), (acc, item) -> add(acc, item));
+        Byte sum = pArray.parallelStream().reduce(wrapToByte(0), (acc, item) -> add(acc, item));
         Byte acc = wrapToByte(0);
         for (int i = 0; i < pArray.length(); i++)
             acc = add(acc, pArray.get(i));
@@ -308,7 +308,7 @@ class TestBasicByteNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithMasked() {
-        Byte sum = masked.stream().parallel().reduce(wrapToByte(0), (acc, item) -> add(acc, item));
+        Byte sum = masked.parallelStream().reduce(wrapToByte(0), (acc, item) -> add(acc, item));
         Byte acc = wrapToByte(0);
         for (int i = 0; i < masked.length(); i++)
             acc = add(acc, masked.get(i));
@@ -362,8 +362,8 @@ class TestBasicByteNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithArray() {
-        NDArray<Byte> increased = array.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Byte> increased = array.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicByteNDArray.getCollector(array.shape()));
         for (int i = 0; i < array.length(); i++)
             assertSpecializedEquals(add(array.get(i), 1), increased.get(i));
@@ -371,8 +371,8 @@ class TestBasicByteNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithSlice() {
-        NDArray<Byte> increased = slice.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Byte> increased = slice.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicByteNDArray.getCollector(slice.shape()));
         for (int i = 0; i < slice.length(); i++)
             assertSpecializedEquals(add(slice.get(i), 1), increased.get(i));
@@ -380,8 +380,8 @@ class TestBasicByteNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithReshaped() {
-        NDArray<Byte> increased = reshaped.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Byte> increased = reshaped.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicByteNDArray.getCollector(reshaped.shape()));
         for (int i = 0; i < reshaped.length(); i++)
             assertSpecializedEquals(add(reshaped.get(i), 1), increased.get(i));
@@ -389,8 +389,8 @@ class TestBasicByteNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithPArray() {
-        NDArray<Byte> increased = pArray.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Byte> increased = pArray.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicByteNDArray.getCollector(pArray.shape()));
         for (int i = 0; i < pArray.length(); i++)
             assertSpecializedEquals(add(pArray.get(i), 1), increased.get(i));
@@ -398,8 +398,8 @@ class TestBasicByteNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithMasked() {
-        NDArray<Byte> increased = masked.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Byte> increased = masked.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicByteNDArray.getCollector(masked.shape()));
         for (int i = 0; i < masked.length(); i++)
             assertSpecializedEquals(add(masked.get(i), 1), increased.get(i));
@@ -663,36 +663,6 @@ class TestBasicByteNDArrayIteration extends TestBase {
     void testForEachWithMasked() {
         NDArray<Byte> array2 = masked.similar().fill(1);
         array2.forEach(value -> assertSpecializedEquals(wrapToByte(1), value));
-    }
-
-    @Test
-    void testForEachSequentialWithArray() {
-        int[] i = {0};
-        array.forEachSequential(value -> assertSpecializedEquals(array.get(i[0]++), value));
-    }
-
-    @Test
-    void testForEachSequentialWithSlice() {
-        int[] i = {0};
-        slice.forEachSequential(value -> assertSpecializedEquals(slice.get(i[0]++), value));
-    }
-
-    @Test
-    void testForEachSequentialWithReshaped() {
-        int[] i = {0};
-        reshaped.forEachSequential(value -> assertSpecializedEquals(reshaped.get(i[0]++), value));
-    }
-
-    @Test
-    void testForEachSequentialWithPArray() {
-        int[] i = {0};
-        pArray.forEachSequential(value -> assertSpecializedEquals(pArray.get(i[0]++), value));
-    }
-
-    @Test
-    void testForEachSequentialWithMasked() {
-        int[] i = {0};
-        masked.forEachSequential(value -> assertSpecializedEquals(masked.get(i[0]++), value));
     }
 
     @Test

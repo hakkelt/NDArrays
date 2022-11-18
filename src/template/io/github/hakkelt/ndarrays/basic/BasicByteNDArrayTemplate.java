@@ -26,7 +26,7 @@ import io.github.hakkelt.ndarrays.internal.RealNDArrayCollector;
     "BigInteger", "arbitrary precision integer" }, extraImports = "java.math.BigInteger")
 @Replacements(value = { "new BigDecimal[length()];        Arrays.fill(this.data, BigDecimal.ZERO);", "BigDecimal",
     "BigDecimal", "arbitrary precision floating-point" }, extraImports = "java.math.BigDecimal")
-public final class BasicByteNDArrayTemplate extends AbstractByteNDArray {
+public class BasicByteNDArrayTemplate extends AbstractByteNDArray {
     protected byte[] data;
 
     @SuppressWarnings("unused")

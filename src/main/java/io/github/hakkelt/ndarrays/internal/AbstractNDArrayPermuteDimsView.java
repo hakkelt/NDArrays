@@ -3,6 +3,8 @@ package io.github.hakkelt.ndarrays.internal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -12,6 +14,7 @@ import io.github.hakkelt.ndarrays.NDArrayUtils;
 abstract class AbstractNDArrayPermuteDimsView<T, T2 extends Number> extends AbstractNDArrayView<T,T2> {
 
     protected int[] dimsOrder;
+    protected int[] inverseDimsOrder;
 
     public int[] getDimsOrder() {
         return dimsOrder;
@@ -27,9 +30,32 @@ abstract class AbstractNDArrayPermuteDimsView<T, T2 extends Number> extends Abst
             this.parent = (AbstractNDArray<T, T2>) parent;
             this.dimsOrder = dimsOrder;
         }
+        this.inverseDimsOrder = new int[dimsOrder.length];
+        for (int i = 0; i < dimsOrder.length; i++)
+            this.inverseDimsOrder[dimsOrder[i]] = i;
         this.dataLength = parent.length();
         this.shape = permuteArray(this.parent.shape, this.dimsOrder);
         this.multipliers = NDArrayUtils.calculateMultipliers(this.shape);
+    }
+
+    @Override
+    public NDArray<T> mapOnSlices(BiConsumer<NDArray<T>,int[]> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
+    }
+
+    @Override
+    public NDArray<T> mapOnSlices(BiFunction<NDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
+    }
+
+    @Override
+    public NDArray<T> applyOnSlices(BiConsumer<NDArray<T>,int[]> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(this, func, iterationDims);
+    }
+
+    @Override
+    public NDArray<T> applyOnSlices(BiFunction<NDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(this, func, iterationDims);
     }
 
     @Override
@@ -40,7 +66,7 @@ abstract class AbstractNDArrayPermuteDimsView<T, T2 extends Number> extends Abst
     @Override
     protected T getUnchecked(int... indices) {
         NDArrayUtils.boundaryCheck(indices, shape);
-        return parent.getUnchecked(permuteArray(indices, dimsOrder));
+        return parent.getUnchecked(permuteArray(indices, inverseDimsOrder));
     }
 
     @Override
@@ -52,13 +78,13 @@ abstract class AbstractNDArrayPermuteDimsView<T, T2 extends Number> extends Abst
     @Override
     protected void setUnchecked(T value, int... indices) {
         NDArrayUtils.boundaryCheck(indices, shape);
-        parent.setUnchecked(value, permuteArray(indices, dimsOrder));
+        parent.setUnchecked(value, permuteArray(indices, inverseDimsOrder));
     }
 
     @Override
     protected String printItem(int index, String format) {
         int[] viewIndices = linearIndexToViewIndices(index);
-        int parentLinearIndex = NDArrayUtils.cartesianIndicesToLinearIndex(permuteArray(viewIndices, dimsOrder),
+        int parentLinearIndex = NDArrayUtils.cartesianIndicesToLinearIndex(permuteArray(viewIndices, inverseDimsOrder),
                 parent.multipliers);
         return parent.printItem(parentLinearIndex, format);
     }

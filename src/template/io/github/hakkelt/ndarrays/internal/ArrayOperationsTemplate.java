@@ -38,7 +38,7 @@ public class ArrayOperationsTemplate<T,T2 extends Number> {
     @Replacements({"divide", "divisors", "DIVIDE"})
     public NDArray<T> add(AbstractNDArray<T,T2> me, Object... addends) {
         checkDimensionMatchBeforeCombine(me, addends, "add");
-        return me.streamLinearIndices().parallel()
+        return me.streamLinearIndices()
             .mapToObj(i -> me.accumulateAtIndex(i, AccumulateOperators.ADD, addends))
             .collect(me.getCollectorInternal(me.shape));
     }
@@ -49,14 +49,14 @@ public class ArrayOperationsTemplate<T,T2 extends Number> {
     @Replacements({"divideInplace", "divisors", "DIVIDE"})
     public NDArray<T> addInplace(AbstractNDArray<T,T2> me, Object... addends) {
         checkDimensionMatchBeforeCombine(me, addends, "addInplace");
-        me.streamLinearIndices().parallel()
+        me.streamLinearIndices()
             .forEach(i -> me.set(me.accumulateAtIndex(i, AccumulateOperators.ADD, addends), i));
         return me;
     }
 
     @Replace(pattern = "double", replacements = "T")
     public NDArray<T> fill(AbstractNDArray<T,T2> me, double value) {
-        me.streamLinearIndices().parallel().forEach(i -> me.set(value, i));
+        me.streamLinearIndices().forEach(i -> me.set(value, i));
         return me;
     }
 
@@ -80,7 +80,7 @@ public class ArrayOperationsTemplate<T,T2 extends Number> {
 
     @Replace(pattern = "double", replacements = {"T2", "Complex"})
     public ComplexNDArray<T2> fill(ComplexNDArray<T2> me, double value) {
-        me.streamLinearIndices().parallel().forEach(i -> me.set(value, i));
+        me.streamLinearIndices().forEach(i -> me.set(value, i));
         return me;
     }
 

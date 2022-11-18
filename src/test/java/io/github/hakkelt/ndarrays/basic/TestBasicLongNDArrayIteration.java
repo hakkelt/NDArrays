@@ -272,7 +272,7 @@ class TestBasicLongNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithArray() {
-        Long sum = array.stream().parallel().reduce(wrapToLong(0), (acc, item) -> add(acc, item));
+        Long sum = array.parallelStream().reduce(wrapToLong(0), (acc, item) -> add(acc, item));
         Long acc = wrapToLong(0);
         for (int i = 0; i < array.length(); i++)
             acc = add(acc, array.get(i));
@@ -281,7 +281,7 @@ class TestBasicLongNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithSlice() {
-        Long sum = slice.stream().parallel().reduce(wrapToLong(0), (acc, item) -> add(acc, item));
+        Long sum = slice.parallelStream().reduce(wrapToLong(0), (acc, item) -> add(acc, item));
         Long acc = wrapToLong(0);
         for (int i = 0; i < slice.length(); i++)
             acc = add(acc, slice.get(i));
@@ -290,7 +290,7 @@ class TestBasicLongNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithReshaped() {
-        Long sum = reshaped.stream().parallel().reduce(wrapToLong(0), (acc, item) -> add(acc, item));
+        Long sum = reshaped.parallelStream().reduce(wrapToLong(0), (acc, item) -> add(acc, item));
         Long acc = wrapToLong(0);
         for (int i = 0; i < reshaped.length(); i++)
             acc = add(acc, reshaped.get(i));
@@ -299,7 +299,7 @@ class TestBasicLongNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithPArray() {
-        Long sum = pArray.stream().parallel().reduce(wrapToLong(0), (acc, item) -> add(acc, item));
+        Long sum = pArray.parallelStream().reduce(wrapToLong(0), (acc, item) -> add(acc, item));
         Long acc = wrapToLong(0);
         for (int i = 0; i < pArray.length(); i++)
             acc = add(acc, pArray.get(i));
@@ -308,7 +308,7 @@ class TestBasicLongNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithMasked() {
-        Long sum = masked.stream().parallel().reduce(wrapToLong(0), (acc, item) -> add(acc, item));
+        Long sum = masked.parallelStream().reduce(wrapToLong(0), (acc, item) -> add(acc, item));
         Long acc = wrapToLong(0);
         for (int i = 0; i < masked.length(); i++)
             acc = add(acc, masked.get(i));
@@ -362,8 +362,8 @@ class TestBasicLongNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithArray() {
-        NDArray<Long> increased = array.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Long> increased = array.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicLongNDArray.getCollector(array.shape()));
         for (int i = 0; i < array.length(); i++)
             assertSpecializedEquals(add(array.get(i), 1), increased.get(i));
@@ -371,8 +371,8 @@ class TestBasicLongNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithSlice() {
-        NDArray<Long> increased = slice.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Long> increased = slice.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicLongNDArray.getCollector(slice.shape()));
         for (int i = 0; i < slice.length(); i++)
             assertSpecializedEquals(add(slice.get(i), 1), increased.get(i));
@@ -380,8 +380,8 @@ class TestBasicLongNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithReshaped() {
-        NDArray<Long> increased = reshaped.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Long> increased = reshaped.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicLongNDArray.getCollector(reshaped.shape()));
         for (int i = 0; i < reshaped.length(); i++)
             assertSpecializedEquals(add(reshaped.get(i), 1), increased.get(i));
@@ -389,8 +389,8 @@ class TestBasicLongNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithPArray() {
-        NDArray<Long> increased = pArray.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Long> increased = pArray.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicLongNDArray.getCollector(pArray.shape()));
         for (int i = 0; i < pArray.length(); i++)
             assertSpecializedEquals(add(pArray.get(i), 1), increased.get(i));
@@ -398,8 +398,8 @@ class TestBasicLongNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithMasked() {
-        NDArray<Long> increased = masked.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Long> increased = masked.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicLongNDArray.getCollector(masked.shape()));
         for (int i = 0; i < masked.length(); i++)
             assertSpecializedEquals(add(masked.get(i), 1), increased.get(i));
@@ -663,36 +663,6 @@ class TestBasicLongNDArrayIteration extends TestBase {
     void testForEachWithMasked() {
         NDArray<Long> array2 = masked.similar().fill(1);
         array2.forEach(value -> assertSpecializedEquals(wrapToLong(1), value));
-    }
-
-    @Test
-    void testForEachSequentialWithArray() {
-        int[] i = {0};
-        array.forEachSequential(value -> assertSpecializedEquals(array.get(i[0]++), value));
-    }
-
-    @Test
-    void testForEachSequentialWithSlice() {
-        int[] i = {0};
-        slice.forEachSequential(value -> assertSpecializedEquals(slice.get(i[0]++), value));
-    }
-
-    @Test
-    void testForEachSequentialWithReshaped() {
-        int[] i = {0};
-        reshaped.forEachSequential(value -> assertSpecializedEquals(reshaped.get(i[0]++), value));
-    }
-
-    @Test
-    void testForEachSequentialWithPArray() {
-        int[] i = {0};
-        pArray.forEachSequential(value -> assertSpecializedEquals(pArray.get(i[0]++), value));
-    }
-
-    @Test
-    void testForEachSequentialWithMasked() {
-        int[] i = {0};
-        masked.forEachSequential(value -> assertSpecializedEquals(masked.get(i[0]++), value));
     }
 
     @Test

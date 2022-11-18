@@ -21,7 +21,7 @@ import java.util.stream.Collector;
 /**
  * Reference implementation for the NDArray of byte (8 bit integer) values.
  */
-public final class BasicByteNDArray extends AbstractByteNDArray {
+public class BasicByteNDArray extends AbstractByteNDArray {
 
     protected byte[] data;
 

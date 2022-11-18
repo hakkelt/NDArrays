@@ -22,7 +22,7 @@ import java.util.stream.Collector;
 /**
  * Reference implementation for the NDArray of BigInteger (arbitrary precision integer) values.
  */
-public final class BasicBigIntegerNDArray extends AbstractBigIntegerNDArray {
+public class BasicBigIntegerNDArray extends AbstractBigIntegerNDArray {
 
     protected BigInteger[] data;
 

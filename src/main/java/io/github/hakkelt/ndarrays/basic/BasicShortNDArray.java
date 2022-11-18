@@ -21,7 +21,7 @@ import java.util.stream.Collector;
 /**
  * Reference implementation for the NDArray of short (16 bit integer) values.
  */
-public final class BasicShortNDArray extends AbstractShortNDArray {
+public class BasicShortNDArray extends AbstractShortNDArray {
 
     protected short[] data;
 

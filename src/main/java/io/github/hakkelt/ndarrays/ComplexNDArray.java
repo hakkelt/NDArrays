@@ -11,6 +11,7 @@ import io.github.hakkelt.ndarrays.internal.ArrayOperations;
 import io.github.hakkelt.ndarrays.internal.CopyFromOperations;
 import io.github.hakkelt.ndarrays.internal.ViewOperations;
 
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -332,6 +333,30 @@ public interface ComplexNDArray<T extends Number> extends NDArray<Complex> {
     @Override
     public ComplexNDArray<T> applyWithCartesianIndices(BiFunction<Complex,int[],Complex> func);
 
+    /**
+     * Apply the given function to each slices of the array that overrides each entry with the calculated new values.
+     * 
+     * Please note that slices might not be processed in a sequential order!
+     * 
+     * @param func function that receives the value of the current entry and its Cartesian coordinate, and modifies the
+     *            passed NDArray
+     * @param iterationDims dimensions along which iteration is performed
+     * @return itself after the update
+     */
+    public ComplexNDArray<T> applyOnComplexSlices(BiConsumer<ComplexNDArray<T>,int[]> func, int... iterationDims);
+
+    /**
+     * Apply the given function to each slices of the array, and override each entry with the returned slice.
+     * 
+     * Please note that slices might not be processed in a sequential order!
+     * 
+     * @param func function that receives the value of the current entry and its Cartesian coordinate, and returns a
+     *            slice from which values are copied to original array
+     * @param iterationDims dimensions along which iteration is performed
+     * @return itself after the update
+     */
+    public ComplexNDArray<T> applyOnComplexSlices(BiFunction<ComplexNDArray<T>,int[],NDArray<?>> func, int... iterationDims);
+
     @Override
     public default ComplexNDArray<T> map(UnaryOperator<Complex> func) {
         ComplexNDArray<T> newInstance = copy();
@@ -352,6 +377,30 @@ public interface ComplexNDArray<T extends Number> extends NDArray<Complex> {
         newInstance.applyWithCartesianIndices(func);
         return newInstance;
     }
+
+    /**
+     * Apply the given function to each slices of the array, and create a new NDArray with the calculated new values.
+     * 
+     * Please note that slices might not be processed in a sequential order!
+     * 
+     * @param func function that receives slice and its Cartesian coordinate along the iteration dimensions, and overwrites
+     *            the values in the slice with the calculated new values
+     * @param iterationDims dimensions along which iteration is performed
+     * @return the new NDArray with the calculated new values
+     */
+    public ComplexNDArray<T> mapOnComplexSlices(BiConsumer<ComplexNDArray<T>,int[]> func, int... iterationDims);
+
+    /**
+     * Apply the given function to each slices of the array, and create a new NDArray with the calculated new values.
+     * 
+     * Please note that slices might not be processed in a sequential order!
+     * 
+     * @param func function that receives slice and its Cartesian coordinate along the iteration dimensions, and returns
+     *            a new array with the same size as the slice
+     * @param iterationDims dimensions along which iteration is performed
+     * @return the new NDArray with the calculated new values
+     */
+    public ComplexNDArray<T> mapOnComplexSlices(BiFunction<ComplexNDArray<T>,int[],NDArray<?>> func, int... iterationDims);
 
     /**
      * Returns a new array holding the real part of the array

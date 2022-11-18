@@ -9,6 +9,11 @@ public class Errors {
     protected Errors() {}
     
     /**
+     * Cannot find secondary data type (precision)!
+     */
+    public static final String CANNOT_FIND_DTYPE2 =
+        "Cannot find secondary data type (precision)!";
+    /**
      * Type of the two input arrays must be the same!
      */
     public static final String COPYFROM_INPUT_TYPE_DIFERS =
@@ -102,7 +107,7 @@ public class Errors {
      * Axis %d cannot be selected
      */
     public static final String CANNOT_SELECT_DIM_NEGATIVE =
-        "Axis %d cannot be selected";
+        "Axis %d cannot be selected!";
     /**
      * Axis %d cannot be selected because the array has only %d dimensions
      */
@@ -112,12 +117,17 @@ public class Errors {
      * Axis %d cannot be dropped
      */
     public static final String CANNOT_DROP_DIM_NEGATIVE =
-        "Axis %d cannot be dropped";
+        "Axis %d cannot be dropped!";
+    /**
+     * Iteration dimensions must be provided in increasing order and no duplicates allowed!
+     */
+    public static final String ITERATION_DIMENSIONS_MUST_BE_INCREASING = 
+        "Iteration dimensions must be provided in increasing order and no duplicates allowed!";
     /**
      * Axis %d cannot be dropped because the array has only %d dimensions
      */
     public static final String CANNOT_DROP_DIM_OVERFLOW =
-        "Axis %d cannot be dropped because the array has only %d dimensions";
+        "Axis %d cannot be dropped because the array has only %d dimensions!";
     /**
      * Reading values from an array of type %s is not supported!
      */

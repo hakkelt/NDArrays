@@ -17,6 +17,15 @@ public class ComplexNDArrayReshapeViewTemplate<T extends Number> extends Abstrac
     public ComplexNDArrayReshapeViewTemplate(NDArray<Complex> parent, int ...newShape) {
         super(parent, newShape);
     }
+
+    @Patterns({"mapOnComplexSlices", "BiConsumer<ComplexNDArray<T>,int[]>", "copy()"})
+    @Replacements({"mapOnComplexSlices", "BiFunction<ComplexNDArray<T>,int[],NDArray<?>>", "copy()"})
+    @Replacements({"applyOnComplexSlices", "BiConsumer<ComplexNDArray<T>,int[]>", "this"})
+    @Replacements({"applyOnComplexSlices", "BiFunction<ComplexNDArray<T>,int[],NDArray<?>>", "this"})
+    @Override
+    public ComplexNDArray<T> mapOnComplexSlices(BiConsumer<ComplexNDArray<T>,int[]> func, int... iterationDims) {
+        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
+    }
     
     @Override
     @Patterns({"real", "this::getReal"})

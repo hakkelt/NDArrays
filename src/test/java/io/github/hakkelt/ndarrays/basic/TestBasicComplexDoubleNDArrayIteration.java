@@ -273,7 +273,7 @@ class TestBasicComplexDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithArray() {
-        Complex sum = array.stream().parallel().reduce(wrapToComplex(0), (acc, item) -> add(acc, item));
+        Complex sum = array.parallelStream().reduce(wrapToComplex(0), (acc, item) -> add(acc, item));
         Complex acc = wrapToComplex(0);
         for (int i = 0; i < array.length(); i++)
             acc = add(acc, array.get(i));
@@ -282,7 +282,7 @@ class TestBasicComplexDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithSlice() {
-        Complex sum = slice.stream().parallel().reduce(wrapToComplex(0), (acc, item) -> add(acc, item));
+        Complex sum = slice.parallelStream().reduce(wrapToComplex(0), (acc, item) -> add(acc, item));
         Complex acc = wrapToComplex(0);
         for (int i = 0; i < slice.length(); i++)
             acc = add(acc, slice.get(i));
@@ -291,7 +291,7 @@ class TestBasicComplexDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithReshaped() {
-        Complex sum = reshaped.stream().parallel().reduce(wrapToComplex(0), (acc, item) -> add(acc, item));
+        Complex sum = reshaped.parallelStream().reduce(wrapToComplex(0), (acc, item) -> add(acc, item));
         Complex acc = wrapToComplex(0);
         for (int i = 0; i < reshaped.length(); i++)
             acc = add(acc, reshaped.get(i));
@@ -300,7 +300,7 @@ class TestBasicComplexDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithPArray() {
-        Complex sum = pArray.stream().parallel().reduce(wrapToComplex(0), (acc, item) -> add(acc, item));
+        Complex sum = pArray.parallelStream().reduce(wrapToComplex(0), (acc, item) -> add(acc, item));
         Complex acc = wrapToComplex(0);
         for (int i = 0; i < pArray.length(); i++)
             acc = add(acc, pArray.get(i));
@@ -309,7 +309,7 @@ class TestBasicComplexDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelStreamWithMasked() {
-        Complex sum = masked.stream().parallel().reduce(wrapToComplex(0), (acc, item) -> add(acc, item));
+        Complex sum = masked.parallelStream().reduce(wrapToComplex(0), (acc, item) -> add(acc, item));
         Complex acc = wrapToComplex(0);
         for (int i = 0; i < masked.length(); i++)
             acc = add(acc, masked.get(i));
@@ -363,8 +363,8 @@ class TestBasicComplexDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithArray() {
-        NDArray<Complex> increased = array.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Complex> increased = array.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicComplexDoubleNDArray.getCollector(array.shape()));
         for (int i = 0; i < array.length(); i++)
             assertSpecializedEquals(add(array.get(i), 1), increased.get(i));
@@ -372,8 +372,8 @@ class TestBasicComplexDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithSlice() {
-        NDArray<Complex> increased = slice.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Complex> increased = slice.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicComplexDoubleNDArray.getCollector(slice.shape()));
         for (int i = 0; i < slice.length(); i++)
             assertSpecializedEquals(add(slice.get(i), 1), increased.get(i));
@@ -381,8 +381,8 @@ class TestBasicComplexDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithReshaped() {
-        NDArray<Complex> increased = reshaped.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Complex> increased = reshaped.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicComplexDoubleNDArray.getCollector(reshaped.shape()));
         for (int i = 0; i < reshaped.length(); i++)
             assertSpecializedEquals(add(reshaped.get(i), 1), increased.get(i));
@@ -390,8 +390,8 @@ class TestBasicComplexDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithPArray() {
-        NDArray<Complex> increased = pArray.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Complex> increased = pArray.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicComplexDoubleNDArray.getCollector(pArray.shape()));
         for (int i = 0; i < pArray.length(); i++)
             assertSpecializedEquals(add(pArray.get(i), 1), increased.get(i));
@@ -399,8 +399,8 @@ class TestBasicComplexDoubleNDArrayIteration extends TestBase {
 
     @Test
     void testParallelCollectorWithMasked() {
-        NDArray<Complex> increased = masked.stream().parallel()
-        .map(value -> add(value, 1))
+        NDArray<Complex> increased = masked.parallelStream()
+            .map(value -> add(value, 1))
             .collect(BasicComplexDoubleNDArray.getCollector(masked.shape()));
         for (int i = 0; i < masked.length(); i++)
             assertSpecializedEquals(add(masked.get(i), 1), increased.get(i));
@@ -664,36 +664,6 @@ class TestBasicComplexDoubleNDArrayIteration extends TestBase {
     void testForEachWithMasked() {
         NDArray<Complex> array2 = masked.similar().fill(1);
         array2.forEach(value -> assertSpecializedEquals(wrapToComplex(1), value));
-    }
-
-    @Test
-    void testForEachSequentialWithArray() {
-        int[] i = {0};
-        array.forEachSequential(value -> assertSpecializedEquals(array.get(i[0]++), value));
-    }
-
-    @Test
-    void testForEachSequentialWithSlice() {
-        int[] i = {0};
-        slice.forEachSequential(value -> assertSpecializedEquals(slice.get(i[0]++), value));
-    }
-
-    @Test
-    void testForEachSequentialWithReshaped() {
-        int[] i = {0};
-        reshaped.forEachSequential(value -> assertSpecializedEquals(reshaped.get(i[0]++), value));
-    }
-
-    @Test
-    void testForEachSequentialWithPArray() {
-        int[] i = {0};
-        pArray.forEachSequential(value -> assertSpecializedEquals(pArray.get(i[0]++), value));
-    }
-
-    @Test
-    void testForEachSequentialWithMasked() {
-        int[] i = {0};
-        masked.forEachSequential(value -> assertSpecializedEquals(masked.get(i[0]++), value));
     }
 
     @Test

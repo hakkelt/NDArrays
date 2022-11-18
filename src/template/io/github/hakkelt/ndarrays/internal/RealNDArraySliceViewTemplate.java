@@ -10,7 +10,7 @@ import io.github.hakkelt.ndarrays.*;
 @ClassTemplate(outputDirectory = "main/java/io/github/hakkelt/ndarrays/internal", newName = "RealNDArraySliceView")
 public class RealNDArraySliceViewTemplate<T extends Number> extends AbstractNDArraySliceView<T,T> implements RealNDArray<T> {
 
-    public RealNDArraySliceViewTemplate(NDArray<T> parent, Range[] slicingExpressions) {
+    public RealNDArraySliceViewTemplate(NDArray<T> parent, NormalizedRange[] slicingExpressions) {
         super(parent, slicingExpressions);
     }
 

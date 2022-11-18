@@ -65,7 +65,7 @@ For a complete list of features, please refer to the [javadoc documentation](htt
     <dependency>
         <groupId>io.github.hakkelt</groupId>
         <artifactId>ndarrays</artifactId>
-        <version>2.0</version>
+        <version>2.1.2</version>
     </dependency>
     ...
 </dependencies>

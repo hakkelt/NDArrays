@@ -25,7 +25,7 @@ import org.apache.commons.math3.complex.Complex;
  * Reference implementation for the NDArray of complex double (single-precision,
  * 32 bit doubleing point) values.
  */
-public final class BasicComplexDoubleNDArray extends AbstractComplexNDArray<Double> {
+public class BasicComplexDoubleNDArray extends AbstractComplexNDArray<Double> {
 
     protected double[] data;
 
@@ -350,7 +350,8 @@ public final class BasicComplexDoubleNDArray extends AbstractComplexNDArray<Doub
 
     @Override
     protected Complex getUnchecked(int linearIndex) {
-        return new Complex(getRealUnchecked(linearIndex), getImagUnchecked(linearIndex));
+        int pos = linearIndex * 2;
+        return new Complex(data[pos], data[pos + 1]);
     }
 
     @Override
@@ -380,8 +381,9 @@ public final class BasicComplexDoubleNDArray extends AbstractComplexNDArray<Doub
 
     @Override
     protected void setUnchecked(Complex value, int linearIndex) {
-        setRealUnchecked(wrapRealValue(value.getReal()), linearIndex);
-        setImagUnchecked(wrapRealValue(value.getImaginary()), linearIndex);
+        int pos = linearIndex * 2;
+        data[pos] = value.getReal();
+        data[pos + 1] = value.getImaginary();
     }
 
     @Override

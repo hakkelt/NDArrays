@@ -201,12 +201,4 @@ class TestBasicComplexFloatNDArrayMask extends TestBase {
         assertEquals(masked.length() / 2 + masked.length() % 2, masked2.length());
     }
 
-    @Test
-    void testMaskInverseMask() {
-        NDArray<Complex> mask2 = new BasicComplexFloatNDArray(
-                masked.map(value -> value.getReal() > 20 ? wrapToComplex(1) : wrapToComplex(0)));
-        NDArray<Complex> masked2 = masked.inverseMask(mask2);
-        masked2.forEachSequential(value -> assertTrue(value.getReal() <= 20));
-    }
-
 }
