@@ -74,7 +74,7 @@ class TestBasicBigDecimalNDArrayMask extends TestBase {
     @Test
     void testcontentToString() {
         String str = masked.contentToString();
-        String numberFormat = "%10.5e\t";
+        String numberFormat = "%8.3e\t";
         String line;
         if (masked.dtype() != Complex.class) {
             line = masked.streamLinearIndices()

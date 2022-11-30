@@ -24,19 +24,19 @@ import io.github.hakkelt.ndarrays.internal.*;
 @Replacements({ "BasicLongNDArray", "NDArrayView<Long>", "Long", "wrapToDouble(value)", "BasicShortNDArray",
         "RealNDArrayReshapeView", "%6d" })
 @Replacements({ "BasicFloatNDArray", "NDArrayView<Float>", "Float", "wrapToDouble(value)", "BasicLongNDArray",
-        "RealNDArrayReshapeView", "%10.5e" })
+        "RealNDArrayReshapeView", "%8.3e" })
 @Replacements({ "BasicDoubleNDArray", "NDArrayView<Double>", "Double", "wrapToDouble(value)", "BasicLongNDArray",
-        "RealNDArrayReshapeView", "%10.5e" })
+        "RealNDArrayReshapeView", "%8.3e" })
 @Replacements(value = { "BasicBigIntegerNDArray", "NDArrayView<BigInteger>", "BigInteger", "wrapToDouble(value)",
         "BasicLongNDArray", "RealNDArrayReshapeView", "%6d" }, extraImports = "java.math.BigInteger")
 @Replacements(value = { "BasicBigDecimalNDArray", "NDArrayView<BigDecimal>", "BigDecimal", "wrapToDouble(value)",
-        "BasicLongNDArray", "RealNDArrayReshapeView", "%10.5e" }, extraImports = "java.math.BigDecimal")
+        "BasicLongNDArray", "RealNDArrayReshapeView", "%8.3e" }, extraImports = "java.math.BigDecimal")
 @Replacements(value = { "BasicComplexFloatNDArray", "NDArrayView<Complex Float>", "Complex", "value.getReal()",
         "BasicComplexDoubleNDArray", "ComplexNDArrayReshapeView",
-        "%10.5e+%10.5ei" }, extraImports = "org.apache.commons.math3.complex.Complex")
+        "%8.3e+%8.3ei" }, extraImports = "org.apache.commons.math3.complex.Complex")
 @Replacements(value = { "BasicComplexDoubleNDArray", "NDArrayView<Complex Double>", "Complex", "value.getReal()",
         "BasicComplexFloatNDArray", "ComplexNDArrayReshapeView",
-        "%10.5e+%10.5ei" }, extraImports = "org.apache.commons.math3.complex.Complex")
+        "%8.3e+%8.3ei" }, extraImports = "org.apache.commons.math3.complex.Complex")
 class TestMask extends TestBase {
     NDArray<Byte> array, masked;
     NDArray<Byte> mask;

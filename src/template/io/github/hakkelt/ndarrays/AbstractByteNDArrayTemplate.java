@@ -28,6 +28,11 @@ public abstract class AbstractByteNDArrayTemplate extends AbstractRealNDArray<By
     }
 
     @Override
+    protected Byte oneT() {
+        return Byte.valueOf((byte) 1);
+    }
+
+    @Override
     protected Byte wrapValue(Number value) {
         return Byte.valueOf(value.byteValue());
     }

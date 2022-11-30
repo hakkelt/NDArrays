@@ -338,7 +338,7 @@ class TestBasicFloatNDArraySlice extends TestBase {
     @Test
     void testcontentToString() {
         String str = slice.contentToString();
-        String lineFormat = "%10.5e\t%10.5e\t%10.5e\t%n";
+        String lineFormat = "%8.3e\t%8.3e\t%8.3e\t%n";
         String expected;
         if (!array.dtype().equals(Complex.class)) {
             expected = new StringBuilder()

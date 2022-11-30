@@ -49,7 +49,7 @@ class TestFunctions extends TestBase {
         String str = array.contentToString();
         String firstLine = array.getNamePrefix() + " NDArray<Byte>(4 × 5 × 3)" + System.lineSeparator();
         if (array.dtype().equals(Float.class) || array.dtype().equals(Double.class) || array.dtype().equals(BigDecimal.class)) {
-            String lineFormat = "%10.5e\t%10.5e\t%10.5e\t%10.5e\t%10.5e\t%n";
+            String lineFormat = "%8.3e\t%8.3e\t%8.3e\t%8.3e\t%8.3e\t%n";
             String expected = new StringBuilder()
                 .append(firstLine)
                 .append("[:, :, 0] =" + System.lineSeparator())
@@ -73,7 +73,7 @@ class TestFunctions extends TestBase {
                 .toString();
             assertEquals(expected, str);
         }else if (array.dtype().equals(Complex.class)) {
-            String lineFormat = "%10.5e+%10.5ei\t%10.5e+%10.5ei\t%10.5e+%10.5ei\t%10.5e+%10.5ei\t%10.5e+%10.5ei\t%n";
+            String lineFormat = "%8.3e+%8.3ei\t%8.3e+%8.3ei\t%8.3e+%8.3ei\t%8.3e+%8.3ei\t%8.3e+%8.3ei\t%n";
             String expected = new StringBuilder()
                 .append(firstLine)
                 .append("[:, :, 0] =" + System.lineSeparator())

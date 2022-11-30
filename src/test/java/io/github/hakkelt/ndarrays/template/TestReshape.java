@@ -18,16 +18,16 @@ import io.github.hakkelt.ndarrays.internal.*;
 @Replacements({ "BasicShortNDArray", "NDArrayView<Short>", "Short", "BasicLongNDArray", "RealNDArrayReshapeView", "%6d" })
 @Replacements({ "BasicIntegerNDArray", "NDArrayView<Integer>", "Integer", "BasicLongNDArray", "RealNDArrayReshapeView", "%6d" })
 @Replacements({ "BasicLongNDArray", "NDArrayView<Long>", "Long", "BasicShortNDArray", "RealNDArrayReshapeView", "%6d" })
-@Replacements({ "BasicFloatNDArray", "NDArrayView<Float>", "Float", "BasicLongNDArray", "RealNDArrayReshapeView", "%10.5e" })
-@Replacements({ "BasicDoubleNDArray", "NDArrayView<Double>", "Double", "BasicLongNDArray", "RealNDArrayReshapeView", "%10.5e" })
+@Replacements({ "BasicFloatNDArray", "NDArrayView<Float>", "Float", "BasicLongNDArray", "RealNDArrayReshapeView", "%8.3e" })
+@Replacements({ "BasicDoubleNDArray", "NDArrayView<Double>", "Double", "BasicLongNDArray", "RealNDArrayReshapeView", "%8.3e" })
 @Replacements(value = { "BasicBigIntegerNDArray", "NDArrayView<BigInteger>", "BigInteger", "BasicLongNDArray", "RealNDArrayReshapeView",
         "%6d" }, extraImports = "java.math.BigInteger")
 @Replacements(value = { "BasicBigDecimalNDArray", "NDArrayView<BigDecimal>", "BigDecimal", "BasicLongNDArray", "RealNDArrayReshapeView",
-        "%10.5e" }, extraImports = "java.math.BigDecimal")
+        "%8.3e" }, extraImports = "java.math.BigDecimal")
 @Replacements(value = { "BasicComplexFloatNDArray", "NDArrayView<Complex Float>", "Complex", "BasicComplexDoubleNDArray", "ComplexNDArrayReshapeView",
-        "%10.5e+%10.5ei" }, extraImports = "org.apache.commons.math3.complex.Complex")
+        "%8.3e+%8.3ei" }, extraImports = "org.apache.commons.math3.complex.Complex")
 @Replacements(value = { "BasicComplexDoubleNDArray", "NDArrayView<Complex Double>", "Complex", "BasicComplexFloatNDArray", "ComplexNDArrayReshapeView",
-        "%10.5e+%10.5ei" }, extraImports = "org.apache.commons.math3.complex.Complex")
+        "%8.3e+%8.3ei" }, extraImports = "org.apache.commons.math3.complex.Complex")
 class TestReshape extends TestBase {
     NDArray<Byte> arrayOriginal;
     NDArray<Byte> array;

@@ -72,7 +72,7 @@ class TestBasicComplexFloatNDArrayMask extends TestBase {
     @Test
     void testcontentToString() {
         String str = masked.contentToString();
-        String numberFormat = "%10.5e+%10.5ei\t";
+        String numberFormat = "%8.3e+%8.3ei\t";
         String line;
         if (masked.dtype() != Complex.class) {
             line = masked.streamLinearIndices()

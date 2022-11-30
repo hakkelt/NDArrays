@@ -24,6 +24,11 @@ public abstract class AbstractIntegerNDArray extends AbstractRealNDArray<Integer
     }
 
     @Override
+    protected Integer oneT() {
+        return Integer.valueOf((int) 1);
+    }
+
+    @Override
     protected Integer wrapValue(Number value) {
         return Integer.valueOf(value.intValue());
     }

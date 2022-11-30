@@ -10,9 +10,6 @@ package io.github.hakkelt.ndarrays.internal;
 import io.github.hakkelt.ndarrays.*;
 
 import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.apache.commons.math3.complex.Complex;
 
@@ -21,48 +18,24 @@ import org.apache.commons.math3.complex.Complex;
  */
 public class ArrayOperations<T, T2 extends Number> {
 
-    public NDArray<T> sum(AbstractNDArray<T,T2> me, int... selectedDims) {
-        Set<Integer> dimSelection = IntStream.of(selectedDims).boxed().collect(Collectors.toSet());
-        Object[] expressions = IntStream.range(0, me.ndim())
-                .mapToObj(i -> dimSelection.contains(i) ? ":" : 0).toArray();
-        int[] remainingDimsIndices = me.calculateRemainingDims(selectedDims);
-        int[] remainingDims = IntStream.of(remainingDimsIndices).map(me::shape).toArray();
-        return IntStream.range(0, NDArrayUtils.calculateLength(remainingDims))
-            .mapToObj(i -> {
-                T value = me.slice(expressions).sum();
-                if (i < NDArrayUtils.calculateLength(remainingDims) - 1)
-                    me.incrementSlicingExpression(expressions, 0, remainingDimsIndices);
-                return value;
-            })
-            .collect(me.getCollectorInternal(remainingDims));
-    }
-
     public NDArray<T> add(AbstractNDArray<T,T2> me, Object... addends) {
         checkDimensionMatchBeforeCombine(me, addends, "add");
-        return me.streamLinearIndices()
-            .mapToObj(i -> me.accumulateAtIndex(i, AccumulateOperators.ADD, addends))
-            .collect(me.getCollectorInternal(me.shape));
+        return me.similar().fillUsingLinearIndices(i -> me.accumulateAtIndex(i, AccumulateOperators.ADD, addends));
     }
 
     public NDArray<T> subtract(AbstractNDArray<T,T2> me, Object... substrahends) {
         checkDimensionMatchBeforeCombine(me, substrahends, "subtract");
-        return me.streamLinearIndices()
-            .mapToObj(i -> me.accumulateAtIndex(i, AccumulateOperators.SUBTRACT, substrahends))
-            .collect(me.getCollectorInternal(me.shape));
+        return me.similar().fillUsingLinearIndices(i -> me.accumulateAtIndex(i, AccumulateOperators.SUBTRACT, substrahends));
     }
 
     public NDArray<T> multiply(AbstractNDArray<T,T2> me, Object... multiplicands) {
         checkDimensionMatchBeforeCombine(me, multiplicands, "multiply");
-        return me.streamLinearIndices()
-            .mapToObj(i -> me.accumulateAtIndex(i, AccumulateOperators.MULTIPLY, multiplicands))
-            .collect(me.getCollectorInternal(me.shape));
+        return me.similar().fillUsingLinearIndices(i -> me.accumulateAtIndex(i, AccumulateOperators.MULTIPLY, multiplicands));
     }
 
     public NDArray<T> divide(AbstractNDArray<T,T2> me, Object... divisors) {
         checkDimensionMatchBeforeCombine(me, divisors, "divide");
-        return me.streamLinearIndices()
-            .mapToObj(i -> me.accumulateAtIndex(i, AccumulateOperators.DIVIDE, divisors))
-            .collect(me.getCollectorInternal(me.shape));
+        return me.similar().fillUsingLinearIndices(i -> me.accumulateAtIndex(i, AccumulateOperators.DIVIDE, divisors));
     }
 
     public NDArray<T> addInplace(AbstractNDArray<T,T2> me, Object... addends) {
@@ -101,11 +74,6 @@ public class ArrayOperations<T, T2 extends Number> {
     public NDArray<T> fill(AbstractNDArray<T,T2> me, T value) {
         me.streamLinearIndices().forEach(i -> me.set(value, i));
         return me;
-    }
-
-    @SuppressWarnings("unchecked")
-    public ComplexNDArray<T2> sum(ComplexNDArray<T2> me, int... selectedDims) {
-        return (ComplexNDArray<T2>)sum((AbstractNDArray<T,T2>)me, selectedDims);
     }
 
     @SuppressWarnings("unchecked")

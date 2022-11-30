@@ -379,18 +379,6 @@ public interface NDArray<T> extends Iterable<T> {
     public NDArray<T> applyWithCartesianIndices(BiFunction<T,int[],T> func);
 
     /**
-     * Apply the given function to each slices of the array that overrides each entry with the calculated new values.
-     * 
-     * Please note that slices might not be processed in a sequential order!
-     * 
-     * @param func function that receives the value of the current entry and its Cartesian coordinate, and modifies the
-     *            passed NDArray
-     * @param iterationDims dimensions along which iteration is performed
-     * @return itself after the update
-     */
-    public NDArray<T> applyOnSlices(BiConsumer<NDArray<T>,int[]> func, int... iterationDims);
-
-    /**
      * Apply the given function to each slices of the array, and override each entry with the returned slice.
      * 
      * Please note that slices might not be processed in a sequential order!
@@ -432,18 +420,6 @@ public interface NDArray<T> extends Iterable<T> {
      * @return the new NDArray with the calculated new values
      */
     public NDArray<T> mapWithCartesianIndices(BiFunction<T,int[],T> func);
-
-    /**
-     * Apply the given function to each slices of the array, and create a new NDArray with the calculated new values.
-     * 
-     * Please note that slices might not be processed in a sequential order!
-     * 
-     * @param func function that receives slice and its Cartesian coordinate along the iteration dimensions, and overwrites
-     *            the values in the slice with the calculated new values
-     * @param iterationDims dimensions along which iteration is performed
-     * @return the new NDArray with the calculated new values
-     */
-    public NDArray<T> mapOnSlices(BiConsumer<NDArray<T>,int[]> func, int... iterationDims);
 
     /**
      * Apply the given function to each slices of the array, and create a new NDArray with the calculated new values.
@@ -552,6 +528,18 @@ public interface NDArray<T> extends Iterable<T> {
      * @return a String containing tabular representation of the array.
      */
     public String contentToString();
+
+    /**
+     * Returns a String containing tabular representation of the array.
+     * 
+     * For arrays that have more than 2 dimensions, the function prints 2D slices and iterates over all other dimensions
+     * incrementally. Note: this function might produce enormous output as it doesn't truncate result even for large
+     * arrays!
+     * 
+     * @param format format specifier for individual elements (e.g. 5.3f)
+     * @return a String containing tabular representation of the array.
+     */
+    public String contentToString(String format);
 
     /**
      * Returns a String representation of element type.
@@ -1449,6 +1437,60 @@ public interface NDArray<T> extends Iterable<T> {
      * @return sum of all elementsalong the specified dimensions
      */
     public NDArray<T> sum(int... selectedDims);
+
+    /**
+     * Returns the product of all elements in this NDArray.
+     * 
+     * @return product of all elements
+     */
+    public T prod();
+
+    /**
+     * Returns the product of all elements along the specified dimensions in this NDArray.
+     * 
+     * <p>
+     * For example, if <code>A</code> is a [5 × 8 × 3] array, then <code>B = A.prod(2)</code> returns a [5 × 8] array,
+     * and <code>B.get(1,1) == A.get(1,1,0) * A.get(1,1,1) * A.get(1,1,2)</code>.
+     * 
+     * @param selectedDims dimensions along which multiplication should be performed
+     * @return product of all elements along the specified dimensions
+     */
+    public NDArray<T> prod(int... selectedDims);
+
+    /**
+     * Returns the result of accumulation of all elements in this NDArray.
+     * 
+     * @param func accumulation function that accepts two elements and returns accumulation result
+     * @return result of accumulation
+     */
+    public T accumulate(BinaryOperator<T> func);
+
+    /**
+     * Returns the accumulation of all elements along the specified dimensions in this NDArray.
+     * 
+     * <p>
+     * For example, if <code>A</code> is a [5 × 8 × 3] array, then <code>B = A.accumulate(func, 2)</code> returns a
+     * [5 × 8] array, and <code>B.get(1,1) == func(func(A.get(1,1,0), A.get(1,1,1)), A.get(1,1,2))</code>.
+     * 
+     * @param func accumulation function that accepts two elements and returns accumulation result
+     * @param selectedDims dimensions along which the accumulation should be performed
+     * @return result of accumulation of all elements along the specified dimensions
+     */
+    public NDArray<T> accumulate(BinaryOperator<T> func, int... selectedDims);
+
+    /**
+     * Reduces slices along the specified dimensions in this NDArray to scalar values, reducing the number of
+     * dimensions.
+     * 
+     * <p>
+     * For example, if <code>A</code> is a [5 × 8 × 3] array, then <code>B = A.reduce(func, 2)</code> returns a [5 × 8]
+     * array, and <code>B.get(1,1) == func(A.slice(1, 1, ":"), new int[] { 1, 1 })</code>.
+     * 
+     * @param func reduction function that accepts a slice and its index and returns reduction result
+     * @param selectedDims dimensions along which the reduction should be performed
+     * @return result of reduction of all slices along the specified dimensions
+     */
+    public NDArray<T> reduceSlices(BiFunction<NDArray<T>,int[],T> func, int... selectedDims);
 
     /**
      * Returns the 2-norm (Euclidean norm) of the vectorized array.

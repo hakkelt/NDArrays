@@ -3,7 +3,6 @@ package io.github.hakkelt.ndarrays.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
@@ -87,23 +86,13 @@ abstract class AbstractNDArrayMaskView<T, T2 extends Number> extends AbstractNDA
     }
 
     @Override
-    public NDArray<T> mapOnSlices(BiConsumer<NDArray<T>,int[]> func, int... iterationDims) {
-        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
-    }
-
-    @Override
     public NDArray<T> mapOnSlices(BiFunction<NDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
-        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
-    }
-
-    @Override
-    public NDArray<T> applyOnSlices(BiConsumer<NDArray<T>,int[]> func, int... iterationDims) {
-        return ApplyOnSlices.applyOnSlices(this, func, iterationDims);
+        return SliceOperations.applyOnSlices(copy(), func, iterationDims);
     }
 
     @Override
     public NDArray<T> applyOnSlices(BiFunction<NDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
-        return ApplyOnSlices.applyOnSlices(this, func, iterationDims);
+        return SliceOperations.applyOnSlices(this, func, iterationDims);
     }
 
     @Override

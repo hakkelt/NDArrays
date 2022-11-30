@@ -26,6 +26,11 @@ public abstract class AbstractBigDecimalNDArray extends AbstractRealNDArray<BigD
     }
 
     @Override
+    protected BigDecimal oneT() {
+        return BigDecimal.ONE;
+    }
+
+    @Override
     protected BigDecimal wrapValue(Number value) {
         if (value instanceof BigInteger)
             return new BigDecimal((BigInteger) value);

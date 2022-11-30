@@ -18,13 +18,12 @@ public class ComplexNDArrayReshapeViewTemplate<T extends Number> extends Abstrac
         super(parent, newShape);
     }
 
-    @Patterns({"mapOnComplexSlices", "BiConsumer<ComplexNDArray<T>,int[]>", "copy()"})
-    @Replacements({"mapOnComplexSlices", "BiFunction<ComplexNDArray<T>,int[],NDArray<?>>", "copy()"})
-    @Replacements({"applyOnComplexSlices", "BiConsumer<ComplexNDArray<T>,int[]>", "this"})
-    @Replacements({"applyOnComplexSlices", "BiFunction<ComplexNDArray<T>,int[],NDArray<?>>", "this"})
+    @Patterns({"mapOnComplexSlices", "applyOnSlices", "BiFunction<ComplexNDArray<T>,int[],NDArray<?>>", "copy()"})
+    @Replacements({"applyOnComplexSlices", "applyOnSlices", "BiFunction<ComplexNDArray<T>,int[],NDArray<?>>", "this"})
+    @Replacements({"reduceComplexSlices", "reduceComplexSlices", "BiFunction<ComplexNDArray<T>,int[],Complex>", "this"})
     @Override
-    public ComplexNDArray<T> mapOnComplexSlices(BiConsumer<ComplexNDArray<T>,int[]> func, int... iterationDims) {
-        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
+    public ComplexNDArray<T> mapOnComplexSlices(BiFunction<ComplexNDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
+        return SliceOperations.applyOnSlices(copy(), func, iterationDims);
     }
     
     @Override

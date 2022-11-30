@@ -204,7 +204,7 @@ class TestComplexSpecific extends TestBase {
         array.set(new Complex(2, -3), 2);
         array.set(new Complex(-2, -3), 3);
         assertEquals("basic NDArray<Complex Float>(4)" + System.lineSeparator()
-                + "2,00000e+00+3,00000e+00i	-2,00000e+00+3,00000e+00i	2,00000e+00-3,00000e+00i	-2,00000e+00-3,00000e+00i	",
+                + "2,000e+00+3,000e+00i	-2,000e+00+3,000e+00i	2,000e+00-3,000e+00i	-2,000e+00-3,000e+00i	",
                 array.contentToString());
     }
 

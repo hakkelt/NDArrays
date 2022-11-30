@@ -16,7 +16,6 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -64,22 +63,22 @@ public abstract class AbstractComplexNDArray<T extends Number> extends AbstractN
 
     @Override
     public NDArray<T> real() {
-        return streamLinearIndices().mapToObj(this::getReal).collect(getRealCollectorInternal(shape));
+        return createNewRealNDArrayOfSameTypeAsMe(shape).fillUsingLinearIndices(this::getReal);
     }
 
     @Override
     public NDArray<T> imaginary() {
-        return streamLinearIndices().mapToObj(this::getImag).collect(getRealCollectorInternal(shape));
+        return createNewRealNDArrayOfSameTypeAsMe(shape).fillUsingLinearIndices(this::getImag);
     }
 
     @Override
     public NDArray<T> abs() {
-        return streamLinearIndices().mapToObj(i -> get(i).abs()).collect(getRealCollectorInternal(shape));
+        return createNewRealNDArrayOfSameTypeAsMe(shape).fillUsingLinearIndices(i -> wrapRealValue(getUnchecked(i).abs()));
     }
 
     @Override
     public NDArray<T> argument() {
-        return streamLinearIndices().mapToObj(i -> get(i).getArgument()).collect(getRealCollectorInternal(shape));
+        return createNewRealNDArrayOfSameTypeAsMe(shape).fillUsingLinearIndices(i -> wrapRealValue(getUnchecked(i).getArgument()));
     }
 
     @Override
@@ -158,23 +157,13 @@ public abstract class AbstractComplexNDArray<T extends Number> extends AbstractN
     }
 
     @Override
-    public ComplexNDArray<T> applyOnComplexSlices(BiConsumer<ComplexNDArray<T>,int[]> func, int... iterationDims) {
-        return ApplyOnSlices.applyOnSlices(this, func, iterationDims);
-    }
-
-    @Override
     public ComplexNDArray<T> applyOnComplexSlices(BiFunction<ComplexNDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
-        return ApplyOnSlices.applyOnSlices(this, func, iterationDims);
-    }
-
-    @Override
-    public ComplexNDArray<T> mapOnComplexSlices(BiConsumer<ComplexNDArray<T>,int[]> func, int... iterationDims) {
-        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
+        return SliceOperations.applyOnSlices(this, func, iterationDims);
     }
 
     @Override
     public ComplexNDArray<T> mapOnComplexSlices(BiFunction<ComplexNDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
-        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
+        return SliceOperations.applyOnSlices(copy(), func, iterationDims);
     }
 
     @Override
@@ -371,6 +360,11 @@ public abstract class AbstractComplexNDArray<T extends Number> extends AbstractN
     @Override
     protected Complex zeroT() {
         return Complex.ZERO;
+    }
+
+    @Override
+    protected Complex oneT() {
+        return Complex.ONE;
     }
 
     @Override

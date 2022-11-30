@@ -24,6 +24,11 @@ public abstract class AbstractLongNDArray extends AbstractRealNDArray<Long> {
     }
 
     @Override
+    protected Long oneT() {
+        return Long.valueOf((long) 1);
+    }
+
+    @Override
     protected Long wrapValue(Number value) {
         return Long.valueOf(value.longValue());
     }

@@ -11,23 +11,21 @@ import io.github.hakkelt.ndarrays.NDArrayUtils;
 
 public class Printer {
 
-    static final String DEFAULT_INTEGER_FORMAT = "%6d";
-    static final String DEFAULT_FLOATING_POINT_FORMAT = "%10.5e";
+    public static final String DEFAULT_INTEGER_FORMAT = "%6d";
+    public static final String DEFAULT_FLOATING_POINT_FORMAT = "%8.3e";
 
     private Printer() {}
 
     public static String contentToString(
             String dataType,
-            String typeName,
-            BiFunction<Integer, String, String> printItem,
             String name,
+            String typeName,
+            String format,
+            BiFunction<Integer, String, String> printItem,
             int[] shape,
             int[] multipliers) {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("%s %s<%s>(%s)%n", name, typeName, dataType, dimsToString(shape)));
-        boolean isFloatingPointType = dataType.equals("Float") || dataType.equals("Double")
-            || dataType.equals("BigDecimal") || dataType.startsWith("Complex");
-        String format = isFloatingPointType ? DEFAULT_FLOATING_POINT_FORMAT : DEFAULT_INTEGER_FORMAT;
         if (shape.length == 1)
             printRow(sb, 0, shape[0], 1, format, printItem);
         else if (shape.length == 2)

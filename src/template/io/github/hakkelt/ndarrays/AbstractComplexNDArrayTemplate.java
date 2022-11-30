@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -62,10 +61,10 @@ public abstract class AbstractComplexNDArrayTemplate<T extends Number> extends  
     @Override
     @Patterns({"real", "this::getReal"})
     @Replacements({"imaginary", "this::getImag"})
-    @Replacements({"abs", "i -> get(i).abs()"})
-    @Replacements({"argument", "i -> get(i).getArgument()"})
+    @Replacements({"abs", "i -> wrapRealValue(getUnchecked(i).abs())"})
+    @Replacements({"argument", "i -> wrapRealValue(getUnchecked(i).getArgument())"})
     public NDArray<T> real() {
-        return streamLinearIndices().mapToObj(this::getReal).collect(getRealCollectorInternal(shape));
+        return createNewRealNDArrayOfSameTypeAsMe(shape).fillUsingLinearIndices(this::getReal);
     }
 
     @Override
@@ -138,23 +137,13 @@ public abstract class AbstractComplexNDArrayTemplate<T extends Number> extends  
     }
 
     @Override
-    public ComplexNDArray<T> applyOnComplexSlices(BiConsumer<ComplexNDArray<T>,int[]> func, int... iterationDims) {
-        return ApplyOnSlices.applyOnSlices(this, func, iterationDims);
-    }
-
-    @Override
     public ComplexNDArray<T> applyOnComplexSlices(BiFunction<ComplexNDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
-        return ApplyOnSlices.applyOnSlices(this, func, iterationDims);
-    }
-
-    @Override
-    public ComplexNDArray<T> mapOnComplexSlices(BiConsumer<ComplexNDArray<T>,int[]> func, int... iterationDims) {
-        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
+        return SliceOperations.applyOnSlices(this, func, iterationDims);
     }
 
     @Override
     public ComplexNDArray<T> mapOnComplexSlices(BiFunction<ComplexNDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
-        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
+        return SliceOperations.applyOnSlices(copy(), func, iterationDims);
     }
 
     @Override
@@ -283,6 +272,11 @@ public abstract class AbstractComplexNDArrayTemplate<T extends Number> extends  
     @Override
     protected Complex zeroT() {
         return Complex.ZERO;
+    }
+
+    @Override
+    protected Complex oneT() {
+        return Complex.ONE;
     }
 
     @Override

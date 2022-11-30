@@ -195,8 +195,18 @@ public abstract class AbstractNDArrayTemplate<T, T2 extends Number> implements N
 
     @Override
     public String contentToString() {
-        return Printer.contentToString(dataTypeAsString(), getTypeName(), this::printItem,
-            getNamePrefix(), shape, multipliers);
+        String dataType = dataTypeAsString();
+        boolean isFloatingPointType = dataType.equals("Float") || dataType.equals("Double")
+            || dataType.equals("BigDecimal") || dataType.startsWith("Complex");
+        return contentToString(isFloatingPointType
+            ? Printer.DEFAULT_FLOATING_POINT_FORMAT
+            : Printer.DEFAULT_INTEGER_FORMAT);
+    }
+
+    @Override
+    public String contentToString(String format) {
+        return Printer.contentToString(dataTypeAsString(), getNamePrefix(), getTypeName(), format,
+            this::printItem, shape, multipliers);
     }
 
     @Override
@@ -434,15 +444,13 @@ public abstract class AbstractNDArrayTemplate<T, T2 extends Number> implements N
         return this;
     }
 
-    @Patterns({"mapOnSlices", "BiConsumer<NDArray<T>,int[]>", "copy()"})
-    @Replacements({"mapOnSlices", "BiFunction<NDArray<T>,int[],NDArray<?>>", "copy()"})
-    @Replacements({"applyOnSlices", "BiConsumer<NDArray<T>,int[]>", "this"})
-    @Replacements({"applyOnSlices", "BiFunction<NDArray<T>,int[],NDArray<?>>", "this"})
+    @Patterns({"mapOnSlices", "applyOnSlices", "BiFunction<NDArray<T>,int[],NDArray<?>>", "copy()"})
+    @Replacements({"applyOnSlices", "applyOnSlices", "BiFunction<NDArray<T>,int[],NDArray<?>>", "this"})
+    @Replacements({"reduceSlices", "reduceSlices", "BiFunction<NDArray<T>,int[],T>", "this"})
     @Override
-    public NDArray<T> mapOnSlices(BiConsumer<NDArray<T>,int[]> func, int... iterationDims) {
-        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
+    public NDArray<T> mapOnSlices(BiFunction<NDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
+        return SliceOperations.applyOnSlices(copy(), func, iterationDims);
     }
-
 
     @Override
     public void forEach(Consumer<? super T> func) {
@@ -469,7 +477,17 @@ public abstract class AbstractNDArrayTemplate<T, T2 extends Number> implements N
 
     @Override
     public T sum() {
-        return maybeParallelStream().reduce(zeroT(), (acc, item) -> accumulate(acc, item, AccumulateOperators.ADD));
+        return maybeParallelStream().reduce((acc, item) -> accumulate(acc, item, AccumulateOperators.ADD)).orElseThrow();
+    }
+
+    @Override
+    public T prod() {
+        return maybeParallelStream().reduce((acc, item) -> accumulate(acc, item, AccumulateOperators.MULTIPLY)).orElseThrow();
+    }
+
+    @Override
+    public T accumulate(BinaryOperator<T> func) {
+        return maybeParallelStream().reduce(func).orElseThrow();
     }
 
     @Override
@@ -536,7 +554,7 @@ public abstract class AbstractNDArrayTemplate<T, T2 extends Number> implements N
         else if (p == 2)
             return norm();
         else if (p == Double.POSITIVE_INFINITY)
-            return streamAbs().max(new NumberComparator()).orElse(zeroT2()).doubleValue();
+            return streamAbs().max(new NumberComparator()).orElseThrow().doubleValue();
         return Math.pow(
                 streamAbs()
                     .map(value -> Math.pow(value.doubleValue(), p))
@@ -562,6 +580,8 @@ public abstract class AbstractNDArrayTemplate<T, T2 extends Number> implements N
     protected abstract T zeroT();
 
     protected abstract T2 zeroT2();
+
+    protected abstract T oneT();
 
     protected abstract T wrapValue(Number value);
 

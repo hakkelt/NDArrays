@@ -18,16 +18,16 @@ import io.github.hakkelt.ndarrays.internal.Errors;
 @Replacements({ "BasicShortNDArray", "NDArrayView<Short>", "Short", "BasicLongNDArray", "%6d" })
 @Replacements({ "BasicIntegerNDArray", "NDArrayView<Integer>", "Integer", "BasicLongNDArray", "%6d" })
 @Replacements({ "BasicLongNDArray", "NDArrayView<Long>", "Long", "BasicShortNDArray", "%6d" })
-@Replacements({ "BasicFloatNDArray", "NDArrayView<Float>", "Float", "BasicLongNDArray", "%10.5e" })
-@Replacements({ "BasicDoubleNDArray", "NDArrayView<Double>", "Double", "BasicLongNDArray", "%10.5e" })
+@Replacements({ "BasicFloatNDArray", "NDArrayView<Float>", "Float", "BasicLongNDArray", "%8.3e" })
+@Replacements({ "BasicDoubleNDArray", "NDArrayView<Double>", "Double", "BasicLongNDArray", "%8.3e" })
 @Replacements(value = { "BasicBigIntegerNDArray", "NDArrayView<BigInteger>", "BigInteger", "BasicLongNDArray",
         "%6d" }, extraImports = "java.math.BigInteger")
 @Replacements(value = { "BasicBigDecimalNDArray", "NDArrayView<BigDecimal>", "BigDecimal", "BasicLongNDArray",
-        "%10.5e" }, extraImports = "java.math.BigDecimal")
+        "%8.3e" }, extraImports = "java.math.BigDecimal")
 @Replacements(value = { "BasicComplexFloatNDArray", "NDArrayView<Complex Float>", "Complex", "BasicComplexDoubleNDArray",
-        "%10.5e+%10.5ei" }, extraImports = "org.apache.commons.math3.complex.Complex")
+        "%8.3e+%8.3ei" }, extraImports = "org.apache.commons.math3.complex.Complex")
 @Replacements(value = { "BasicComplexDoubleNDArray", "NDArrayView<Complex Double>", "Complex", "BasicComplexFloatNDArray",
-        "%10.5e+%10.5ei" }, extraImports = "org.apache.commons.math3.complex.Complex")
+        "%8.3e+%8.3ei" }, extraImports = "org.apache.commons.math3.complex.Complex")
 class TestPermuteDims extends TestBase {
     NDArray<Byte> arrayOriginal;
     NDArray<Byte> array;

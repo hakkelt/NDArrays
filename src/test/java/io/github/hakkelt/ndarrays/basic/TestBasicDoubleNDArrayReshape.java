@@ -72,7 +72,7 @@ class TestBasicDoubleNDArrayReshape extends TestBase {
     @Test
     void testContentToString() {
         String str = reshaped.contentToString();
-        String lineFormat = "%10.5e\t%10.5e\t%10.5e\t%n";
+        String lineFormat = "%8.3e\t%8.3e\t%8.3e\t%n";
         StringBuilder sb = new StringBuilder();
         sb.append(array.getNamePrefix() + " NDArrayView<Double>(20 × 3)" + System.lineSeparator());
         for (int i = 0; i < 20; i++)

@@ -72,7 +72,7 @@ class TestBasicComplexFloatNDArrayPermuteDims extends TestBase {
     @Test
     void testContentToString() {
         String str = pArray.contentToString();
-        String lineFormat = "%10.5e+%10.5ei\t%10.5e+%10.5ei\t%10.5e+%10.5ei\t%n";
+        String lineFormat = "%8.3e+%8.3ei\t%8.3e+%8.3ei\t%8.3e+%8.3ei\t%n";
         StringBuilder sb = new StringBuilder();
         sb.append(array.getNamePrefix() + " NDArrayView<Complex Float>(4 × 3 × 5)" + System.lineSeparator());
         for (int i = 0; i < pArray.shape(2); i++) {

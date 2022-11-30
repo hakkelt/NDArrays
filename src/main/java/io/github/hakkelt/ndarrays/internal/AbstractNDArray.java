@@ -252,8 +252,18 @@ public abstract class AbstractNDArray<T, T2 extends Number> implements NDArray<T
 
     @Override
     public String contentToString() {
-        return Printer.contentToString(dataTypeAsString(), getTypeName(), this::printItem,
-            getNamePrefix(), shape, multipliers);
+        String dataType = dataTypeAsString();
+        boolean isFloatingPointType = dataType.equals("Float") || dataType.equals("Double")
+            || dataType.equals("BigDecimal") || dataType.startsWith("Complex");
+        return contentToString(isFloatingPointType
+            ? Printer.DEFAULT_FLOATING_POINT_FORMAT
+            : Printer.DEFAULT_INTEGER_FORMAT);
+    }
+
+    @Override
+    public String contentToString(String format) {
+        return Printer.contentToString(dataTypeAsString(), getNamePrefix(), getTypeName(), format,
+            this::printItem, shape, multipliers);
     }
 
     @Override
@@ -588,23 +598,18 @@ public abstract class AbstractNDArray<T, T2 extends Number> implements NDArray<T
     }
 
     @Override
-    public NDArray<T> mapOnSlices(BiConsumer<NDArray<T>,int[]> func, int... iterationDims) {
-        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
-    }
-
-    @Override
     public NDArray<T> mapOnSlices(BiFunction<NDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
-        return ApplyOnSlices.applyOnSlices(copy(), func, iterationDims);
-    }
-
-    @Override
-    public NDArray<T> applyOnSlices(BiConsumer<NDArray<T>,int[]> func, int... iterationDims) {
-        return ApplyOnSlices.applyOnSlices(this, func, iterationDims);
+        return SliceOperations.applyOnSlices(copy(), func, iterationDims);
     }
 
     @Override
     public NDArray<T> applyOnSlices(BiFunction<NDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
-        return ApplyOnSlices.applyOnSlices(this, func, iterationDims);
+        return SliceOperations.applyOnSlices(this, func, iterationDims);
+    }
+
+    @Override
+    public NDArray<T> reduceSlices(BiFunction<NDArray<T>,int[],T> func, int... iterationDims) {
+        return SliceOperations.reduceSlices(this, func, iterationDims);
     }
 
     @Override
@@ -632,7 +637,17 @@ public abstract class AbstractNDArray<T, T2 extends Number> implements NDArray<T
 
     @Override
     public T sum() {
-        return maybeParallelStream().reduce(zeroT(), (acc, item) -> accumulate(acc, item, AccumulateOperators.ADD));
+        return maybeParallelStream().reduce((acc, item) -> accumulate(acc, item, AccumulateOperators.ADD)).orElseThrow();
+    }
+
+    @Override
+    public T prod() {
+        return maybeParallelStream().reduce((acc, item) -> accumulate(acc, item, AccumulateOperators.MULTIPLY)).orElseThrow();
+    }
+
+    @Override
+    public T accumulate(BinaryOperator<T> func) {
+        return maybeParallelStream().reduce(func).orElseThrow();
     }
 
     @Override
@@ -658,7 +673,7 @@ public abstract class AbstractNDArray<T, T2 extends Number> implements NDArray<T
         else if (p == 2)
             return norm();
         else if (p == Double.POSITIVE_INFINITY)
-            return streamAbs().max(new NumberComparator()).orElse(zeroT2()).doubleValue();
+            return streamAbs().max(new NumberComparator()).orElseThrow().doubleValue();
         return Math.pow(
                 streamAbs()
                     .map(value -> Math.pow(value.doubleValue(), p))
@@ -684,6 +699,8 @@ public abstract class AbstractNDArray<T, T2 extends Number> implements NDArray<T
     protected abstract T zeroT();
 
     protected abstract T2 zeroT2();
+
+    protected abstract T oneT();
 
     protected abstract T wrapValue(Number value);
 

@@ -73,7 +73,7 @@ class TestBasicBigDecimalNDArrayPermuteDims extends TestBase {
     @Test
     void testContentToString() {
         String str = pArray.contentToString();
-        String lineFormat = "%10.5e\t%10.5e\t%10.5e\t%n";
+        String lineFormat = "%8.3e\t%8.3e\t%8.3e\t%n";
         StringBuilder sb = new StringBuilder();
         sb.append(array.getNamePrefix() + " NDArrayView<BigDecimal>(4 × 3 × 5)" + System.lineSeparator());
         for (int i = 0; i < pArray.shape(2); i++) {

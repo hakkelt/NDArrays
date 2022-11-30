@@ -24,6 +24,11 @@ public abstract class AbstractFloatNDArray extends AbstractRealNDArray<Float> {
     }
 
     @Override
+    protected Float oneT() {
+        return Float.valueOf((float) 1);
+    }
+
+    @Override
     protected Float wrapValue(Number value) {
         return Float.valueOf(value.floatValue());
     }

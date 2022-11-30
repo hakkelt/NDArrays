@@ -17,16 +17,16 @@ import io.github.hakkelt.ndarrays.internal.Errors;
 @Replacements({ "BasicShortNDArray", "NDArrayView<Short>", "Short", "%6d" })
 @Replacements({ "BasicIntegerNDArray", "NDArrayView<Integer>", "Integer", "%6d" })
 @Replacements({ "BasicLongNDArray", "NDArrayView<Long>", "Long", "%6d" })
-@Replacements({ "BasicFloatNDArray", "NDArrayView<Float>", "Float", "%10.5e" })
-@Replacements({ "BasicDoubleNDArray", "NDArrayView<Double>", "Double", "%10.5e" })
+@Replacements({ "BasicFloatNDArray", "NDArrayView<Float>", "Float", "%8.3e" })
+@Replacements({ "BasicDoubleNDArray", "NDArrayView<Double>", "Double", "%8.3e" })
 @Replacements(value = { "BasicBigIntegerNDArray", "NDArrayView<BigInteger>", "BigInteger",
         "%6d" }, extraImports = "java.math.BigInteger")
 @Replacements(value = { "BasicBigDecimalNDArray", "NDArrayView<BigDecimal>", "BigDecimal",
-        "%10.5e" }, extraImports = "java.math.BigDecimal")
+        "%8.3e" }, extraImports = "java.math.BigDecimal")
 @Replacements(value = { "BasicComplexFloatNDArray", "NDArrayView<Complex Float>", "Complex",
-        "%10.5e+%10.5ei" }, extraImports = "org.apache.commons.math3.complex.Complex")
+        "%8.3e+%8.3ei" }, extraImports = "org.apache.commons.math3.complex.Complex")
 @Replacements(value = { "BasicComplexDoubleNDArray", "NDArrayView<Complex Double>", "Complex",
-        "%10.5e+%10.5ei" }, extraImports = "org.apache.commons.math3.complex.Complex")
+        "%8.3e+%8.3ei" }, extraImports = "org.apache.commons.math3.complex.Complex")
 class TestSlice extends TestBase {
     NDArray<Byte> arrayOriginal;
     NDArray<Byte> array;

@@ -25,6 +25,11 @@ public abstract class AbstractBigIntegerNDArray extends AbstractRealNDArray<BigI
     }
 
     @Override
+    protected BigInteger oneT() {
+        return BigInteger.ONE;
+    }
+
+    @Override
     protected BigInteger wrapValue(Number value) {
         if (value instanceof BigInteger)
             return (BigInteger) value;

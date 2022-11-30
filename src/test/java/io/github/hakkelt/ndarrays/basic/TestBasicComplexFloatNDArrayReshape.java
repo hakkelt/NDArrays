@@ -72,7 +72,7 @@ class TestBasicComplexFloatNDArrayReshape extends TestBase {
     @Test
     void testContentToString() {
         String str = reshaped.contentToString();
-        String lineFormat = "%10.5e+%10.5ei\t%10.5e+%10.5ei\t%10.5e+%10.5ei\t%n";
+        String lineFormat = "%8.3e+%8.3ei\t%8.3e+%8.3ei\t%8.3e+%8.3ei\t%n";
         StringBuilder sb = new StringBuilder();
         sb.append(array.getNamePrefix() + " NDArrayView<Complex Float>(20 × 3)" + System.lineSeparator());
         for (int i = 0; i < 20; i++)

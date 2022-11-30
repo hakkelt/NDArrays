@@ -19,7 +19,7 @@ class TestIterateSlices {
         NDArray<Float> data = new BasicFloatNDArray(5, 7, 9, 11).fillUsingLinearIndices(i -> (float) i);
         data.applyOnSlices((slice, idx) -> {
             assertEquals(data.slice(idx[0], ":", idx[1], ":"), slice);
-            slice.apply(value -> value * value);
+            return slice.apply(value -> value * value);
         }, 0, 2);
         data.forEachWithLinearIndices((value, i) -> assertEquals(i * i, value));
     }
@@ -39,7 +39,7 @@ class TestIterateSlices {
         NDArray<Integer> data = new BasicIntegerNDArray(5, 7, 9, 11).fillUsingLinearIndices(i -> i);
         NDArray<Integer> result = data.mapOnSlices((slice, idx) -> {
             assertEquals(data.slice(idx[0], ":", ":", idx[1]), slice);
-            slice.apply(value -> value * value);
+            return slice.apply(value -> value * value);
         }, 0, 3);
         result.forEachWithLinearIndices((value, i) -> assertEquals(i * i, value));
     }
@@ -60,7 +60,7 @@ class TestIterateSlices {
         NDArray<Short> slice = data.slice("1:4", ":", 3, ":");
         slice.applyOnSlices((slice2, idx) -> {
             assertEquals(slice.slice(idx[0], ":", idx[1]), slice2);
-            slice2.apply(value -> (short) (value * value));
+            return slice2.apply(value -> (short) (value * value));
         }, 0, 2);
         int[] multipliers = NDArrayUtils.calculateMultipliers(data.shape());
         data.forEachWithCartesianIndices((value, idx) -> {
@@ -87,7 +87,7 @@ class TestIterateSlices {
             .fillUsingLinearIndices(i -> new Complex(i));
         ComplexNDArray<Float> result = data.mapOnComplexSlices((slice, idx) -> {
             assertEquals(data.slice(idx[0], ":", ":", idx[1]), slice);
-            slice.apply(value -> value.multiply(value));
+            return slice.apply(value -> value.multiply(value));
         }, 0, 3);
         result.forEachWithLinearIndices((value, i) -> assertEquals(new Complex(i * i), value));
     }

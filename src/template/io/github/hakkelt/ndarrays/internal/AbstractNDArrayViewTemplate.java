@@ -62,6 +62,11 @@ abstract class AbstractNDArrayViewTemplate<T,T2 extends Number> extends Abstract
     }
 
     @Override
+    protected T oneT() {
+        return parent.oneT();
+    }
+
+    @Override
     protected double absSum() {
         if (dtype() == Complex.class)
             return stream().map(value -> ((Complex)value).abs()).reduce(0., Double::sum);

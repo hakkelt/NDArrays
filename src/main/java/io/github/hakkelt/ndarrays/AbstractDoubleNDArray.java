@@ -24,6 +24,11 @@ public abstract class AbstractDoubleNDArray extends AbstractRealNDArray<Double> 
     }
 
     @Override
+    protected Double oneT() {
+        return Double.valueOf((double) 1);
+    }
+
+    @Override
     protected Double wrapValue(Number value) {
         return Double.valueOf(value.doubleValue());
     }

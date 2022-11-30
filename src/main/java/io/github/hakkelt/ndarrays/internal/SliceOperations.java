@@ -1,28 +1,20 @@
 package io.github.hakkelt.ndarrays.internal;
 
 import java.util.Arrays;
-import java.util.function.BiConsumer;
+import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import org.apache.commons.math3.complex.Complex;
 
 import io.github.hakkelt.ndarrays.ComplexNDArray;
 import io.github.hakkelt.ndarrays.NDArray;
 import io.github.hakkelt.ndarrays.Range;
 
-public class ApplyOnSlices {
+public class SliceOperations {
 
-    private ApplyOnSlices() {}
-
-    public static <T> NDArray<T> applyOnSlices(NDArray<T> array, BiConsumer<NDArray<T>,int[]> func, int... iterationDims) {
-        NormalizedRange[] template = constructSlicingExpressionTemplate(array.shape(), iterationDims);
-        NDArray.streamCartesianIndices(getIterationShape(array.shape(), iterationDims)).parallel()
-            .forEach(idx -> {
-                NormalizedRange[] slicingExpr = constructSlicingExpression(template, idx);
-                NDArray<T> slice = array.slice((Object[]) slicingExpr);
-                func.accept(slice, idx);            
-            });
-        return array;
-    }
+    private SliceOperations() {}
 
     public static <T> NDArray<T> applyOnSlices(NDArray<T> array, BiFunction<NDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
         NormalizedRange[] template = constructSlicingExpressionTemplate(array.shape(), iterationDims);
@@ -37,17 +29,6 @@ public class ApplyOnSlices {
         return array;
     }
 
-    public static <T extends Number> ComplexNDArray<T> applyOnSlices(ComplexNDArray<T> array, BiConsumer<ComplexNDArray<T>,int[]> func, int... iterationDims) {
-        NormalizedRange[] template = constructSlicingExpressionTemplate(array.shape(), iterationDims);
-        NDArray.streamCartesianIndices(getIterationShape(array.shape(), iterationDims)).parallel()
-            .forEach(idx -> {
-                NormalizedRange[] slicingExpr = constructSlicingExpression(template, idx);
-                ComplexNDArray<T> slice = array.slice((Object[]) slicingExpr);
-                func.accept(slice, idx);            
-            });
-        return array;
-    }
-
     public static <T extends Number> ComplexNDArray<T> applyOnSlices(ComplexNDArray<T> array, BiFunction<ComplexNDArray<T>,int[],NDArray<?>> func, int... iterationDims) {
         NormalizedRange[] template = constructSlicingExpressionTemplate(array.shape(), iterationDims);
         NDArray.streamCartesianIndices(getIterationShape(array.shape(), iterationDims)).parallel()
@@ -56,9 +37,33 @@ public class ApplyOnSlices {
                 ComplexNDArray<T> slice = array.slice((Object[]) slicingExpr);
                 NDArray<?> result = func.apply(slice, idx);
                 if (slice != result)
-                    slice.copyFrom(result);                
+                    slice.copyFrom(result);
             });
         return array;
+    }
+
+    public static <T> NDArray<T> reduceSlices(NDArray<T> array, BiFunction<NDArray<T>,int[],T> func, int... reducedDims) {
+        Set<Integer> reducedDimsSet = Arrays.stream(reducedDims).boxed().collect(Collectors.toSet());
+        int[] iterationDims = IntStream.range(0, array.ndim()).filter(d -> !reducedDimsSet.contains(d)).toArray();
+        NormalizedRange[] template = constructSlicingExpressionTemplate(array.shape(), iterationDims);
+        return ((AbstractNDArray<T,?>) array).createNewNDArrayOfSameTypeAsMe(getIterationShape(array.shape(), iterationDims))
+            .fillUsingCartesianIndices(idx -> {
+                NormalizedRange[] slicingExpr = constructSlicingExpression(template, idx);
+                return func.apply(array.slice((Object[]) slicingExpr), idx);
+            });
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Number> ComplexNDArray<T> reduceComplexSlices(ComplexNDArray<T> array, BiFunction<ComplexNDArray<T>,int[],Complex> func, int... reducedDims) {
+        Set<Integer> reducedDimsSet = Arrays.stream(reducedDims).boxed().collect(Collectors.toSet());
+        int[] iterationDims = IntStream.range(0, array.ndim()).filter(d -> !reducedDimsSet.contains(d)).toArray();
+        NormalizedRange[] template = constructSlicingExpressionTemplate(array.shape(), iterationDims);
+        return (ComplexNDArray<T>) ((AbstractNDArray<Complex,T>) array).createNewNDArrayOfSameTypeAsMe(getIterationShape(array.shape(), iterationDims))
+            .fillUsingCartesianIndices(idx -> {
+                NormalizedRange[] slicingExpr = constructSlicingExpression(template, idx);
+                ComplexNDArray<T> slice = array.slice((Object[]) slicingExpr);
+                return func.apply(slice, idx);              
+            });
     }
 
     protected static int[] getIterationShape(int[] shape, int[] iterationDims) {

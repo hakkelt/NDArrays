@@ -1,8 +1,8 @@
 package io.github.hakkelt.ndarrays;
 
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
@@ -13,6 +13,7 @@ import org.apache.commons.math3.complex.Complex;
 import io.github.hakkelt.generator.*;
 import io.github.hakkelt.ndarrays.internal.ArrayOperations;
 import io.github.hakkelt.ndarrays.internal.CopyFromOperations;
+import io.github.hakkelt.ndarrays.internal.SliceOperations;
 import io.github.hakkelt.ndarrays.internal.ViewOperations;
 
 /**
@@ -35,6 +36,18 @@ public interface ComplexNDArrayTemplate<T extends Number> extends NDArray<Comple
      * @return the type of values returned by get method.
      */
     public Class<?> dtype2();
+
+    /**
+     * Returns a String containing tabular representation of the array.
+     * 
+     * For arrays that have more than 2 dimensions, the function prints 2D slices and iterates over all other dimensions
+     * incrementally. Note: this function might produce enormous output as it doesn't truncate result even for large
+     * arrays!
+     * 
+     * @param format format specifier for real/imaginary part of individual elements (e.g. 5.3f)
+     * @return a String containing tabular representation of the array.
+     */
+    public String contentToString(String format);
 
     /** 
      * Returns the real part of an element specified by linear indexing.
@@ -169,18 +182,6 @@ public interface ComplexNDArrayTemplate<T extends Number> extends NDArray<Comple
     public ComplexNDArrayTemplate<T> applyWithCartesianIndices(BiFunction<Complex, int[], Complex> func);
 
     /**
-     * Apply the given function to each slices of the array that overrides each entry with the calculated new values.
-     * 
-     * Please note that slices might not be processed in a sequential order!
-     * 
-     * @param func function that receives the value of the current entry and its Cartesian coordinate, and modifies the
-     *            passed NDArray
-     * @param iterationDims dimensions along which iteration is performed
-     * @return itself after the update
-     */
-    public ComplexNDArray<T> applyOnComplexSlices(BiConsumer<ComplexNDArray<T>,int[]> func, int... iterationDims);
-
-    /**
      * Apply the given function to each slices of the array, and override each entry with the returned slice.
      * 
      * Please note that slices might not be processed in a sequential order!
@@ -212,18 +213,6 @@ public interface ComplexNDArrayTemplate<T extends Number> extends NDArray<Comple
         newInstance.applyWithCartesianIndices(func);
         return newInstance;
     }
-
-    /**
-     * Apply the given function to each slices of the array, and create a new NDArray with the calculated new values.
-     * 
-     * Please note that slices might not be processed in a sequential order!
-     * 
-     * @param func function that receives slice and its Cartesian coordinate along the iteration dimensions, and overwrites
-     *            the values in the slice with the calculated new values
-     * @param iterationDims dimensions along which iteration is performed
-     * @return the new NDArray with the calculated new values
-     */
-    public ComplexNDArray<T> mapOnComplexSlices(BiConsumer<ComplexNDArray<T>,int[]> func, int... iterationDims);
 
     /**
      * Apply the given function to each slices of the array, and create a new NDArray with the calculated new values.
@@ -335,7 +324,33 @@ public interface ComplexNDArrayTemplate<T extends Number> extends NDArray<Comple
 
     @Override
     public default ComplexNDArrayTemplate<T> sum(int... selectedDims) {
-        return new ArrayOperations<Complex,T>().sum(this, selectedDims);
+        return SliceOperations.reduceComplexSlices(this, (slice, idx) -> slice.sum(), selectedDims);
+    }
+
+    @Override
+    public default ComplexNDArrayTemplate<T> prod(int... selectedDims) {
+        return SliceOperations.reduceComplexSlices(this, (slice, idx) -> slice.prod(), selectedDims);
+    }
+
+    @Override
+    public default ComplexNDArray<T> accumulate(BinaryOperator<Complex> func, int... selectedDims) {
+        return SliceOperations.reduceComplexSlices(this, (slice, idx) -> slice.accumulate(func), selectedDims);
+    }
+
+    /**
+     * Reduces slices along the specified dimensions in this NDArray to scalar values, reducing the number of
+     * dimensions.
+     * 
+     * <p>
+     * For example, if <code>A</code> is a [5 × 8 × 3] array, then <code>B = A.reduce(func, 2)</code> returns a [5 × 8]
+     * array, and <code>B.get(1,1) == func(A.slice(1, 1, ":"), new int[] { 1, 1 })</code>.
+     * 
+     * @param func reduction function that accepts a slice and its index and returns reduction result
+     * @param selectedDims dimensions along which the reduction should be performed
+     * @return result of reduction of all slices along the specified dimensions
+     */
+    public default ComplexNDArray<T> reduceComplexSlices(BiFunction<ComplexNDArray<T>, int[], Complex> func, int... selectedDims) {
+        return SliceOperations.reduceComplexSlices(this, func, selectedDims);
     }
     
     /** 

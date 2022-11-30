@@ -2,6 +2,7 @@ package io.github.hakkelt.ndarrays.internal;
 
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+import java.util.function.BinaryOperator;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
@@ -20,10 +21,17 @@ import io.github.hakkelt.ndarrays.*;
 @ClassTemplate(outputDirectory = "main/java/io/github/hakkelt/ndarrays/internal", newName = "RealNDArray")
 public interface RealNDArrayTemplate<T extends Number> extends NDArray<T> {
 
+    @Replace(pattern = "sum", replacements = "prod")
     @Override
     @SuppressWarnings("unchecked")
     public default NDArray<T> sum(int... selectedDims) {
-        return new ArrayOperations<T,T>().sum((AbstractNDArray<T,T>)this, selectedDims);
+        return SliceOperations.reduceSlices((AbstractNDArray<T,T>)this, (slice, idx) -> slice.sum(), selectedDims);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public default NDArray<T> accumulate(BinaryOperator<T> func, int... selectedDims) {
+        return SliceOperations.reduceSlices((AbstractNDArray<T,T>)this, (slice, idx) -> slice.accumulate(func), selectedDims);
     }
 
     @Override

@@ -1,0 +1,207 @@
+{%- extends 'base.html.j2' -%}
+{% from 'mathjax.html.j2' import mathjax %}
+{% from 'jupyter_widgets.html.j2' import jupyter_widgets %}
+
+{%- block header -%}
+<!DOCTYPE html>
+<html>
+<head>
+{%- block html_head -%}
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% set nb_title = nb.metadata.get('title', '') or resources['metadata']['name'] %}
+<title>{{nb_title}}</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/vs.min.css">
+<style>
+.code-block {
+    font-size: 10px;
+    margin-top: -5px;
+    margin-left: -5px;
+    padding: 5px;
+    width: calc(100% + 5px);
+    background-color: antiquewhite;
+}
+pre {
+  margin: 0!important;
+}
+.hljs {
+    background: inherit!important;
+}
+.jp-RenderedText.jp-OutputArea-output {
+    margin-left: 2em;
+}
+#language-selector {
+    width: 5.5em;
+    position: fixed;
+    background: white;
+    border: solid #c9c3c3;
+    border-radius: 5px;
+    padding: 0.5em;
+    right: 20px;
+    z-index: 999;
+}
+</style>
+<script type="module">
+import hljs from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/es/highlight.min.js';
+import java from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/es/languages/java.min.js';
+import python from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/es/languages/python.min.js';
+import matlab from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/es/languages/matlab.min.js';
+import julia from 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/es/languages/julia.min.js';
+
+hljs.registerLanguage('java', java);
+hljs.registerLanguage('python', python);
+hljs.registerLanguage('matlab', matlab);
+hljs.registerLanguage('julia', julia);
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.querySelectorAll('pre').forEach((el) => {
+      let content = el.innerHTML.replace('<span></span>', '');
+      let language;
+      if (content.startsWith('&gt;java'))
+        language = 'Java';
+      else if (content.startsWith('&gt;matlab'))
+        language = 'Matlab';
+      else if (content.startsWith('&gt;python'))
+        language = 'Python';
+      else if (content.startsWith('&gt;julia'))
+        language = 'Julia';
+      else
+        return;
+      content = content.split('\n').slice(1).join('\n'); // remove the first line
+      if (content.startsWith("%maven"))
+        content = content.split('\n').slice(1).join('\n'); // remove the first line
+      content = content.trim();
+      let parent = el.parentElement;
+      el.remove();
+      let languageDiv = document.createElement("div");
+      languageDiv.classList.add('code-block');
+      languageDiv.textContent = language;
+      parent.appendChild(languageDiv);
+      let pre = document.createElement("pre");
+      let code = document.createElement("code");
+      code.classList.add('language-' + language.toLowerCase());
+      code.innerHTML = content;
+      pre.appendChild(code);
+      parent.appendChild(pre);
+      hljs.highlightElement(code);
+    });
+    document.querySelectorAll('#language-selector div').forEach((el) => {
+      el.addEventListener('change', (event) => {
+        document.querySelectorAll('.celltag_' + event.target.name).forEach((elem) => {
+          elem.style.display = event.target.checked ? 'block' : 'none';
+        });
+      });
+    });
+});
+</script>
+
+{%- block html_head_js -%}
+{%- block html_head_js_requirejs -%}
+<script src="{{ resources.require_js_url }}"></script>
+{%- endblock html_head_js_requirejs -%}
+{%- endblock html_head_js -%}
+
+{% block jupyter_widgets %}
+  {%- if "widgets" in nb.metadata -%}
+    {{ jupyter_widgets(resources.jupyter_widgets_base_url, resources.html_manager_semver_range) }}
+  {%- endif -%}
+{% endblock jupyter_widgets %}
+
+{% block extra_css %}
+{% endblock extra_css %}
+
+{% for css in resources.inlining.css -%}
+  <style type="text/css">
+    {{ css }}
+  </style>
+{% endfor %}
+
+{% block notebook_css %}
+{{ resources.include_css("static/index.css") }}
+{% if resources.theme == 'dark' %}
+    {{ resources.include_css("static/theme-dark.css") }}
+{% else %}
+    {{ resources.include_css("static/theme-light.css") }}
+{% endif %}
+<style type="text/css">
+a.anchor-link {
+   display: none;
+}
+.highlight  {
+    margin: 0.4em;
+}
+
+/* Input area styling */
+.jp-InputArea {
+    overflow: hidden;
+}
+
+.jp-InputArea-editor {
+    overflow: hidden;
+}
+
+@media print {
+  body {
+    margin: 0;
+  }
+}
+</style>
+
+{% endblock notebook_css %}
+
+{{ mathjax() }}
+
+{%- block html_head_css -%}
+{%- endblock html_head_css -%}
+
+{%- endblock html_head -%}
+</head>
+{%- endblock header -%}
+
+{%- block body_header -%}
+{% if resources.theme == 'dark' %}
+<body class="jp-Notebook" data-jp-theme-light="false" data-jp-theme-name="JupyterLab Dark">
+{% else %}
+<body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
+{% endif %}
+<div id="language-selector">
+  <div>
+    <input type="checkbox" id="java" name="java" checked>
+    <label for="java">Java</label>
+  </div>
+  <div>
+    <input type="checkbox" id="matlab" name="matlab" checked>
+    <label for="matlab">Matlab</label>
+  </div>
+  <div>
+    <input type="checkbox" id="python" name="python" checked>
+    <label for="python">Python</label>
+  </div>
+  <div>
+    <input type="checkbox" id="julia" name="julia" checked>
+    <label for="julia">Julia</label>
+  </div>
+</div>
+{%- endblock body_header -%}
+
+{% block in_prompt -%}
+{%- endblock in_prompt %}
+
+{% block empty_in_prompt -%}
+{%- endblock empty_in_prompt %}
+
+{% block output_area_prompt %}
+{% endblock output_area_prompt %}
+
+{% block body_footer %}
+</body>
+{% endblock body_footer %}
+
+{% block footer %}
+{% block footer_js %}
+{% endblock footer_js %}
+{{ super() }}
+</html>
+{% endblock footer %}
+

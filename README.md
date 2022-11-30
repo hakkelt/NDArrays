@@ -42,20 +42,11 @@ array.addInplace(new Complex(1, 3.5)); // Adds 1 + 3.5i to all elements
 
 ## Documentation
 
-### Tutorial:
+ - It presents NDArray features through examples, and illustrates how the task would be solved in Matlab, Python and Julia: [Tutorial](https://hakkelt.github.io/NDArrays/tutorial/)
 
-It presents NDArray features through examples, and illustrates how the task would be solved in Matlab, Python and Julia. For better readability, multiple versions is rendered of this tutorial.
- - [All-in-one](https://hakkelt.github.io/NDArrays/tutorial/NDArrays.html): Java vs Matlab vs Python vs Julia
- - [Java-only](https://hakkelt.github.io/NDArrays/tutorial/NDArrays-Java-only.html): Only Java examples
- - [Java+Matlab tutorial](https://hakkelt.github.io/NDArrays/tutorial/NDArrays-Matlab.html): Java and Matlab examples
- - [Java+Python tutorial](https://hakkelt.github.io/NDArrays/tutorial/NDArrays-Python.html): Java and Python examples
- - [Java+Julia tutorial](https://hakkelt.github.io/NDArrays/tutorial/NDArrays-Julia.html): Java and Julia examples
+ - For more examples, see tests in [src/test/java/com/github/hakkelt/ndarrays/basic](https://github.com/hakkelt/NDArrays/tree/main/src/test/java/io/github/hakkelt/ndarrays/basic).
 
-For more examples, see tests in [src/test/java/com/github/hakkelt/ndarrays/basic](https://github.com/hakkelt/NDArrays/tree/main/src/test/java/io/github/hakkelt/ndarrays/basic).
-
-### Javadoc
-
-For a complete list of features, please refer to the [javadoc documentation](https://hakkelt.github.io/NDArrays/).
+ - For a complete list of features, please refer to the [javadoc documentation](https://hakkelt.github.io/NDArrays/).
 
 ## Installation
 
@@ -65,7 +56,7 @@ For a complete list of features, please refer to the [javadoc documentation](htt
     <dependency>
         <groupId>io.github.hakkelt</groupId>
         <artifactId>ndarrays</artifactId>
-        <version>2.1.2</version>
+        <version>2.2.0</version>
     </dependency>
     ...
 </dependencies>

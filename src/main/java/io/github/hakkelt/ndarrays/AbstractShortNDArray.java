@@ -24,6 +24,11 @@ public abstract class AbstractShortNDArray extends AbstractRealNDArray<Short> {
     }
 
     @Override
+    protected Short oneT() {
+        return Short.valueOf((short) 1);
+    }
+
+    @Override
     protected Short wrapValue(Number value) {
         return Short.valueOf(value.shortValue());
     }

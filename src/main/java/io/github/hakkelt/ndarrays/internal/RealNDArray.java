@@ -11,6 +11,7 @@ import io.github.hakkelt.ndarrays.*;
 
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+import java.util.function.BinaryOperator;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
@@ -27,7 +28,19 @@ public interface RealNDArray<T extends Number> extends NDArray<T> {
     @Override
     @SuppressWarnings("unchecked")
     public default NDArray<T> sum(int... selectedDims) {
-        return new ArrayOperations<T,T>().sum((AbstractNDArray<T,T>)this, selectedDims);
+        return SliceOperations.reduceSlices((AbstractNDArray<T,T>)this, (slice, idx) -> slice.sum(), selectedDims);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public default NDArray<T> prod(int... selectedDims) {
+        return SliceOperations.reduceSlices((AbstractNDArray<T,T>)this, (slice, idx) -> slice.prod(), selectedDims);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public default NDArray<T> accumulate(BinaryOperator<T> func, int... selectedDims) {
+        return SliceOperations.reduceSlices((AbstractNDArray<T,T>)this, (slice, idx) -> slice.accumulate(func), selectedDims);
     }
 
     @Override
