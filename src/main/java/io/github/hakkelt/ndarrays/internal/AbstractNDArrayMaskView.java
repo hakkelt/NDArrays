@@ -1,18 +1,18 @@
 package io.github.hakkelt.ndarrays.internal;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import io.github.hakkelt.ndarrays.NDArray;
 import io.github.hakkelt.ndarrays.NDArrayUtils;
 
 public abstract class AbstractNDArrayMaskView<T, T2 extends Number> extends AbstractNDArrayView<T,T2> {
 
-    List<Integer> indexMapper = new ArrayList<>();
+    List<Integer> indexMapper;
 
     @SuppressWarnings("unchecked")
     protected AbstractNDArrayMaskView(NDArray<T> parent, NDArray<?> mask, boolean isInverse) {
@@ -21,14 +21,16 @@ public abstract class AbstractNDArrayMaskView<T, T2 extends Number> extends Abst
                     Printer.dimsToString(parent.shape()), Printer.dimsToString(mask.shape())));
         if (parent instanceof AbstractNDArrayMaskView) {
             this.parent = ((AbstractNDArrayMaskView<T, T2>) parent).parent;
-            mask.streamLinearIndices()
+            indexMapper = mask.streamLinearIndices()
                 .filter(i -> isInverse ^ !this.parent.wrapValue(mask.get(i)).equals(this.parent.zeroT()))
-                .forEach(i -> indexMapper.add(((AbstractNDArrayMaskView<T2, T2>) parent).indexMapper.get(i)));
+                .mapToObj(i -> ((AbstractNDArrayMaskView<T2, T2>) parent).indexMapper.get(i))
+                .collect(Collectors.toList());
         } else {
             this.parent = (AbstractNDArray<T, T2>) parent;
-            mask.streamLinearIndices()
+            indexMapper = mask.streamLinearIndices()
                 .filter(i -> isInverse ^ !this.parent.wrapValue(mask.get(i)).equals(this.parent.zeroT()))
-                .forEach(i -> indexMapper.add(i));
+                .boxed()
+                .collect(Collectors.toList());
         }
         this.dataLength = indexMapper.size();
         this.shape = new int[] { dataLength };
@@ -39,14 +41,16 @@ public abstract class AbstractNDArrayMaskView<T, T2 extends Number> extends Abst
     protected AbstractNDArrayMaskView(NDArray<T> parent, Predicate<T> func) {
         if (parent instanceof AbstractNDArrayMaskView) {
             this.parent = ((AbstractNDArrayMaskView<T, T2>) parent).parent;
-            parent.streamLinearIndices()
+            indexMapper = parent.streamLinearIndices()
                 .filter(i -> func.test(parent.get(i)))
-                .forEach(i -> indexMapper.add(((AbstractNDArrayMaskView<T, T2>) parent).indexMapper.get(i)));
+                .mapToObj(i -> ((AbstractNDArrayMaskView<T, T2>) parent).indexMapper.get(i))
+                .collect(Collectors.toList());
         } else {
             this.parent = (AbstractNDArray<T, T2>) parent;
-            parent.streamLinearIndices()
+            indexMapper = parent.streamLinearIndices()
                 .filter(i -> func.test(parent.get(i)))
-                .forEach(i -> indexMapper.add(i));
+                .boxed()
+                .collect(Collectors.toList());
         }
         this.dataLength = indexMapper.size();
         this.shape = new int[] { dataLength };
@@ -58,27 +62,30 @@ public abstract class AbstractNDArrayMaskView<T, T2 extends Number> extends Abst
         if (parent instanceof AbstractNDArrayMaskView) {
             this.parent = ((AbstractNDArrayMaskView<T, T2>) parent).parent;
             if (withLinearIndices)
-                parent.streamLinearIndices()
+                indexMapper = parent.streamLinearIndices()
                     .filter(i -> ((BiPredicate<T, Integer>) func).test(parent.get(i), i))
-                    .forEach(i -> indexMapper.add(((AbstractNDArrayMaskView<T, T2>) parent).indexMapper.get(i)));
+                    .mapToObj(i -> ((AbstractNDArrayMaskView<T, T2>) parent).indexMapper.get(i))
+                    .collect(Collectors.toList());
             else
-                parent.streamCartesianIndices()
+                indexMapper = parent.streamCartesianIndices()
                     .filter(indices -> ((BiPredicate<T, int[]>) func).test(parent.get(indices), indices))
                     .mapToInt(indices -> NDArrayUtils.cartesianIndicesToLinearIndex(indices,
                             ((AbstractNDArray<?, ?>) parent).multipliers))
-                    .forEach(i -> indexMapper.add(((AbstractNDArrayMaskView<T, T2>) parent).indexMapper.get(i)));
+                    .mapToObj(i -> ((AbstractNDArrayMaskView<T, T2>) parent).indexMapper.get(i))
+                    .collect(Collectors.toList());
         } else {
             this.parent = (AbstractNDArray<T, T2>) parent;
             if (withLinearIndices)
-                parent.streamLinearIndices()
+                indexMapper = parent.streamLinearIndices()
                     .filter(i -> ((BiPredicate<T, Integer>) func).test(parent.get(i), i))
-                    .forEach(i -> indexMapper.add(i));
+                    .boxed()
+                    .collect(Collectors.toList());
             else
-                parent.streamCartesianIndices()
+                indexMapper = parent.streamCartesianIndices()
                     .filter(indices -> ((BiPredicate<T, int[]>) func).test(parent.get(indices), indices))
-                    .mapToInt(indices -> NDArrayUtils.cartesianIndicesToLinearIndex(indices,
+                    .map(indices -> NDArrayUtils.cartesianIndicesToLinearIndex(indices,
                             this.parent.multipliers))
-                    .forEach(i -> indexMapper.add(i));
+                    .collect(Collectors.toList());
         }
         this.dataLength = indexMapper.size();
         this.shape = new int[] { dataLength };
