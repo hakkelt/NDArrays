@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 import io.github.hakkelt.ndarrays.NDArray;
 import io.github.hakkelt.ndarrays.NDArrayUtils;
 
-abstract class AbstractNDArrayPermuteDimsView<T, T2 extends Number> extends AbstractNDArrayView<T,T2> {
+public abstract class AbstractNDArrayPermuteDimsView<T, T2 extends Number> extends AbstractNDArrayView<T,T2> {
 
     protected int[] dimsOrder;
     protected int[] inverseDimsOrder;

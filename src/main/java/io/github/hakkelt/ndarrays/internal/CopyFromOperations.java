@@ -81,7 +81,11 @@ public class CopyFromOperations<T, T2 extends Number> {
     public NDArray<T2> copyFrom(RealNDArray<T2> me, NDArray<?> array) {
         NDArrayUtils.checkShapeCompatibility(me, array.shape());
         AbstractNDArray<T2,T2> castedMe = (AbstractNDArray<T2,T2>) me;
-        AbstractNDArray<?, ?> castedArray = (AbstractNDArray<?,?>) array;
+        AbstractNDArray<?, ?> castedArray;
+        if (array instanceof AbstractNDArrayView && ((AbstractNDArrayView<T2,T2>) array).getTopMostParent() == me)
+            castedArray = (AbstractNDArray<?,?>) array.copy();
+        else
+            castedArray = (AbstractNDArray<?,?>) array;
         me.streamLinearIndices()
             .forEach(i -> castedMe.setUnchecked(castedMe.wrapValue(castedArray.getUnchecked(i)), i));
         return me;
@@ -147,7 +151,11 @@ public class CopyFromOperations<T, T2 extends Number> {
     public ComplexNDArray<T2> copyFrom(ComplexNDArray<T2> me, NDArray<?> array) {
         NDArrayUtils.checkShapeCompatibility(me, array.shape());
         AbstractNDArray<Complex, T2> castedMe = (AbstractNDArray<Complex, T2>) me;
-        AbstractNDArray<?, ?> castedArray = (AbstractNDArray<?,?>) array;
+        AbstractNDArray<?, ?> castedArray;
+        if (array instanceof AbstractNDArrayView && ((AbstractNDArrayView<T,T2>) array).getTopMostParent() == me)
+            castedArray = (AbstractNDArray<?,?>) array.copy();
+        else
+            castedArray = (AbstractNDArray<?,?>) array;
         if (array.dtype() == Complex.class)
             me.streamLinearIndices()
                 .forEach(i -> castedMe.setUnchecked((Complex) castedArray.getUnchecked(i), i));

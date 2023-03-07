@@ -5,7 +5,7 @@ import java.util.function.BiFunction;
 import io.github.hakkelt.ndarrays.NDArray;
 import io.github.hakkelt.ndarrays.NDArrayUtils;
 
-abstract class AbstractNDArrayReshapeView<T, T2 extends Number> extends AbstractNDArrayView<T,T2> {
+public abstract class AbstractNDArrayReshapeView<T, T2 extends Number> extends AbstractNDArrayView<T,T2> {
 
     @SuppressWarnings("unchecked")
     protected AbstractNDArrayReshapeView(NDArray<T> parent, int... newShape) {

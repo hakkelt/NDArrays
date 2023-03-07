@@ -17,7 +17,7 @@ import java.util.stream.Collector;
 
 import org.apache.commons.math3.complex.Complex;
 
-abstract class AbstractNDArrayView<T, T2 extends Number> extends AbstractNDArray<T,T2> {
+public abstract class AbstractNDArrayView<T, T2 extends Number> extends AbstractNDArray<T,T2> {
 
     protected AbstractNDArray<T,T2> parent;
 
@@ -48,6 +48,13 @@ abstract class AbstractNDArrayView<T, T2 extends Number> extends AbstractNDArray
 
     public AbstractNDArray<T,T2> getParent() {
         return parent;
+    }
+
+    public AbstractNDArray<T,T2> getTopMostParent() {
+        AbstractNDArray<T,T2> tmp = this.parent;
+        while (tmp instanceof AbstractNDArrayView)
+            tmp = ((AbstractNDArrayView<T,T2>) tmp).getParent();
+        return tmp;
     }
 
     @Override

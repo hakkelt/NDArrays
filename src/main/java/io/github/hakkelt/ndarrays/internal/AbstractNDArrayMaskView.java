@@ -10,7 +10,7 @@ import java.util.function.Predicate;
 import io.github.hakkelt.ndarrays.NDArray;
 import io.github.hakkelt.ndarrays.NDArrayUtils;
 
-abstract class AbstractNDArrayMaskView<T, T2 extends Number> extends AbstractNDArrayView<T,T2> {
+public abstract class AbstractNDArrayMaskView<T, T2 extends Number> extends AbstractNDArrayView<T,T2> {
 
     List<Integer> indexMapper = new ArrayList<>();
 

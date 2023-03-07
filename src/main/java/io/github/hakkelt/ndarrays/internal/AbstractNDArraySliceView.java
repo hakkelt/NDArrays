@@ -6,7 +6,7 @@ import io.github.hakkelt.ndarrays.NDArray;
 import io.github.hakkelt.ndarrays.NDArrayUtils;
 import io.github.hakkelt.ndarrays.Range;
 
-abstract class AbstractNDArraySliceView<T, T2 extends Number> extends AbstractNDArrayView<T,T2> {
+public abstract class AbstractNDArraySliceView<T, T2 extends Number> extends AbstractNDArrayView<T,T2> {
 
     protected SlicingExpression slicingExpression;
 

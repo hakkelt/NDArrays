@@ -26,7 +26,7 @@
     catch(err) {
     }
 //-->
-var data = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10};
+var data = {"i0":10,"i1":10,"i2":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -126,7 +126,17 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li><a href="AbstractNDArray.html" title="class in io.github.hakkelt.ndarrays.internal">io.github.hakkelt.ndarrays.internal.AbstractNDArray</a>&lt;T,&#8203;T2&gt;</li>
 <li>
 <ul class="inheritance">
+<li><a href="AbstractNDArrayView.html" title="class in io.github.hakkelt.ndarrays.internal">io.github.hakkelt.ndarrays.internal.AbstractNDArrayView</a>&lt;T,&#8203;T2&gt;</li>
+<li>
+<ul class="inheritance">
+<li><a href="AbstractNDArrayReshapeView.html" title="class in io.github.hakkelt.ndarrays.internal">io.github.hakkelt.ndarrays.internal.AbstractNDArrayReshapeView</a>&lt;T,&#8203;T&gt;</li>
+<li>
+<ul class="inheritance">
 <li>io.github.hakkelt.ndarrays.internal.RealNDArrayReshapeView&lt;T&gt;</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -141,7 +151,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 </dl>
 <hr>
 <pre>public class <span class="typeNameLabel">RealNDArrayReshapeView&lt;T extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Number.html?is-external=true" title="class or interface in java.lang" class="externalLink">Number</a>&gt;</span>
-extends <a href="AbstractNDArray.html" title="class in io.github.hakkelt.ndarrays.internal">AbstractNDArray</a>&lt;T,&#8203;T2&gt;
+extends <a href="AbstractNDArrayReshapeView.html" title="class in io.github.hakkelt.ndarrays.internal">AbstractNDArrayReshapeView</a>&lt;T,&#8203;T&gt;
 implements <a href="RealNDArray.html" title="interface in io.github.hakkelt.ndarrays.internal">RealNDArray</a>&lt;T&gt;</pre>
 <div class="block">A view for an NDArray holding real values that changes the shape of the parent NDArray.
  When reshape(...) is called for a real NDArray, an instance of this class is returned.</div>
@@ -188,86 +198,13 @@ implements <a href="RealNDArray.html" title="interface in io.github.hakkelt.ndar
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code><a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;T&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#applyOnSlices(java.util.function.BiFunction,int...)">applyOnSlices</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/function/BiFunction.html?is-external=true" title="class or interface in java.util.function" class="externalLink">BiFunction</a>&lt;<a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;T&gt;,&#8203;int[],&#8203;<a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;?&gt;&gt;&nbsp;func,
-             int...&nbsp;iterationDims)</code></th>
-<td class="colLast">
-<div class="block">Apply the given function to each slices of the array, and override each entry with the returned slice.</div>
-</td>
-</tr>
-<tr id="i1" class="rowColor">
-<td class="colFirst"><code><a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;T&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#copy()">copy</a></span>()</code></th>
-<td class="colLast">
-<div class="block">Returns a copy of this NDArray.</div>
-</td>
-</tr>
-<tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;<a href="RealNDArrayReshapeView.html" title="type parameter in RealNDArrayReshapeView">T</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#copyFrom(io.github.hakkelt.ndarrays.NDArray)">copyFrom</a></span>&#8203;(<a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;?&gt;&nbsp;array)</code></th>
 <td class="colLast">
 <div class="block">Updates this NDArray with the elements of the NDArray given as parameter.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
-<td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#dataTypeAsString()">dataTypeAsString</a></span>()</code></th>
-<td class="colLast">
-<div class="block">Returns a String representation of element type.</div>
-</td>
-</tr>
-<tr id="i4" class="altColor">
-<td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Class.html?is-external=true" title="class or interface in java.lang" class="externalLink">Class</a>&lt;?&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#dtype()">dtype</a></span>()</code></th>
-<td class="colLast">
-<div class="block">Returns the type of values returned by get method.</div>
-</td>
-</tr>
-<tr id="i5" class="rowColor">
-<td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Class.html?is-external=true" title="class or interface in java.lang" class="externalLink">Class</a>&lt;?&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#dtype2()">dtype2</a></span>()</code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
-<tr id="i6" class="altColor">
-<td class="colFirst"><code>boolean</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#equals(java.lang.Object)">equals</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">Object</a>&nbsp;obj)</code></th>
-<td class="colLast">
-<div class="block">Compares the specified object with this NDArray for equality.</div>
-</td>
-</tr>
-<tr id="i7" class="rowColor">
-<td class="colFirst"><code><a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a></code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getNamePrefix()">getNamePrefix</a></span>()</code></th>
-<td class="colLast">
-<div class="block">Returns a string that identifies the implementation behind this current object.</div>
-</td>
-</tr>
-<tr id="i8" class="altColor">
-<td class="colFirst"><code><a href="AbstractNDArray.html" title="class in io.github.hakkelt.ndarrays.internal">AbstractNDArray</a>&lt;T,&#8203;T2&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getParent()">getParent</a></span>()</code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
-<tr id="i9" class="rowColor">
-<td class="colFirst"><code>int</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#hashCode()">hashCode</a></span>()</code></th>
-<td class="colLast">
-<div class="block">This method is unsupported because NDArrays should not be used as keys in hash-based collections.</div>
-</td>
-</tr>
-<tr id="i10" class="altColor">
-<td class="colFirst"><code>int[]</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#linearIndexToViewIndices(int)">linearIndexToViewIndices</a></span>&#8203;(int&nbsp;linearIndex)</code></th>
-<td class="colLast">&nbsp;</td>
-</tr>
-<tr id="i11" class="rowColor">
-<td class="colFirst"><code><a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;T&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#mapOnSlices(java.util.function.BiFunction,int...)">mapOnSlices</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/function/BiFunction.html?is-external=true" title="class or interface in java.util.function" class="externalLink">BiFunction</a>&lt;<a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;T&gt;,&#8203;int[],&#8203;<a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;?&gt;&gt;&nbsp;func,
-           int...&nbsp;iterationDims)</code></th>
-<td class="colLast">
-<div class="block">Apply the given function to each slices of the array, and create a new NDArray with the calculated new values.</div>
-</td>
-</tr>
-<tr id="i12" class="altColor">
+<tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#set(java.lang.Number,int)">set</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Number.html?is-external=true" title="class or interface in java.lang" class="externalLink">Number</a>&nbsp;value,
    int&nbsp;linearIndex)</code></th>
@@ -275,7 +212,7 @@ implements <a href="RealNDArray.html" title="interface in io.github.hakkelt.ndar
 <div class="block">Sets the value of an element specified by linear indexing.</div>
 </td>
 </tr>
-<tr id="i13" class="rowColor">
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#set(java.lang.Number,int...)">set</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Number.html?is-external=true" title="class or interface in java.lang" class="externalLink">Number</a>&nbsp;value,
    int...&nbsp;indices)</code></th>
@@ -283,14 +220,21 @@ implements <a href="RealNDArray.html" title="interface in io.github.hakkelt.ndar
 <div class="block">Sets the value of an element specified by cartesian indexing.</div>
 </td>
 </tr>
-<tr id="i14" class="altColor">
-<td class="colFirst"><code><a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;T&gt;</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#similar()">similar</a></span>()</code></th>
-<td class="colLast">
-<div class="block">Returns a new array of the same shape as this NDArray filled with zeros.</div>
-</td>
-</tr>
 </table>
+<ul class="blockList">
+<li class="blockList"><a id="methods.inherited.from.class.io.github.hakkelt.ndarrays.internal.AbstractNDArrayReshapeView">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;io.github.hakkelt.ndarrays.internal.<a href="AbstractNDArrayReshapeView.html" title="class in io.github.hakkelt.ndarrays.internal">AbstractNDArrayReshapeView</a></h3>
+<code><a href="AbstractNDArrayReshapeView.html#applyOnSlices(java.util.function.BiFunction,int...)">applyOnSlices</a>, <a href="AbstractNDArrayReshapeView.html#mapOnSlices(java.util.function.BiFunction,int...)">mapOnSlices</a></code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a id="methods.inherited.from.class.io.github.hakkelt.ndarrays.internal.AbstractNDArrayView">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;io.github.hakkelt.ndarrays.internal.<a href="AbstractNDArrayView.html" title="class in io.github.hakkelt.ndarrays.internal">AbstractNDArrayView</a></h3>
+<code><a href="AbstractNDArrayView.html#copy()">copy</a>, <a href="AbstractNDArrayView.html#dataTypeAsString()">dataTypeAsString</a>, <a href="AbstractNDArrayView.html#dtype()">dtype</a>, <a href="AbstractNDArrayView.html#dtype2()">dtype2</a>, <a href="AbstractNDArrayView.html#equals(java.lang.Object)">equals</a>, <a href="AbstractNDArrayView.html#getNamePrefix()">getNamePrefix</a>, <a href="AbstractNDArrayView.html#getParent()">getParent</a>, <a href="AbstractNDArrayView.html#getTopMostParent()">getTopMostParent</a>, <a href="AbstractNDArrayView.html#hashCode()">hashCode</a>, <a href="AbstractNDArrayView.html#linearIndexToViewIndices(int)">linearIndexToViewIndices</a>, <a href="AbstractNDArrayView.html#similar()">similar</a></code></li>
+</ul>
 <ul class="blockList">
 <li class="blockList"><a id="methods.inherited.from.class.io.github.hakkelt.ndarrays.internal.AbstractNDArray">
 <!--   -->
@@ -409,7 +353,7 @@ implements <a href="RealNDArray.html" title="interface in io.github.hakkelt.ndar
 <a id="set(java.lang.Number,int...)">
 <!--   -->
 </a>
-<ul class="blockList">
+<ul class="blockListLast">
 <li class="blockList">
 <h4>set</h4>
 <pre class="methodSignature">public&nbsp;void&nbsp;set&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Number.html?is-external=true" title="class or interface in java.lang" class="externalLink">Number</a>&nbsp;value,
@@ -432,216 +376,6 @@ implements <a href="RealNDArray.html" title="interface in io.github.hakkelt.ndar
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>value</code> - value to be assigned</dd>
 <dd><code>indices</code> - cartesian coordinates</dd>
-</dl>
-</li>
-</ul>
-<a id="mapOnSlices(java.util.function.BiFunction,int...)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>mapOnSlices</h4>
-<pre class="methodSignature">public&nbsp;<a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;T&gt;&nbsp;mapOnSlices&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/function/BiFunction.html?is-external=true" title="class or interface in java.util.function" class="externalLink">BiFunction</a>&lt;<a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;T&gt;,&#8203;int[],&#8203;<a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;?&gt;&gt;&nbsp;func,
-                              int...&nbsp;iterationDims)</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../NDArray.html#mapOnSlices(java.util.function.BiFunction,int...)">NDArray</a></code></span></div>
-<div class="block">Apply the given function to each slices of the array, and create a new NDArray with the calculated new values.
- 
- Please note that slices might not be processed in a sequential order!</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../NDArray.html#mapOnSlices(java.util.function.BiFunction,int...)">mapOnSlices</a></code>&nbsp;in interface&nbsp;<code><a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;T&gt;</code></dd>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="AbstractNDArray.html#mapOnSlices(java.util.function.BiFunction,int...)">mapOnSlices</a></code>&nbsp;in class&nbsp;<code><a href="AbstractNDArray.html" title="class in io.github.hakkelt.ndarrays.internal">AbstractNDArray</a>&lt;T,&#8203;T2 extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Number.html?is-external=true" title="class or interface in java.lang" class="externalLink">Number</a>&gt;</code></dd>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>func</code> - function that receives slice and its Cartesian coordinate along the iteration dimensions, and returns
-            a new array with the same size as the slice</dd>
-<dd><code>iterationDims</code> - dimensions along which iteration is performed</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>the new NDArray with the calculated new values</dd>
-</dl>
-</li>
-</ul>
-<a id="applyOnSlices(java.util.function.BiFunction,int...)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>applyOnSlices</h4>
-<pre class="methodSignature">public&nbsp;<a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;T&gt;&nbsp;applyOnSlices&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/function/BiFunction.html?is-external=true" title="class or interface in java.util.function" class="externalLink">BiFunction</a>&lt;<a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;T&gt;,&#8203;int[],&#8203;<a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;?&gt;&gt;&nbsp;func,
-                                int...&nbsp;iterationDims)</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../NDArray.html#applyOnSlices(java.util.function.BiFunction,int...)">NDArray</a></code></span></div>
-<div class="block">Apply the given function to each slices of the array, and override each entry with the returned slice.
- 
- Please note that slices might not be processed in a sequential order!</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../NDArray.html#applyOnSlices(java.util.function.BiFunction,int...)">applyOnSlices</a></code>&nbsp;in interface&nbsp;<code><a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;T&gt;</code></dd>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="AbstractNDArray.html#applyOnSlices(java.util.function.BiFunction,int...)">applyOnSlices</a></code>&nbsp;in class&nbsp;<code><a href="AbstractNDArray.html" title="class in io.github.hakkelt.ndarrays.internal">AbstractNDArray</a>&lt;T,&#8203;T2 extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Number.html?is-external=true" title="class or interface in java.lang" class="externalLink">Number</a>&gt;</code></dd>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>func</code> - function that receives the value of the current entry and its Cartesian coordinate, and returns a
-            slice from which values are copied to original array</dd>
-<dd><code>iterationDims</code> - dimensions along which iteration is performed</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>itself after the update</dd>
-</dl>
-</li>
-</ul>
-<a id="getNamePrefix()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getNamePrefix</h4>
-<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;getNamePrefix()</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../NDArray.html#getNamePrefix()">NDArray</a></code></span></div>
-<div class="block">Returns a string that identifies the implementation behind this current object. The output of the toString()
- function starts with this string.</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>a string that identifies the implementation</dd>
-</dl>
-</li>
-</ul>
-<a id="dtype()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>dtype</h4>
-<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Class.html?is-external=true" title="class or interface in java.lang" class="externalLink">Class</a>&lt;?&gt;&nbsp;dtype()</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../NDArray.html#dtype()">NDArray</a></code></span></div>
-<div class="block">Returns the type of values returned by get method.
- 
- Possible values: <code>Float.class</code>, <code>Double.class</code>, <code>Complex.class</code>
- <code>Byte.class</code>, <code>Short.class</code>, <code>Integer.class</code>, <code>Long.class</code>.</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>the type of values returned by get method.</dd>
-</dl>
-</li>
-</ul>
-<a id="dtype2()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>dtype2</h4>
-<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Class.html?is-external=true" title="class or interface in java.lang" class="externalLink">Class</a>&lt;?&gt;&nbsp;dtype2()</pre>
-</li>
-</ul>
-<a id="dataTypeAsString()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>dataTypeAsString</h4>
-<pre class="methodSignature">public&nbsp;<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html?is-external=true" title="class or interface in java.lang" class="externalLink">String</a>&nbsp;dataTypeAsString()</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../NDArray.html#dataTypeAsString()">NDArray</a></code></span></div>
-<div class="block">Returns a String representation of element type.</div>
-<dl>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>"Byte", "Short", "Integer", "Long", "Float", "Double", "Complex Float", or "Complex Double" depending on
-         the type of array</dd>
-</dl>
-</li>
-</ul>
-<a id="getParent()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>getParent</h4>
-<pre class="methodSignature">public&nbsp;<a href="AbstractNDArray.html" title="class in io.github.hakkelt.ndarrays.internal">AbstractNDArray</a>&lt;T,&#8203;T2&gt;&nbsp;getParent()</pre>
-</li>
-</ul>
-<a id="similar()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>similar</h4>
-<pre class="methodSignature">public&nbsp;<a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;T&gt;&nbsp;similar()</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../NDArray.html#similar()">NDArray</a></code></span></div>
-<div class="block">Returns a new array of the same shape as this NDArray filled with zeros.</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../NDArray.html#similar()">similar</a></code>&nbsp;in interface&nbsp;<code><a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;T&gt;</code></dd>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="AbstractNDArray.html#similar()">similar</a></code>&nbsp;in class&nbsp;<code><a href="AbstractNDArray.html" title="class in io.github.hakkelt.ndarrays.internal">AbstractNDArray</a>&lt;T,&#8203;T2 extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Number.html?is-external=true" title="class or interface in java.lang" class="externalLink">Number</a>&gt;</code></dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>a new array of the same shape as this NDArray filled with zeros.</dd>
-</dl>
-</li>
-</ul>
-<a id="copy()">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>copy</h4>
-<pre class="methodSignature">public&nbsp;<a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;T&gt;&nbsp;copy()</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../NDArray.html#copy()">NDArray</a></code></span></div>
-<div class="block">Returns a copy of this NDArray.</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../NDArray.html#copy()">copy</a></code>&nbsp;in interface&nbsp;<code><a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;T&gt;</code></dd>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="AbstractNDArray.html#copy()">copy</a></code>&nbsp;in class&nbsp;<code><a href="AbstractNDArray.html" title="class in io.github.hakkelt.ndarrays.internal">AbstractNDArray</a>&lt;T,&#8203;T2 extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Number.html?is-external=true" title="class or interface in java.lang" class="externalLink">Number</a>&gt;</code></dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>a copy of this NDArray.</dd>
-</dl>
-</li>
-</ul>
-<a id="linearIndexToViewIndices(int)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>linearIndexToViewIndices</h4>
-<pre class="methodSignature">public&nbsp;int[]&nbsp;linearIndexToViewIndices&#8203;(int&nbsp;linearIndex)</pre>
-</li>
-</ul>
-<a id="equals(java.lang.Object)">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>equals</h4>
-<pre class="methodSignature">public&nbsp;boolean&nbsp;equals&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Object.html?is-external=true" title="class or interface in java.lang" class="externalLink">Object</a>&nbsp;obj)</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../NDArray.html#equals(java.lang.Object)">NDArray</a></code></span></div>
-<div class="block">Compares the specified object with this NDArray for equality.
- 
- Two arrays are equal, if they are both real or both complex, and they are element-wise equal. If the specified
- object is not NDArray then the function returns false.</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../NDArray.html#equals(java.lang.Object)">equals</a></code>&nbsp;in interface&nbsp;<code><a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;T&gt;</code></dd>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="AbstractNDArray.html#equals(java.lang.Object)">equals</a></code>&nbsp;in class&nbsp;<code><a href="AbstractNDArray.html" title="class in io.github.hakkelt.ndarrays.internal">AbstractNDArray</a>&lt;T,&#8203;T2 extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Number.html?is-external=true" title="class or interface in java.lang" class="externalLink">Number</a>&gt;</code></dd>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>obj</code> - Object to be compared for equality</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>true if the specified object equals with this NDArray</dd>
-</dl>
-</li>
-</ul>
-<a id="hashCode()">
-<!--   -->
-</a>
-<ul class="blockListLast">
-<li class="blockList">
-<h4>hashCode</h4>
-<pre class="methodSignature">public&nbsp;int&nbsp;hashCode()</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../NDArray.html#hashCode()">NDArray</a></code></span></div>
-<div class="block">This method is unsupported because NDArrays should not be used as keys in hash-based collections.</div>
-<dl>
-<dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../NDArray.html#hashCode()">hashCode</a></code>&nbsp;in interface&nbsp;<code><a href="../NDArray.html" title="interface in io.github.hakkelt.ndarrays">NDArray</a>&lt;T&gt;</code></dd>
-<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="AbstractNDArray.html#hashCode()">hashCode</a></code>&nbsp;in class&nbsp;<code><a href="AbstractNDArray.html" title="class in io.github.hakkelt.ndarrays.internal">AbstractNDArray</a>&lt;T,&#8203;T2 extends <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Number.html?is-external=true" title="class or interface in java.lang" class="externalLink">Number</a>&gt;</code></dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>always throws UnsupportedOperationsException</dd>
 </dl>
 </li>
 </ul>

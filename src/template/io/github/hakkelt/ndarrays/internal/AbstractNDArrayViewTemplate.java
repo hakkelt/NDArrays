@@ -12,7 +12,7 @@ import io.github.hakkelt.ndarrays.NDArray;
 import io.github.hakkelt.ndarrays.NDArrayUtils;
 
 @ClassTemplate(outputDirectory = "main/java/io/github/hakkelt/ndarrays/internal", newName = "AbstractNDArrayView")
-abstract class AbstractNDArrayViewTemplate<T,T2 extends Number> extends AbstractNDArray<T,T2> { // NOSONAR
+public abstract class AbstractNDArrayViewTemplate<T,T2 extends Number> extends AbstractNDArray<T,T2> { // NOSONAR
     protected AbstractNDArray<T,T2> parent;
 
     @Override
@@ -42,6 +42,13 @@ abstract class AbstractNDArrayViewTemplate<T,T2 extends Number> extends Abstract
 
     public AbstractNDArray<T,T2> getParent() {
         return parent;
+    }
+
+    public AbstractNDArray<T,T2> getTopMostParent() {
+        AbstractNDArray<T,T2> tmp = this.parent;
+        while (tmp instanceof AbstractNDArrayViewTemplate)
+            tmp = ((AbstractNDArrayViewTemplate<T,T2>) tmp).getParent();
+        return tmp;
     }
 
     @Override
